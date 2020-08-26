@@ -1,0 +1,73 @@
+<#macro script>
+    <script>
+        $(document).ready(function(){
+
+        });
+    </script>
+</#macro>
+<#macro css>
+    <style>
+        th {
+            width: 20%;
+        }
+
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+    <#include "../template/breadcrumb.ftl" />
+    <#include "../template/pagination.ftl" />
+    <#include "settled_merchant_status_label.ftl" />
+    <@layout.layout script css _res.get("breadcrumb.settled_merchant") modal>
+    <#assign menus={"/": _res.get("breadcrumb.home")} />
+    <@nav menus _res.get("breadcrumb.settled_merchant") />
+
+    <div class="search-box">
+    <a href="${base}/settled_merchant/add" class="btn btn-primary">${_res.get("merchant.btn.new")}</a>
+    </div>
+
+    <table class="table table-hover ">
+        <tr>
+            <th style="width: 10%">${_res.get("merchant.settled_merchant.name")}</th>
+            <th style="width: 10%">${_res.get("merchant.settled_merchant_type.name")}</th>
+            <th style="width: 10%">${_res.get("merchant.settled_merchant.status")}</th>
+            <th style="width: 10%">${_res.get("merchant.settled_merchant.phone")}</th>
+            <th style="width: 15%">${_res.get("merchant.settled_merchant.contact")}</th>
+            <th style="width: 15%">${_res.get("action")}</th>
+        </tr>
+        <#list settledMerchants.list as settledMerchant>
+            <tr>
+                <td><#if (settledMerchant.logo??)><img src="${settledMerchant.logo!}" height="50"></#if>
+                    ${settledMerchant.name!}
+                </td>
+                <td>
+                    ${(settledMerchant.settledMerchantType.name)!}
+                </td>
+                <td>
+                    <#if settledMerchant.status??>
+                        <span class="label <@statusLabel settledMerchant.status/>">
+                            ${_res.get("merchant.settled_merchant." + settledMerchant.status?lower_case)}
+                        </span>
+                    </#if>
+                </td>
+                <td>${settledMerchant.phone!}</td>
+                <td>
+                    <div>${settledMerchant.contact_user!}</div>
+                    <div>${settledMerchant.contact_phone!}</div>
+                    <div>${settledMerchant.contact_email!}</div>
+                </td>
+                <td>
+                    <a class="btn btn-primary btn-sm btn-danger" href="${base}/settled_merchant/delete/${settledMerchant.id!}"
+                       onclick="return confirm('${_res.get("merchant.settled_merchant.delete_confirm")}');">${_res.get("delete")}</a>
+                    <a class="btn btn-primary btn-sm" href="${base}/settled_merchant/detail/${settledMerchant.id!}">${_res.get("detail")}</a>
+                </td>
+            </tr>
+        </#list>
+        <#if settledMerchants.list?size == 0>
+            <tr>
+                <td colspan="10">没有任何数据</td>
+            </tr>
+        </#if>
+    </table>
+    <@paginate currentPage=settledMerchants.pageNumber totalPage=settledMerchants.totalPage actionUrl="${base}/settled_merchant?pageNumber=" urlParas="&pageSize=${pageSize!}" />
+</@layout.layout>

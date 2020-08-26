@@ -1,0 +1,1 @@
+insert into t_widget (name, display_name, url, width, sort_order) values ('merchant_apply.overview', '商家申请', '/merchant_apply/widget', 12, 4);

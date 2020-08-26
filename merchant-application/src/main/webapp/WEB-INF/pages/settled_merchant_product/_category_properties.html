@@ -1,0 +1,14 @@
+<table class="table table-bordered table-hover">
+    <tr>
+        <th>名称</th>
+        <th>值</th>
+    </tr>
+    <#list category.categoryProperties as p>
+        <input type="hidden" name="productProperty[${p.id}].property_id" value="${p.id}">
+        <tr>
+            <td>${p.display_name!}</td>
+            <td><input type="text" class="form-control" name="productProperty[${p.id}].property_value" value="${p.default_value!}"></td>
+        </tr>
+    </#list>
+
+</table>

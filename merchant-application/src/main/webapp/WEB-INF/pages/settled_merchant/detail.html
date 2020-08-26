@@ -1,0 +1,66 @@
+<#macro script>
+    <script src="${base}/assets/js/jquery.qrcode.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#form').validate();
+        });
+
+        function setStatus(status) {
+            $('#status').val(status);
+        }
+
+        jQuery("#merchant-qrcode").qrcode("${wxHost!}/app?mid=${settledMerchant.id}&invite_code=${settledMerchant.invite_code!}");
+
+    </script>
+</#macro>
+<#macro css>
+    <style>
+        <#include "common.css" />
+    </style>
+
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+<#include "settled_merchant_status_label.ftl" />
+<@layout.layout script css _res.get("breadcrumb.settled_merchant") modal>
+    <#assign menus={"/": _res.get("breadcrumb.home"), "/settled_merchant": _res.get("breadcrumb.settled_merchant")} />
+    <@nav menus _res.get("detail") />
+
+   <#include "common.ftl" />
+    <hr/>
+
+    <form id="form" class="form-inline" action="${base}/settled_merchant/updateStatus" method="post">
+        <#if (settledMerchant.status)?? && (settledMerchant.status)!= 'REJECTED'>
+            <input type="hidden" name="settledMerchant.id" value="${settledMerchant.id!}" />
+            <input type="hidden" id="status" name="settledMerchant.status" />
+            <span>处理意见：<input type="text" class="form-control required" style="width: 60%" name="result"/></span>
+            <#if settledMerchant.status == 'APPROVING'>
+             <span id="role_select_span">
+                    分配角色：
+                    <select name="role_id" class="form-control">
+                        <option value="">未分配</option>
+                        <#list roles as role>
+                            <option value="${role.id!}">${role.name!}</option>
+                        </#list>
+                    </select>
+             </span>
+            </#if>
+            <#if settledMerchant.status == 'INIT'>
+                <button type="submit" class="btn btn-primary" onclick="if(confirm('确定开始审核吗？')){setStatus('APPROVING');}else{return false;}" >开始审核</button>
+            </#if>
+            <#if settledMerchant.status == 'APPROVING'>
+                <button type="submit" class="btn btn-primary" id="approve_btn" onclick="if(confirm('确定通过审核吗？')){setStatus('APPROVED');}else{return false;}" >通过审核</button>
+                <button type="submit" class="btn btn-primary" onclick="if(confirm('确定拒绝吗？')){setStatus('REJECTED');}else{return false;}">拒绝</button>
+
+            </#if>
+            <#if settledMerchant.status == 'APPROVED'>
+                <button type="submit" class="btn btn-primary" onclick="if(confirm('确定锁定吗？')){setStatus('LOCKED');}else{return false;}">锁定</button>
+            </#if>
+            <#if settledMerchant.status == 'LOCKED'>
+                <button type="submit" class="btn btn-primary" onclick="if(confirm('确定解锁吗？')){setStatus('APPROVED');}else{return false;}" >解锁</button>
+            </#if>
+        </#if>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+    </form>
+</@layout.layout>

@@ -1,0 +1,48 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+    $("#form").validate();
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.express") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/express": _res.get("breadcrumb.express")}>
+    <@nav menus _res.get("breadcrumb.add")/>
+    <@msg message />
+
+    <form id="form" class="form-horizontal" action="${base}/express/save" method="post">
+        <div class="form-group">
+            <label for="name" class="col-lg-2 col-md-2 control-label">${_res.get("express.name")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="text" class="form-control required" id="name" name="express.name">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="code" class="col-lg-2 col-md-2 control-label">${_res.get("express.code")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="text" class="form-control required" id="code" name="express.code">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label">${_res.get("express.is_default")}</label>
+            <div class="col-lg-4 col-md-6">
+                <label class="radio-inline"> 
+                    <input type="radio" name="express.is_default" value="1" checked>${_res.get("express.is_default.1")} 
+                </label>
+                 <label class="radio-inline"> 
+                <input type="radio" name="express.is_default" value="0" > ${_res.get("express.is_default.0")}
+            </label>
+            </div>
+        </div>
+        <hr>
+        <button id="submitBtn" type="submit" class="btn btn-primary">${_res.get("btn.save")}</button>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+
+    </form>
+
+</@layout.layout>

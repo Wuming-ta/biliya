@@ -1,0 +1,104 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+      $("#role_form").validate({
+          rules: {
+            "role.name": {
+                required: true,
+                remote: {
+                    url: "${base}/role/nameVerify",
+                    type: "POST",
+                    data: {
+                      "name": function() { return $("#name").val(); },
+                      "id": function() { return $("#id").val(); }
+                    }
+                }
+            }
+        },
+        messages: {
+            "role.name": {
+                remote: "${_res.get("identity.role.name.exist")}"
+            }
+        }
+      });
+  });
+</script>  
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.role") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/role": _res.get("breadcrumb.role")}>
+    <@nav menus _res.get("breadcrumb.edit")/>
+    <@msg message />
+    <form id="role_form" class="form-horizontal" role="form" action="${base}/role/update" method="post">
+
+        <input type="hidden"  id="id" name="role.id" value="${role.id!}">
+
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label required-label" for="name">${_res.get("identity.role.name")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="text" class="form-control required" id="name" name="role.name" value="${role.name!}" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label" for="description">${_res.get("identity.role.description")}</label>
+            <div class="col-lg-4 col-md-6">
+                <textarea rows="3" class="form-control" id="description" name="role.description">${role.description!}</textarea>
+            </div>
+        </div>
+        <#assign rolePermissions=role.permissions />
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label" for="description">${_res.get("identity.role.permission")}</label>
+            <div class="col-lg-10 col-md-10">
+                <#list permissionGroups as group>
+                    <h4>${group.name}</h4>
+                    <#list group.permissionDefinitions as permissionDefinition>
+                        <div>
+                        <label class="checkbox-inline">
+                            <#assign hasPermission="false"/>
+                            <#list rolePermissions as rolePermission>
+                                <#if rolePermission.identifier == permissionDefinition.identifier>
+                                <input name="permissions" type="checkbox" checked value="${permissionDefinition.identifier}">${permissionDefinition.name!}
+                                <#assign hasPermission="true"/>
+                                </#if>
+                            </#list>
+                            <#if hasPermission == "false">
+                                <input name="permissions" type="checkbox" value="${permissionDefinition.identifier}">${permissionDefinition.name!}
+                            </#if>
+                        </label>
+                        </div>
+                    </#list>
+                </#list>
+
+                <#if extPermDataList??>
+                <#list extPermDataList as extPerm>
+                    <h4>${extPerm.name!}</h4>
+                    <#list extPerm.permissions as permission>
+                        <div>
+                        <label class="checkbox-inline">
+                            <#assign hasPermission="false"/>
+                            <#list rolePermissions as rolePermission>
+                                <#if rolePermission.identifier == permission.identifier>
+                                    <input name="permissions" type="checkbox" checked value="${permission.identifier}">${permission.name!}
+                                    <#assign hasPermission="true"/>
+                                </#if>
+                            </#list>
+                            <#if hasPermission == "false">
+                            <input name="permissions" type="checkbox" value="${permission.identifier}">${permission.name!}
+                            </#if>
+                        </label>
+                        </div>
+                    </#list>
+                </#list>
+                </#if>
+            </div>
+        </div>
+
+        <hr>
+        <button type="submit" class="btn btn-primary">${_res.get("btn.submit")}</button>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+    </form>
+</@layout.layout>

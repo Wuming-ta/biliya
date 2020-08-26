@@ -1,0 +1,25 @@
+<#macro script>
+<#include "common.js"/>
+
+</#macro>
+<#macro css>
+    <style>
+        <#include "common.css"/>
+    </style>
+</#macro>
+<#macro modal>
+    <#include "_selectRegion.html"/>
+</#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("menu.fare_template") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/fare_template": _res.get("breadcrumb.fare_template")}/>
+    <@nav menus _res.get("breadcrumb.add")/>
+    <@msg message />
+
+    <form action="${base}/fare_template/save" class="form-horizontal" role="form" method="post">
+        <#include "_form.html"/>
+    </form>
+
+</@layout.layout>

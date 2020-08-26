@@ -1,0 +1,75 @@
+<#macro script>
+<script>
+    $(document).ready(function(){
+        $("#form").validate();
+    });
+    function checkGroupName(id) {
+        var name = $("#ad-group-name-"+id).val();
+        var $error = $("#ad-group-name-error-"+id);
+        if (name != null && name != "") {
+            $error.addClass("hidden");
+            return true;
+        }
+        else {
+            $error.removeClass("hidden");
+            return false;
+        }
+    }
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.ad") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.ad") />
+    <@msg message />
+
+    <div class="search-box">
+        <form id="form" class="form-inline" action="${base}/ad/saveGroup" method="post">
+            <input type="text" class="form-control required" name="adGroup.name" placeholder="${_res.get("ad.group.name")}">
+            <button type="submit" class="btn btn-primary">${_res.get("btn.ad.group.new")}</button>
+        </form>
+    </div>
+
+    <table class="table table-hover">
+        <tr>
+            <th>${_res.get("ad.group.id")}</th>
+            <th>${_res.get("ad.group.name")}</th>
+            <th>${_res.get("ad.group.action")}</th>
+        </tr>
+        <#list groups as group>
+            <form action="${base}/ad/updateGroup/${group.id}" method="post" onsubmit="return checkGroupName(${group.id});">
+                <input type="hidden" name="adGroup.id" value="${group.id}">
+                <tr>
+                    <td>${group.id}</td>
+                    <td><input id="ad-group-name-${group.id}" class="form-control required" type="text" name="adGroup.name" value="${group.name!}">
+                    <label class="error hidden" id="ad-group-name-error-${group.id}">必须填写</label>
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-primary btn-sm">${_res.get("btn.update")}</button>
+                        <span class="vertical-separator"></span>
+                        <a class="btn btn-danger btn-sm" href="${base}/ad/deleteGroup/${group.id}"
+                           onclick="javascript:if (confirm('${_res.get("ad.group.delete.confirm")}')){return true;} return false;">${_res.get("btn.delete")}</a>
+                        <span class="vertical-separator"></span>
+                        <a class="btn btn-info btn-sm" href="${base}/ad/list/${group.id}">查看该组所有广告</a>
+                        <a class="btn btn-info btn-sm" href="${base}/ad/list/${group.id}?available=true">查看该组当前在播广告</a>
+                        <span class="vertical-separator"></span>
+                        <a class="btn btn-info btn-sm" href="${base}/ad/add?groupId=${group.id}">添加广告</a>
+
+                    </td>
+                </tr>
+            </form>
+        </#list>
+        <#if groups?size == 0>
+            <tr>
+                <td colspan="10">No Data</td>
+            </tr>
+        </#if>
+
+    </table>
+
+</@layout.layout>

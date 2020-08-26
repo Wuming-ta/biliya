@@ -1,0 +1,59 @@
+<#macro script>
+    <#include "../common/pwd-validate-modal.js" />
+    <script>
+      $(document).ready(function(){
+
+      });
+    </script>
+
+
+</#macro>
+<#macro css>
+    <style>
+    .col-summary-sm {
+        width: 160px;
+    }
+    </style>
+</#macro>
+<#macro modal>
+    <#include "../common/pwd-validate-modal.html" />
+</#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+
+<@layout.layout script css _res.get("breadcrumb.copartner") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.copartner")/>
+    <@msg message />
+
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th>${_res.get("partner.copartner.Id")}</th>
+            <th>${_res.get("partner.copartner.name")}</th>
+            <th>${_res.get("partner.copartner.status")}</th>
+            <th>${_res.get("partner.copartner.create_time")}</th>
+            <th>${_res.get("partner.copartner.action")}</th>
+        </tr>
+        <#list copartners.list as seller>
+            <tr>
+                <td>${seller.id}</td>
+                <td><a href="${base}/copartner/detail/${seller.id}">${seller.user_name!'-'}</a></td>
+                <td>${_res.get("partner.copartner.status." + seller.status?lower_case)}</td>
+                <td>${seller.create_time!}</td>
+                <td>
+                    <#if seller.status == 'NORMAL'>
+                        <a class="btn btn-danger btn-sm" href="${base}/copartner/block/${seller.id}">${_res.get("btn.block")}</a>
+                    <#else>
+                        <a class="btn btn-info btn-sm" href="${base}/copartner/unblock/${seller.id}">${_res.get("btn.unblock")}</a>
+                    </#if>
+                </td>
+            </tr>
+        </#list>
+        <#if (copartners.list?size==0)>
+            <td colspan="20">No Data</td>
+        </#if>
+    </table>
+    <@paginate currentPage=copartners.pageNumber totalPage=copartners.totalPage actionUrl="${base}/copartner?pageNumber=" />
+</@layout.layout>

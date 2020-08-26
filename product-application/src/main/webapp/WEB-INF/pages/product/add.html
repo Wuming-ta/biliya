@@ -1,0 +1,392 @@
+<#macro script>
+<script src="${base}/assets/ueditor-1.4.3.3/ueditor.config.js"></script>
+<script src="${base}/assets/ueditor-1.4.3.3/ueditor.all.js"></script>
+<script src="${base}/assets/ueditor-1.4.3.3/lang/zh-cn/zh-cn.js"></script>
+<#include "common.js"/>
+<#include "add.js"/>
+<#include "../sku_select/listSkus.js" />
+</#macro>
+<#macro css>
+<link href="${base}/assets/ueditor-1.4.3.3/themes/default/css/ueditor.css" type="text/css" rel="stylesheet">
+<style>
+<#include "common.css"/>
+</style>
+</#macro>
+<#macro modal>
+    <#include "../sku_select/_sku_select_modal.html" />
+    <#include "../fare_template/_selectRegion.html"/>
+</#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "../product_category/product_category_select_option.ftl"/>
+<@layout.layout script css _res.get("menu.product") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/product": _res.get("breadcrumb.product")}>
+    <@nav menus _res.get("breadcrumb.add")/>
+    <@msg message />
+    <#assign returnUrl><#if returnUrl??>${returnUrl}<#else>/product</#if></#assign>
+    <form id="product_form" role="form"
+          enctype="multipart/form-data"
+          action="${base}/product/save/?returnUrl=${returnUrl?replace('&', '%26')}" method="post">
+        <input type="hidden" name="product.is_virtual" value="${virtual!0}"/>
+        <table class="table table-bordered">
+            <tr>
+                <td class="col-key">${_res.get("product.name")}<span class="star-required">*</span></td>
+                <td colspan="3"><input type="text" class="form-control required" id="name" name="product.name"></td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("product.short_name")}<span class="star-required">*</span></td>
+                <td class="col-value"><input type="text" class="form-control required" id="short_name" name="product.short_name"></td>
+                <td class="col-key">${_res.get("product.sort_order")}</td>
+                <td class="col-value"><input type="number" id="sort_order" class="form-control required" name="product.sort_order" value="100"></td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("product.promoted")}</td>
+                <td class="col-value">
+                    <label class="radio-inline">
+                        <input type="radio" name="product.promoted" value="1" checked>${_res.get("product.promoted.1")}
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="product.promoted" value="0">${_res.get("product.promoted.0")}
+                    </label>
+                </td>
+                <td class="col-key">${_res.get("product.zone")}</td>
+                <td class="col-value">
+                    <#list partnerLevelZones as z>
+                    <label class="radio-inline">
+                        <input type="radio" name="product.partner_level_zone" value="${z.key}"  <#if z.key=="1">checked</#if> >${z.name}
+                    </label>
+                </#list>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("product.merchant")}<span class="star-required">*</span></td>
+                <td class="col-value">
+                    <select class="form-control required" name="product.mid">
+                        <#list merchantList as m>
+                        <option value="${m.id}">${m.name}</option>
+                    </#list>
+                    </select>
+                </td>
+                <td class="col-key">${_res.get("product.cost_price")}<span class="star-required">*</span></td>
+                <td class="col-value"><input type="number" step="0.01" class="form-control required" name="product.cost_price" ></td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("product.price")}<span class="star-required">*</span></td>
+                <td class="col-value"><input type="number" step="0.01" class="form-control required" id="price" name="product.price" oninput="calcPoint(this,'point');"></td>
+                <td class="col-key">${_res.get("product.point")}</td>
+                <td class="col-value"><p class="form-control-static" id="point"></p></td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("product.suggested_price")}<span class="star-required">*</span></td>
+                <td class="col-value"><input type="number" step="0.01" class="form-control required" name="product.suggested_price" ></td>
+                <td class="col-key">${_res.get("product.distribution_price")}</td>
+                <td class="col-value"><input type="number" step="0.01" class="form-control" name="product.distribution_price" ></td>
+            </tr>
+
+            <tr>
+                <td class="col-key" title="${_res.get('product.presale.placeholder')}">${_res.get("product.presale")}</td>
+                <td class="col-value">
+                    <input type="number" class="form-control" id="presale" name="product.presale" value="0" placeholder="${_res.get('product.presale.placeholder')}">
+                </td>
+                <#if (virtual?? && virtual == "1" ) || !wmsPluginEnabled>
+                <td class="col-key">${_res.get("product.stock_balance")}</td>
+                <td class="col-value">
+                    <input type="number" class="form-control" id="stock_balance" name="product.stock_balance" value="1000">
+                </td>
+                <#else>
+                <td class="col-key"></td>
+                <td class="col-value"></td>
+                </#if>
+            </tr>
+
+            <tr>
+                <td class="col-key">${_res.get("product.weight")}<span class="star-required">*</span></td>
+                <td class="col-value"><input type="number" class="form-control digits required" name="product.weight" ></td>
+                <td class="col-key">${_res.get("product.bulk")}</td>
+                <td class="col-value"><input type="number" class="form-control" name="product.bulk" ></td>
+            </tr>
+
+            <tr>
+                <td class="col-key">${_res.get("product.category")}<span class="star-required">*</span></td>
+                <td class="col-value">
+                    <select name="product.category_id" id="category-id" class="form-control">
+                        <@select productCategories/>
+                    </select>
+                </td>
+                <td class="col-key">${_res.get("product.unit")}<span class="star-required">*</span></td>
+                <td class="col-value"><input type="text" class="form-control required" id="unit" name="product.unit"></td>
+            </tr>
+
+            <tr>
+                <td class="col-key">${_res.get("product.fare_template")}<span class="star-required">*</span></td>
+                <td class="col-value">
+                    <select class="form-control required" name="product.fare_id">
+                        <#list fareTemplates as template>
+                            <option value="${template.id}">${template.name}</option>
+                        </#list>
+                    </select>
+                </td>
+                <td class="col-key">${_res.get("product.required_participate_exam")}</td>
+                <td class="col-value">
+                    <label class="radio-inline">
+                        <input type="radio" name="product.required_participate_exam" value="0" checked>${_res.get("product.required_participate_exam.0")}
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="product.required_participate_exam" value="1">${_res.get("product.required_participate_exam.1")}
+                    </label>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="col-key">优惠活动-积分</td>
+                <td class="col-value">
+                    <input type="number" class="form-control form-control-inline required" name="product.credit" placeholder="0为不能使用积分" value="0">
+                </td>
+                <td class="col-key">优惠活动-优惠券</td>
+                <td class="col-value">
+                    <label class="radio-inline">
+                        <input type="radio" name="product.allow_coupon" value="0" checked>不允许使用
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="product.allow_coupon" value="1">允许使用
+                    </label>
+                </td>
+            </tr>
+
+            <tr>
+                <#if purchaseStrategies?size gt 0>
+                <td class="col-key">${_res.get("product.purchase_strategy")}</td>
+                <td class="col-value">
+                    <select class="form-control" name="purchase_strategy_id">
+                        <option></option>
+                        <#list purchaseStrategies as strategy>
+                            <option value="${strategy.id}" >${strategy.name}</option>
+                        </#list>
+                    </select>
+                </td>
+                </#if>
+
+                <#if productBrands?size gt 0>
+                <td class="col-key">${_res.get("product.brand_name")}</td>
+                <td class="col-value">
+                    <select name="product.brand_id" class="form-control">
+                        <option value="">未选择</option>
+                        <#list productBrands as productBrand>
+                            <option value="${productBrand.id!}">${productBrand.name!}</option>
+                        </#list>
+                    </select>
+                </td>
+                </#if>
+            </tr>
+
+            <#if (virtual?? && virtual == "1" ) || !wmsPluginEnabled>
+            <tr>
+                <td class="col-key">${_res.get("product.barcode")}</td>
+                <td class="col-value"><input type="text" class="form-control" name="product.barcode" ></td>
+                <td class="col-key">${_res.get("product.store_location")}</td>
+                <td class="col-value"><input type="text" class="form-control" name="product.store_location" ></td>
+            </tr>
+            </#if>
+
+            <#if ((!virtual??) || (virtual?? && virtual == "0")) && wmsPluginEnabled>
+            <tr id="sku-tr">
+                <td class="col-key">SKU</td>
+                <td colspan="3">
+                    <input id="sku_id" type="hidden" name="product.sku_id" class="skuid"/>
+                    <input id="sku_code" type="hidden" name="product.sku_code" />
+                    <input id="sku_name" type="hidden" name="product.sku_name" />
+                    <input id="bar_code" type="hidden" name="product.bar_code" />
+                    <div>
+                        <a href="#" class="btn btn-info" data-toggle="modal" data-target="#skuSelectModal">关联SKU</a>
+                    </div>
+                    <div style="margin-top:3px;">
+                        <span id="sku-select-result"></span>
+                    </div>
+                </td>
+            </tr>
+            </#if>
+
+            <tr>
+                <td class="col-key">${_res.get("product.region")}</td>
+                <td colspan="3">
+                    <input type="hidden" class="form-control form-control-inline" id="region" name="product.region">
+                    <span id="region-static"></span>
+                    <a id="region-select" class="btn btn-link">选择</a>
+                </td>
+            </tr>
+
+            <#if showSpecificationSetting>
+            <tr>
+                <td class="col-key">规格</td>
+                <td colspan="3">
+                    <input type="hidden" id="spec-count"/>
+                    <div>用户选购产品时需要选择的产品特性,比如颜色,香味等</div>
+                        <table class="table table-bordered table-hover">
+                        <tr>
+                            <th style="width: 10%">${_res.get("product.name")}</th>
+                            <th style="width: 8%">${_res.get("product.price")}</th>
+                            <th style="width: 8%">${_res.get("product.point")}</th>
+                            <th style="width: 8%">${_res.get("product.weight")}</th>
+                            <th style="width: 8%">${_res.get("product.cost_price")}</th>
+                            <th style="width: 10%">${_res.get("product.suggested_price")}</th>
+                            <#if (virtual?? && virtual == "1" ) || !wmsPluginEnabled>
+                                <th style="width: 10%">${_res.get("product.stock_balance")}</th>
+                            </#if>
+                            <#if ((!virtual??) || (virtual?? && virtual == "0")) && wmsPluginEnabled>
+                                <th style="25%">sku</th>
+                            </#if>
+                            <th style="width: 13%">${_res.get("product.action")}</th>
+                        </tr>
+                        <tr>
+                            <td colspan="10"><a id="spec-create-btn" class="btn btn-default btn-spec">+</a></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            </#if>
+
+            <tr id="properties-div">
+
+            </tr>
+
+            <#if showSettlementSetting>
+            <tr>
+                <td class="col-key">${_res.get("product.settlement_proportion")}</td>
+                <td colspan="3">
+                    <table class="table table-hover table-bordered">
+                        <tr>
+                            <th>级别</th>
+                            <th>级别名称</th>
+                            <th>每件分成</th>
+                            <th></th>
+                        </tr>
+                        <#list productSettlementProportions as productSettlementProportion>
+                        <#assign proportionObject = productSettlementProportion.proportionObject  />
+                        <tr>
+                            <input type="hidden" name="productSettlementProportion[${productSettlementProportion_index}].id" value="${productSettlementProportion_index}" />
+                            <input type="hidden" name="productSettlementProportion[${productSettlementProportion_index}].level" value="${productSettlementProportion.level!}" />
+                            <input type="hidden" name="proportion[${productSettlementProportion_index}].fixedvalue" value="${proportionObject.fixedvalue?c}" />
+                            <input type="hidden" name="proportion[${productSettlementProportion_index}].percentage" value="${proportionObject.percentage?c}" />
+                            <input type="hidden" name="productSettlementProportion[${productSettlementProportion_index}].type" value="${productSettlementProportion.type!}" />
+                            <td>${productSettlementProportion.level!}</td>
+                            <td><input type="text" class="form-control required"  name="productSettlementProportion[${productSettlementProportion_index}].name" value="${productSettlementProportion.name!}"/></td>
+                            <td><input type="number" step="0.1" class="form-control required" name="proportion[${productSettlementProportion_index}].value" value="${proportionObject.value!0}" /></td>
+                            <td>
+                                <#if proportionObject.fixedvalue>元</#if>
+                                <#if proportionObject.percentage>%</#if>
+                            </td>
+                        </tr>
+                        </#list>
+                    </table>
+                </td>
+            </tr>
+            </#if>
+
+            <tr>
+                <td class="col-key">${_res.get("product.cover")}<span class="star-required">*</span></td>
+                <td colspan="3">
+                    <div class="row">
+                        <div class="col-md-2 col-sm-4">
+                            <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                                <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                                <img width="100%">
+                            </div>
+                            <input type="file" class="cover-form-control" accept="image/*" name="cover-1" onchange="previewCover(this);">
+                        </div>
+                        <div class="col-md-2 col-sm-4">
+                            <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                                <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                                <img width="100%">
+                            </div>
+                            <input type="file" class="cover-form-control" accept="image/*" name="cover-2" onchange="previewCover(this);">
+                        </div>
+                        <div class="col-md-2 col-sm-4">
+                            <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                                <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                                <img width="100%">
+                            </div>
+                            <input type="file" class="cover-form-control" accept="image/*" name="cover-3" onchange="previewCover(this);">
+                        </div>
+                        <div class="col-md-2 col-sm-4">
+                            <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                                <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                                <img width="100%">
+                            </div>
+                            <input type="file" class="cover-form-control" accept="image/*" name="cover-4" onchange="previewCover(this);">
+                        </div>
+                        <div class="col-md-2 col-sm-4">
+                            <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                                <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                                <img width="100%">
+                            </div>
+                            <input type="file" class="cover-form-control" accept="image/*" name="cover-5" onchange="previewCover(this);">
+                        </div>
+                        <div class="col-md-2 col-sm-4">
+                            <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                                <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                                <img width="100%">
+                            </div>
+                            <input type="file" class="cover-form-control" accept="image/*" name="cover-6" onchange="previewCover(this);">
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="col-key">${_res.get("product.banner")}</td>
+                <td colspan="3">
+                    <div class="row">
+                        <div class="col-md-2 col-sm-4">
+                            <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                                <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                                <img width="100%">
+                            </div>
+                            <input type="file" class="cover-form-control" accept="image/*" name="banner" onchange="previewCover(this);">
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
+            <#if productTags?size gt 0>
+            <tr>
+                <td class="col-key">标签</td>
+                <td colspan="3">
+                    <#list productTags as tag>
+                    <label class="checkbox-inline">
+                        <input name="tags" type="checkbox" value="${tag.id!}"> ${tag.identifier!} - ${tag.name!}
+                    </label>
+                    </#list>
+                </td>
+            </tr>
+            </#if>
+
+            <tr>
+                <td class="col-key">${_res.get("product.description")}</td>
+                <td colspan="3">
+                    <script type="text/plain" id="myEditor" name="description" style="width: 100%; min-height: 400px"></script>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-key">视频</td>
+                <td colspan="3">
+                    <div>
+                        <span class="glyphicon glyphicon-trash" onclick="videoDeleteClick(this);"></span>
+                        <video style="height:auto;" src="" controls="controls"></video>
+                    </div>
+                    <input type="file" class="cover-form-control" accept="video/mp4" name="video-1" onChange="previewVideo(this);">
+                </td>
+            </tr>
+        </table>
+
+
+        <hr>
+        <input type="hidden" id="publish" name="publish" value="false"/>
+        <input id="submitBtn" type="button" class="btn btn-primary" value="${_res.get("btn.save")}" />
+        <@shiro.hasPermission name="product.direct_publish">
+        <input id="publishBtn" type="button" class="btn btn-primary" value="${_res.get("btn.direct_publish")}" />
+        </@shiro.hasPermission>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+
+    </form>
+</@layout.layout>

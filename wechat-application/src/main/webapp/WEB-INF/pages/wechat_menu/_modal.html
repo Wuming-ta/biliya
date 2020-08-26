@@ -1,0 +1,215 @@
+
+
+<!--
+  ~   Copyright (C) 2014-2016 www.kequandian.net
+  ~
+  ~    The program may be used and/or copied only with the written permission
+  ~    from www.kequandian.net or in accordance with the terms and
+  ~    conditions stipulated in the agreement/contract under which the program
+  ~    has been supplied.
+  ~
+  ~    All rights reserved.
+  ~
+  -->
+
+<div class="modal fade" id="myModalAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel1">添加菜单</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">菜单名称</label>
+                        <div class="col-md-10"><input class="form-control" id="add_name" type="text" name="fname"/></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">菜单类型</label>
+                        <div class="col-md-10">
+                            <select class="form-control" id="add_type" type="text" name="fname">
+                                <option value="view">网页</option>
+                                <option value="miniprogram">小程序</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">链接地址</label>
+                        <div class="col-md-10"><input class="form-control" id="add_url" type="text" name="fname"/></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">小程序的appid</label>
+                        <div class="col-md-10"><input class="form-control" id="add_appid" type="text" name="fname"/></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">小程序的页面路径</label>
+                        <div class="col-md-10"><input class="form-control" id="add_pagepath" type="text" name="fname"/></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="btn_add" data-dismiss="modal">提交更改</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModalLabelEdit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel2">编辑菜单</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">菜单名称</label>
+                        <div class="col-md-10"><input class="form-control" id="firstEdit_name" type="text" name="fname"/></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">菜单类型</label>
+                        <div class="col-md-10">
+                            <select class="form-control" id="firstEdit_type" type="text" name="fname">
+                                <option value="view">网页</option>
+                                <option value="miniprogram">小程序</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">链接地址</label>
+                        <div class="col-md-10"><input class="form-control" id="firstEdit_url" type="text" name="fname"/></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">小程序的appid</label>
+                        <div class="col-md-10"><input class="form-control" id="firstEdit_appid" type="text" name="fname"/></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">小程序的页面路径</label>
+                        <div class="col-md-10"><input class="form-control" id="firstEdit_pagepath" type="text" name="fname"/></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="btn_close">关闭
+                </button>
+                <button type="button" class="btn btn-primary" id="btn_firstEdit" data-dismiss="modal">
+                    提交更改
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModalLabelEdit2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel3">编辑菜单</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">菜单名称</label>
+                        <div class="col-md-10"><input class="form-control" id="secondEdit_name" type="text" name="fname"/></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">菜单类型</label>
+                        <div class="col-md-10">
+                            <select class="form-control" id="secondEdit_type" type="text" name="fname">
+                                <option value="view">网页</option>
+                                <option value="miniprogram">小程序</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">链接地址</label>
+                        <div class="col-md-10"><input class="form-control" id="secondEdit_url" type="text" name="fname"/></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">小程序的appid</label>
+                        <div class="col-md-10"><input class="form-control" id="secondEdit_appid" type="text" name="fname"/></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">小程序的页面路径</label>
+                        <div class="col-md-10"><input class="form-control" id="secondEdit_pagepath" type="text" name="fname"/></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="btn_secondEdit" data-dismiss="modal">提交更改</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="myModalMenu" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel4">编辑菜单</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">菜单名称</label>
+                        <div class="col-md-10"><input class="form-control" id="menu_name" type="text" name="fname"/></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">菜单类型</label>
+                        <div class="col-md-10">
+                            <select class="form-control" id="menu_type" type="text" name="fname">
+                                <option value="">多级菜单</option>
+                                <option value="view">网页</option>
+                                <option value="miniprogram">小程序</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">链接地址</label>
+                        <div class="col-md-10"><input class="form-control" id="menu_url" type="text" name="fname"/></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">小程序的appid</label>
+                        <div class="col-md-10"><input class="form-control" id="menu_appid" type="text" name="fname"/></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">小程序的页面路径</label>
+                        <div class="col-md-10"><input class="form-control" id="menu_pagepath" type="text" name="fname"/></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="btn_menu" data-dismiss="modal">提交更改</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="viewJson" tabindex="-1" role="dialog" aria-labelledby="viewJsonModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="viewJsonModal">查看JSON</h4>
+            </div>
+            <div class="modal-body">
+                <pre id="view-json-content"></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>

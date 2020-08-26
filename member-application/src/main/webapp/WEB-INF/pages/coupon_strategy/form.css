@@ -1,0 +1,14 @@
+
+<style>
+    .form-control-inline {
+        display: inline;
+        width: auto;
+    }
+    .order-header {
+      border-left: 4px solid orange;
+      font-size: 14px;
+      font-weight: bold;
+      margin: 5px 0px;
+      padding-left: 10px;
+    }
+</style>

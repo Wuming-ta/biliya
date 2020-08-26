@@ -1,0 +1,93 @@
+<#macro script>
+    <#include "common.js" />
+    <#include "listItem.js" />
+    <script>
+        $(document).ready(function(){
+            $('a[role=tab]').click(function(){
+                localStorage.tabName = $(this).prop('id');
+            });
+
+            if(!localStorage.tabName){
+               localStorage.tabName = 'wechat_message_autoreply_tab';
+            }
+            $('#'+localStorage.tabName).tab('show');
+        });
+    </script>
+</#macro>
+<#macro css>
+    <#include "common.css" />
+    <style>
+        .ml-5 {
+            margin-left: 5px;
+        }
+    </style>
+</#macro>
+<#macro modal>
+    <#include "_modal.html" />
+</#macro>
+<#import "../template/layout.ftl" as layout />
+<#import "index.ftl" as index />
+<#include "../template/breadcrumb.ftl" />
+<#include "../template/message.ftl" />
+<@layout.layout script css _res.get("breadcrumb.wechat_autoreply") modal>
+    <#assign menus={"/": _res.get("breadcrumb.home")} />
+    <@nav menus _res.get("breadcrumb.wechat_autoreply") />
+    <div>
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a id="wechat_subscribe_autoreply_tab" href="#wechat_subscribe_autoreply" aria-controls="wechat_subscribe_autoreply" role="tab" data-toggle="tab">添加自动回复</a>
+            </li>
+            <li role="presentation">
+                <a id="wechat_message_autoreply_tab" href="#wechat_message_autoreply" aria-controls="wechat_message_autoreply" role="tab" data-toggle="tab">消息自动回复</a>
+            </li>
+            <li role="presentation">
+                <a id="wechat_keyword_autoreply_tab" href="#wechat_keyword_autoreply" aria-controls="wechat_keyword_autoreply" role="tab" data-toggle="tab">关键词自动回复</a>
+            </li>
+        </ul>
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active tab-pane-cus" id="wechat_subscribe_autoreply" >
+                <@index.index text newses "wechat_subscribe_autoreply"></@index.index>
+            </div>
+            <div role="tabpanel" class="tab-pane tab-pane-cus" id="wechat_message_autoreply">
+                <@index.index messageText messageNewses "wechat_message_autoreply"></@index.index>
+            </div>
+            <div role="tabpanel" class="tab-pane tab-pane-cus" id="wechat_keyword_autoreply">
+                <a class="btn btn-primary" href="${base}/wechat_keyword_autoreply/edit">添加规则</a>
+                <div class="row">
+                    <#list wechatKeywordAutoreplies as wechatKeywordAutoreply>
+                        <div class="col-md-4">
+                            <div class="box <#if wechatKeywordAutoreply.enabled?? && wechatKeywordAutoreply.enabled==1>green-border</#if>">
+                                <div class="box-title <#if wechatKeywordAutoreply.enabled?? && wechatKeywordAutoreply.enabled==0>filter</#if>">
+                                        ${wechatKeywordAutoreply.name!}
+                                </div>
+                                <div class="box-digest text-muted <#if wechatKeywordAutoreply.enabled?? && wechatKeywordAutoreply.enabled==0>filter</#if>">
+                                    关键词：
+                                    <#if wechatKeywordAutoreply.keyword??>
+                                        <#list wechatKeywordAutoreply.keyword?split('|') as keyword>
+                                            <span class="label label-success ml-5">
+                                                ${keyword!}
+                                            </span>
+                                        </#list>
+                                    <#else>未添加关键词
+                                    </#if>
+                                </div>
+                                <div class="box-btn">
+                                    <a class="btn btn-primary" href="${base}/wechat_keyword_autoreply/edit/${wechatKeywordAutoreply.id!}">${_res.get("edit")}</a>
+                                    <#if wechatKeywordAutoreply.enabled == 1>
+                                        <a class="btn btn-warning" style="color: #fff;" href="${base}/wechat_keyword_autoreply/disable/${wechatKeywordAutoreply.id!}">${_res.get("disable")}</a>
+                                    </#if>
+                                    <#if wechatKeywordAutoreply.enabled == 0>
+                                        <a class="btn btn-success" href="${base}/wechat_keyword_autoreply/enable/${wechatKeywordAutoreply.id!}">${_res.get("enable")}</a>
+                                    </#if>
+                                    <a class="btn btn-danger" onclick="return confirm('确定删除此规则吗？');" href="${base}/wechat_keyword_autoreply/delete/${wechatKeywordAutoreply.id!}" >${_res.get("delete")}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </#list>
+                </div>
+            </div>
+        </div>
+    </div>
+</@layout.layout>

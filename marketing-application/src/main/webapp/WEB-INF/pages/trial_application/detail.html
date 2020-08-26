@@ -1,0 +1,621 @@
+<#macro script>
+<script>
+var oldExpressTr;
+
+  $(document).ready(function(){
+
+    $("#rejectForm").validate({ });
+
+    $('#rejectModal').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget);
+      var applicationId = button.data('application-id');
+      var modal = $(this);
+      modal.find('#rejectForm').attr('action','${base}/trial_application/reject/' + applicationId + '?returnUrl=${returnUrl!}');
+    })
+
+
+     <#if (order.status=="CONFIRMED_DELIVER_PENDING")>
+     var $express = $("#express");
+     var $expressNumber = $("#express-number");
+     var $deliver = $("#delivering-btn");
+     $express.hide();
+     var url = "${base}/order/delivering/${order.id}?expressId=#EXPRESSID#&expressNumber=#EXPRESSNUMBER#&returnUrl=/trial_application/detail/${trialApplication.id}";
+
+     $deliver.click(function() {
+        if ($express.is(":hidden")) {
+            $express.show();
+        }
+        else {
+            var id = $("#express-id").find("option:selected").val();
+            if ($expressNumber.val() == "") {
+              $expressNumber.addClass("express-warn");
+            }
+            else if (id == undefined) {
+              $("#express-id").addClass("express-warn");
+            }
+            else {
+              var path = url.replace(/#EXPRESSNUMBER#/g, $expressNumber.val()).replace(/#EXPRESSID#/g, id);
+              window.location.href=path;
+            }
+        }
+     });
+     </#if>
+
+
+       var title = "${_res.get("order.express_info")}";
+       var $popover = $("[data-toggle='popover']");
+       var popoverShown = false;
+       $("#express-info").click(function(e) {
+           if (popoverShown == false) {
+               $popover.popover({
+                  trigger: 'manual',
+                  placement: 'bottom',
+                  container: 'body',
+                  title: title,
+                  html: 'true',
+                  content: function() {
+                    var url = "${base}/order/expressInfo/${order.order_number!}";
+                    return contentMethod(url, "express-info-" + $.now());
+                  }
+               });
+               $popover.popover('show');
+               popoverShown = true;
+           }
+           else {
+               $popover.popover('hide');
+               popoverShown = false;
+           }
+
+           $(document).on("click", function() {
+               $popover.popover('hide');
+               popoverShown = false;
+           });
+
+           e.stopPropagation();
+
+        });
+
+        function contentMethod(url, div_id) {
+            $.ajax(url).done(function(response) {
+                $('#'+div_id).html(response);
+            });
+            return '<div id="'+ div_id +'">Loading...</div>';
+        }
+
+  });
+
+function redeliver() {
+    oldExpressTr = $("#express-tr").html();
+    $("#express-tr").html($("#express-template").html());
+}
+
+function expressCancel() {
+    $("#express-tr").html(oldExpressTr);
+}
+
+function expressSubmit(element) {
+    var url = "${base}/order/updateExpressInfo/${order.id}?expressId=#EXPRESSID#&expressNumber=#EXPRESSNUMBER#";
+    var $expressId = $("select[name='expressId']");
+    var $expressNumber = $("input[name='expressNumber']");
+    var path = url.replace(/#EXPRESSNUMBER#/g, $expressNumber.val()).replace(/#EXPRESSID#/g, $expressId.val());
+    window.location.href=path;
+}
+
+</script>
+
+<script>
+$(document).ready(function(){
+    jQuery.validator.addMethod("decimal", function(value, element) {
+        var decimal = /^-?\d+(\.\d{1,2})?$/;
+        return this.optional(element) || (decimal.test(value));
+    }, $.validator.format("小数位数不能超过两位!"));
+
+   $("#update-contact-info-form").validate();
+   $("#customer-service-reply-form").validate();
+   $("#update-refund-fee-form").validate({
+        rules: {
+            refundFee: {
+                required: true,
+                decimal: true,
+                max: ${order.total_price!0}
+            }
+        }
+   });
+
+   $("#update-contact-info-modal").on("shown.bs.modal", function(e) {
+      $("#p-select").trigger("change");
+   });
+
+   $('#p-select').change(function() {
+      $('#c-select').empty();
+      $('#d-select').empty();
+      var emptyElement = $('#pcd-select-template').html().replace(/#value#/g, "").replace(/#name#/g, "").replace(/#selected#/g, "");
+      $('#c-select').append(emptyElement);
+      var id = $(this).val();
+      if (id != null && id != "") {
+          $.get("${base}/order/ajaxPcd/"+id, function(data) {
+              var currentCity = "${order.city!}";
+              for (var p in data) {
+                  var selected = data[p].name === currentCity ? "selected=\"selected\"" : "";
+                  var html = $('#pcd-select-template').html().replace(/#value#/g, data[p].id).replace(/#name#/g, data[p].name).replace(/#selected#/g, selected);
+                  $('#c-select').append(html);
+              }
+
+              $('#c-select').trigger('change');
+          });
+      }
+  });
+
+  $('#c-select').change(function() {
+      $('#d-select').empty();
+      var emptyElement = $('#pcd-select-template').html().replace(/#value#/g, "").replace(/#name#/g, "").replace(/#selected#/g, "");
+      $('#d-select').append(emptyElement);
+      var id = $(this).val();
+      if (id != null && id != "") {
+          $.get("${base}/order/ajaxPcd/"+id, function(data) {
+              var currentDistrict = "${order.district!}";
+              for (var p in data) {
+                  var selected = data[p].name === currentDistrict ? "selected=\"selected\"" : "";
+                  var html = $('#pcd-select-template').html().replace(/#value#/g, data[p].id).replace(/#name#/g, data[p].name).replace(/#selected#/g, selected);
+                  $('#d-select').append(html);
+              }
+          });
+      }
+  });
+
+});
+</script>
+
+<script type="text/html" id="pcd-select-template">
+    <option value="#value#" #selected#>#name#</option>
+</script>
+
+<script type="text/html" id="express-template">
+    <td class="col-key">
+        ${_res.get("order.express_company")}
+    </td>
+    <td class="col-value">
+        <select class="form-control" name="expressId">
+            <#list expresses as express>
+                <option value="${express.id}">${express.name}</option>
+            </#list>
+        </select>
+    </td>
+    <td class="col-key">${_res.get("order.express_number")}</td>
+    <td class="col-value">
+        <input type="text" class="express" style="width: auto" name="expressNumber">
+        <button type="submit" class="btn btn-primary btn-sm" onclick="expressSubmit(this);">提交</button>
+        <a class="btn btn-default btn-sm" onclick="expressCancel();">取消</a>
+    </td>
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .price{
+            color: red;
+        }
+        .col-key {
+          width: 20%;
+        }
+        .col-value {
+          width: 30%;
+        }
+        .order-header {
+          border-left: 4px solid orange;
+          font-size: 14px;
+          font-weight: bold;
+          margin: 5px 0px;
+          padding-left: 10px;
+        }
+        .express {
+        background-color: #FFFFFF;
+        background-image: none;
+        border: 1px solid #CCCCCC;
+        color: #555555;
+        font-size: 14px;
+        height: 34px;
+        line-height: 1.42857;
+        padding: 6px 12px;
+        width: 250px;
+        }
+        .express-warn {
+          border: 1px solid red;
+        }
+        .my-form-control{
+          width: 85%;
+          display: inline-block;
+          vertical-align: middle;
+        }
+    </style>
+</#macro>
+<#macro modal>
+
+
+<div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">拒绝试用申请</h4>
+            </div>
+            <div class="modal-body">
+                <form id="rejectForm" method="post">
+                    <div class="form-group">
+                        <label for="note" class="control-label">拒绝原因<span class="star-required">*</span></label>
+                        <textarea class="form-control required" name="trialApplication.note" id="note" rows="5"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">${_res.get("close")}</button>
+                        <button type="submit"  class="btn btn-primary">${_res.get("submit")}</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="update-contact-info-modal" tabindex="-1" role="dialog" aria-labelledby="update-contact-info-modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">更新联系人信息</h4>
+                </div>
+                <form id="update-contact-info-form" class="form-horizontal" action="${base}/order/updateContact/${order.id}" method="post">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">${_res.get("order.contact.user")}</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control required" name="contactUser" value="${order.contact_user!}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">${_res.get("order.contact.phone")}</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control required" name="phone" value="${order.phone!}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">${_res.get("order.contact.address")}</label>
+                            <div class="col-md-10">
+                                <div class="col-sm-4">
+                                    <select id="p-select" class="form-control required" name="province">
+                                        <#list pcds as pcd>
+                                            <option value="${pcd.id!}" <#if pcd.name==order.province>selected="selected"</#if> >${pcd.name!}</option>
+                                        </#list>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <select id="c-select" class="form-control required" name="city"></select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <select id="d-select" class="form-control required" name="district"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">${_res.get("order.contact.detail")}</label>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control required" name="detail" value="${order.detail!}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+</#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "./_trial_application_label.ftl" />
+<#include "order_status_label.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.trial_application_detail") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/trial_application": _res.get("breadcrumb.trial_application")}/>
+    <@nav menus _res.get("breadcrumb.trial_application_detail")/>
+    <@msg message />
+
+    <div class="order-header">${_res.get("trial_application.basic")}</div>
+    <table class="table table-hover table-bordered">
+        <tr>
+            <td class="col-key">${_res.get("marketing.trial.trial_application.trial_name")}</td>
+            <td class="col-value">${trial.name!}</td>
+            <td class="col-key">${_res.get("marketing.trial.trial_application.status")}</td>
+            <td class="col-value">
+                 <span class="label <@trialApplicationStatus trialApplication.status />">
+                    ${_res.get("marketing.trial.trial_application.status." +  "${trialApplication.status!}")}
+                </span>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="col-key">${_res.get("marketing.trial.trial_application.applicant_name")}</td>
+            <td class="col-value">${trialApplication.user.name!}</td>
+            <td class="col-key">${_res.get("marketing.trial.trial_application.applicant_phone")}</td>
+            <td class="col-value">${trialApplication.user.phone!}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("marketing.trial.trial.shipping_type")}</td>
+            <td class="col-value">
+                ${_res.get("marketing.trial.trial.shipping_type." + trialApplication.shipping_type)}
+            </td>
+            <td class="col-key">${_res.get("marketing.trial.trial_application.created_time")}</td>
+            <td class="col-value">${trialApplication.created_time!}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("marketing.trial.trial.version")}</td>
+            <td class="col-value">${trialApplication.version!}</td>
+            <td class="col-key"></td>
+            <td class="col-value"></td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("marketing.trial.trial_application.note")}</td>
+            <td colspan="3">${trialApplication.note!}</td>
+        </tr>
+    </table>
+
+    <div class="order-header">订单基本信息</div>
+    <table class="table table-hover table-bordered">
+        <tr>
+            <td class="col-key">${_res.get("order.order_number")}</td>
+            <td class="col-value">${order.order_number!}</td>
+            <td class="col-key">${_res.get("order.trade_number")}</td>
+            <td class="col-value">${order.trade_number!"-"}</td>
+        </tr>
+        <#if order.store_id?? || order.store_user_id??>
+        <tr>
+            <#if order.store_id??>
+                <td class="col-key">${_res.get("order.store_name")}</td>
+                <td class="col-value">${order.store_name!}</td>
+            </#if>
+            <#if order.store_user_id??>
+                <td class="col-key">${_res.get("order.store_user_name")}</td>
+                <td class="col-value">${order.store_user_name!}</td>
+            </#if>
+        </tr>
+        </#if>
+        <tr>
+            <td class="col-key">${_res.get("order.status")}</td>
+            <td class="col-value"><span class="label <@statusLabel order.status/> ">${_res.get("order.status."+order.status?lower_case)}</span></td>
+            <td class="col-key">${_res.get("order.payment_type")}</td>
+            <td class="col-value">
+                <#if order.payment_type??>
+                    ${_res.get("order.payment_type."+order.payment_type?lower_case)}
+                </#if>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.total_price")}</td>
+            <td class="col-value"><span class="price">${order.total_price!}</span></td>
+            <td class="col-key">${_res.get("order.freight")}</td>
+            <td class="col-value">${order.freight!}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.created_date")}</td>
+            <td class="col-value">${order.created_date!"-"}</td>
+            <td class="col-key">${_res.get("order.pay_date")}</td>
+            <td class="col-value">${order.pay_date!"-"}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.confirm_date")}</td>
+            <td class="col-value">${order.confirm_date!"-"}</td>
+            <td class="col-key">${_res.get("order.deliver_date")}</td>
+            <td class="col-value">${order.deliver_date!"-"}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.delivered_date")}</td>
+            <td class="col-value">${order.delivered_date!"-"}</td>
+            <td class="col-key">${_res.get("order.deal_date")}</td>
+            <td class="col-value">${order.deal_date!"-"}</td>
+        </tr>
+        <#if order.coupon_info??>
+        <tr>
+            <td class="col-key">${_res.get("order.coupon_info")}</td>
+            <td colspan="3">${order.coupon_info!"-"}</td>
+        </tr>
+        </#if>
+        <#if order.marketing_admin_url??>
+        <tr>
+            <td class="col-key">${_res.get("order.marketing")}</td>
+            <td colspan="3">
+                <span class="label label-primary">${nameMap.get(order.marketing)!}</span>
+                <a href="${base}${order.marketing_admin_url!}">${order.marketing_description!"-"}</a>
+            </td>
+        </tr>
+        </#if>
+        <tr>
+            <td class="col-key">${_res.get("order.user")}</td>
+            <td colspan="3">
+                <#assign user = order.user />
+                <#if user??>
+                    <small class="text-muted">昵称: </small>
+                    <a href="${base}/user/edit/${order.user_id}">${user.name!"-"}</a>
+                    <small class="text-muted">真实姓名: </small>${user.real_name!"-"}
+                    <small class="text-muted">UID: </small> ${user.uid!"-"}
+                <#else>
+                    ${order.user_id}
+                </#if>
+            </td>
+        </tr>
+
+        <#if (order.invoice==1)>
+        <tr>
+            <td class="col-key">${_res.get("order.invoice_title")}</td>
+            <td colspan="3">${order.invoice_title!"-"}</td>
+        </tr>
+        </#if>
+        <#if order.receiving_time??>
+        <tr>
+            <td class="col-key">${_res.get("order.receiving_time")}</td>
+            <td colspan="3">${order.receiving_time!"-"}</td>
+        </tr>
+        </#if>
+        <#if order.remark??>
+        <tr>
+            <td class="col-key">${_res.get("order.remark")}</td>
+            <td colspan="3">${order.remark!}</td>
+        </tr>
+        </#if>
+        <#if order.mid??>
+            <tr>
+                <td class="col-key">${_res.get("order.mid")}</td>
+                <td class="col-value">${order.mid!"-"}</td>
+                <td class="col-key">${_res.get("order.mname")}</td>
+                <td class="col-value">${order.mname!"-"}</td>
+            </tr>
+        </#if>
+
+        <tr id="express-tr">
+            <td class="col-key">
+                ${_res.get("order.express_company")}
+            </td>
+            <td class="col-value">${order.express_company!"-"}</td>
+            <td class="col-key">${_res.get("order.express_number")}</td>
+            <td class="col-value">
+                <#if (order.express_number??)>
+                    <a id="express-info" data-toggle="popover">${order.express_number}</a>
+                </#if>
+                <#if order.status=='DELIVERING' || order.status=='DELIVERED_CONFIRM_PENDING'>
+                    <a class="btn btn-link btn-sm" onclick="redeliver();">补发货</a>
+                </#if>
+            </td>
+        </tr>
+    </table>
+
+
+    <div class="order-header">${_res.get("order.items")}</div>
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th style="width: 10%"></th>
+            <th style="width: 8%">${_res.get("order.item.product.id")}</th>
+            <th style="width: 30%">${_res.get("order.item.product.name")}/${_res.get("order.item.product.specification")}</th>
+            <th style="width: 20%">${_res.get("order.item.barcode")}/${_res.get("order.item.store_location")}</th>
+            <th style="width: 8%">${_res.get("order.item.product.price")}</th>
+            <th style="width: 8%">${_res.get("order.item.product.cost_price")}</th>
+            <th style="width: 8%">${_res.get("order.item.product.count")}</th>
+            <th style="width: 8%">${_res.get("order.item.product.final_price")}</th>
+        </tr>
+        <#list order.orderItems as item>
+            <tr>
+                <td><img src="${item.cover!}" height="60"> </td>
+                <td>${item.product_id!}</td>
+                <td>
+                    <div>
+                        <a href="${base}/product/edit/${item.product_id}">${item.product_name!}</a>
+                    </div>
+                    <div>
+                        ${item.product_specification_name!}
+                    </div>
+                </td>
+                <td>
+                    <div>${item.barcode!}</div>
+                    <div>${item.store_location!}</div>
+                </td>
+                <td>${item.price!}</td>
+                <td>${item.cost_price!}</td>
+                <td>${item.quantity!}</td>
+                <td><span class="price">${item.final_price!}</span></td>
+            </tr>
+        </#list>
+    </table>
+
+    <div class="order-header" id="contact">
+        ${_res.get("order.contact")}
+        <#if order.status=='CONFIRMED_DELIVER_PENDING'>
+        <a class="btn btn-link" href="#" data-toggle="modal" data-target="#update-contact-info-modal">更新</a>
+        </#if>
+    </div>
+    <table class="table table-hover table-bordered">
+        <tr>
+            <td class="col-key">${_res.get("order.contact.user")}</td>
+            <td>${order.contact_user!}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.contact.phone")}</td>
+            <td>${order.phone!}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.contact.address")}</td>
+            <td>
+                <div>${order.province!} ${order.city!} ${order.district!}</div>
+                <div>${order.street!}</div>
+                <div>${order.detail!}</div>
+            </td>
+        </tr>
+    </table>
+
+
+        <div class="order-header">
+            <span style="margin-right:10px;">处理记录</span>
+            <a data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample" style="font-weight:normal;">
+                查看
+            </a>
+        </div>
+            <div class="collapse" id="collapseExample">
+                <div style="margin-top:10px;">
+                    <#if orderProcessLogs?size gt 0>
+                        <table class="table table-hover table-bordered">
+                            <tr>
+                                <th class="col-key">${_res.get("order.order_process_log.process_date")}</th>
+                                <th style="width:80%">${_res.get("order.order_process_log.content")}</th>
+                            </tr>
+                            <#list orderProcessLogs as orderProcessLog>
+                            <tr>
+                                <td>${orderProcessLog.process_date!}</td>
+                                <td>${orderProcessLog.content!}</td>
+                            </tr>
+                            </#list>
+                        </table>
+                    <#else>暂无订单处理流水
+                    </#if>
+                </div>
+            </div>
+
+
+
+        <hr>
+        <@shiro.hasPermission name="order.edit">
+        <#if (order.status=="CONFIRMED_DELIVER_PENDING")>
+            <span id="express">
+                <select class="express" id="express-id">
+                    <#list expresses as express>
+                        <option value="${express.id}">${express.name}</option>
+                    </#list>
+                </select>
+                <input class="express" type="text" id="express-number" placeholder="${_res.get("order.express_number")}">
+            </span>
+            <a id="delivering-btn" class="btn btn-primary">${_res.get("btn.order.delivering")}</a>
+        </#if>
+        <#if (order.status=="DELIVERING")>
+            <a href="${base}/order/delivered/${order.id}?returnUrl=/trial_application/detail/${trialApplication.id}" class="btn btn-primary">${_res.get("btn.order.delivered")}</a>
+        </#if>
+        </@shiro.hasPermission>
+
+        <@shiro.hasPermission name="marketing.trial_application.delete">
+        <a class="btn btn-danger btn-sm" href="${base}/trial_application/delete/${trialApplication.id}"
+           onclick="javascript:if (confirm('${_res.get("delete_confirm")}')){return true;} return false;">${_res.get("delete")}</a>
+        </@shiro.hasPermission>
+        <@shiro.hasPermission name="marketing.trial_application.edit">
+        <#if (trialApplication.status)?? && (trialApplication.status == "AUDITING")>
+        <a class="btn btn-primary btn-sm"
+           href="${base}/trial_application/agree/${trialApplication.id}?returnUrl=${base}/trial_application/detail/${trialApplication.id}"
+           onclick="javascript:if (confirm('${_res.get("marketing.trial.trial_application.agree_confirm")}')){return true;} return false;"
+        >${_res.get("agree")}</a>
+        <a class="btn btn-primary btn-sm" data-toggle="modal" data-target="#rejectModal" data-application-id="${trialApplication.id}">${_res.get("reject")}</a>
+        </#if>
+        </@shiro.hasPermission>
+
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+    </form>
+
+
+
+</@layout.layout>

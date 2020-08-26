@@ -1,0 +1,87 @@
+<#macro script>
+<script src="${base}/assets/js/spin.min.js"></script>
+<script src="${base}/assets/js/echarts.min.js"></script>
+<script>
+  $(document).ready(function(){
+  var opts = {
+          lines: 13 // The number of lines to draw
+        , length: 28 // The length of each line
+        , width: 10 // The line thickness
+        , radius: 42 // The radius of the inner circle
+        , scale: 0.5 // Scales overall size of the spinner
+        , corners: 1 // Corner roundness (0..1)
+        , color: '#000' // #rgb or #rrggbb or array of colors
+        , opacity: 0.25 // Opacity of the lines
+        , rotate: 0 // The rotation offset
+        , direction: 1 // 1: clockwise, -1: counterclockwise
+        , speed: 1 // Rounds per second
+        , trail: 60 // Afterglow percentage
+        , fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+        , zIndex: 2e9 // The z-index (defaults to 2000000000)
+        , className: 'spinner' // The CSS class to assign to the spinner
+        , top: '50%' // Top position relative to parent
+        , left: '50%' // Left position relative to parent
+        , shadow: false // Whether to render a shadow
+        , hwaccel: false // Whether to use hardware acceleration
+        , position: 'absolute' // Element positioning
+        };
+
+      var nodes = {};
+      <#list widgets as w>
+      nodes["${w.id}"] = "${base}${w.url}";
+      </#list>
+      $.map(nodes, function(value, index){
+          console.log(index + ", " + value);
+          $.ajax({url: value,
+            beforeSend: function() {
+              var dom = "widget-" + index;
+              var target = document.getElementById(dom);
+              var spinner = new Spinner(opts).spin(target);
+            },
+            success: function(result) {
+              var dom = "#widget-" + index;
+              $(dom).html(result);
+            }
+          });
+      });
+  });
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .widget {
+          min-height: 200px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "./template/layout.ftl" as layout>
+<@layout.layout script css productName modal>
+    <#assign width=0, start=true>
+    <#list widgets as w>
+        <#if (w_index == 0) || start>
+            <div class="row">
+                <#assign start=false>
+        </#if>
+
+        <#assign width=width+w.width>
+        <#if (width==12)>
+            <#assign width=0, start=true>
+            <div id="widget-${w.id}" class="col-md-${w.width} col-sm-12 col-xs-12 widget"></div>
+            </div>
+            <#elseif (width>12)>
+                </div>
+                <div class="row">
+                    <div id="widget-${w.id}" class="col-md-${w.width} col-sm-12 col-xs-12 widget">}</div>
+                    <#assign width=w.width>
+            <#else>
+                <div id="widget-${w.id}" class="col-md-${w.width} col-sm-12 col-xs-12 widget"></div>
+                <#if !(w_has_next)>
+                </div>
+            </#if>
+        </#if>
+
+    </#list>
+
+</@layout.layout>
+

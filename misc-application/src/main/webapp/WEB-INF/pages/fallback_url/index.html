@@ -1,0 +1,76 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css>
+<style>
+        .order-header {
+          border-left: 4px solid orange;
+          font-size: 14px;
+          font-weight: bold;
+          margin: 5px 0px;
+          padding-left: 10px;
+        }
+</style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.fallback_url") modal>
+<#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.fallback_url")/>
+    <@msg message />
+
+    <div class="order-header">商城公众号链接</div>
+    <table class="table table-hover ">
+        <tr>
+            <th>名称</th>
+            <th>描述</th>
+            <th>链接</th>
+        </tr>
+        <#list configList as c>
+        <tr>
+            <td>${c.name!}</td>
+            <td>${c.description!}</td>
+            <td>${c.wx_url!}</td>
+        </tr>
+        </#list>
+    </table>
+
+    <div class="order-header">小程序页面路径</div>
+    <table class="table table-hover ">
+        <tr>
+            <th>名称</th>
+            <th>描述</th>
+            <th>路径</th>
+        </tr>
+        <#list wxaConfigList as c>
+        <tr>
+            <td>${c.name!}</td>
+            <td>${c.description!}</td>
+            <td>${c.value!}</td>
+        </tr>
+    </#list>
+    </table>
+
+    <div class="order-header">商城商品链接</div>
+    <table class="table table-hover ">
+        <tr>
+            <th style="width:40%">名称</th>
+            <th style="width:20%">类别</th>
+            <th style="width:40%">路径</th>
+        </tr>
+        <#list products as c>
+        <tr>
+            <td>${c.name!}</td>
+            <td>${c.category.name!}</td>
+            <td>${c.wx_url!}</td>
+        </tr>
+    </#list>
+    </table>
+</@layout.layout>

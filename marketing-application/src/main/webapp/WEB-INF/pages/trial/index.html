@@ -1,0 +1,135 @@
+<#macro script>
+    <script>
+        $(document).ready(function(){
+
+        });
+    </script>
+</#macro>
+<#macro css>
+<style>
+    .cover-image {
+        height: 60px;
+        width: 60px;
+        background-size: cover;
+        background-position: center;
+    }
+</style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+<#include "../template/message.ftl" />
+<#include "../template/pagination.ftl" />
+<#include "./product_category_select_option.ftl"/>
+<@layout.layout script css  _res.get("breadcrumb.trial") modal >
+<#assign menus={"/": _res.get("breadcrumb.home")} />
+<@nav menus _res.get("breadcrumb.trial") />
+<@msg message/>
+<#assign returnUrl>/trial%3fpageNumber=${pageNumber!}%26pageSize=${pageSize!}%26enabled=${enabled!}%26name=${name!}</#assign>
+<div class="search-box">
+    <form role="form" class="form-inline">
+        <div class="form-group">
+            <label>${_res.get("marketing.trial.trial.enabled")}</label>
+            <select name="enabled" class="form-control">
+                <option value=""></option>
+                <option value="0">${_res.get("false")}</option>
+                <option value="1">${_res.get("true")}</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>${_res.get("marketing.trial.trial.name")}</label>
+            <input class="form-control" name="name" value="${name!}" />
+        </div>
+        <div class="form-group">
+            <label>${_res.get("marketing.trial.trial.bar_code")}</label>
+            <input class="form-control" name="barCode" value="${barCode!}" />
+        </div>
+        <div class="form-group">
+            <label>${_res.get("marketing.trial.trial.category")}</label>
+            <select name="categoryId" class="form-control">
+                <#if !(categoryId??) || (categoryId=="")>
+                <#assign cid = 0>
+            </#if>
+            <#if (categoryId??) && (categoryId!="")>
+            <#assign cid = categoryId>
+            </#if>
+            <option></option>
+            <@select productCategories cid?eval />
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">${_res.get("btn.search")}</button>
+        <@shiro.hasPermission name="marketing.trial.edit">
+        <span class="vertical-separator"></span>
+        <a class="btn btn-primary" href="${base}/trial/add">${_res.get("marketing.trial.trial.btn.new")}</a>
+        <#if (marketingConfig.enabled)?? && (marketingConfig.enabled == 0) || (marketingConfig.enabled == 1)>
+        <span class="vertical-separator"></span>
+        <a class="btn btn-primary <#if marketingConfig.enabled = 0>btn-warning<#else>btn-success</#if>"
+           href="${base}/trial/switchEnabled/${marketingConfig.enabled!}"
+            <#if marketingConfig.enabled==1>onclick="return confirm('禁用试用装活动后，试用功能将失效，确定禁用吗？');"</#if>
+            >
+            ${_res.get("marketing.marketing_config.enabled.wholesale."+ marketingConfig.enabled)}
+        </a>
+        </#if>
+        </@shiro.hasPermission>
+    </form>
+</div>
+<table class="table table-hover">
+    <tr>
+        <th style="width:5%;">${_res.get("id")}</th>
+        <th style="width:5%;">${_res.get("marketing.trial.trial.cover")}</th>
+        <th style="width:16%;">${_res.get("marketing.trial.trial.name")}</th>
+        <th style="width:16%">${_res.get("marketing.trial.trial.product_name")}</th>
+        <th style="width:6%">${_res.get("marketing.trial.trial.enabled")}</th>
+        <th style="width:6%;">${_res.get("marketing.trial.trial.index")}</th>
+        <th style="width:20%;">${_res.get("action")}</th>
+    </tr>
+    <#list trials.list as trial>
+        <tr>
+            <td>${trial.id!}</td>
+            <td>
+                <#if trial.cover??>
+                <div class="cover-image" style="background-image: url(${trial.cover!});"></div>
+                </#if>
+            </td>
+            <td>
+                <a href="${base}/trial_application?trial_id=${trial.id!}">
+                    ${trial.name!}
+                </a>
+            </td>
+            <td>
+                <a href="${base}/product/edit/${trial.product_id}">
+                    ${trial.product_name!}
+                </a>
+            </td>
+            <td><span class="label <#if trial.enabled==1>label-primary<#else>label-default</#if>" >${_res.get("marketing.trial.trial.enabled." + trial.enabled?lower_case)}</span></td>
+            <td>${trial.index!}</td>
+            <td>
+                <#if (trial.enabled)?? && (trial.enabled == 0)>
+                    <@shiro.hasPermission name="marketing.trial.delete">
+                    <a class="btn btn-danger btn-sm" href="${base}/trial/delete/${trial.id}?returnUrl=${returnUrl!}"
+                       onclick="javascript:if (confirm('${_res.get("delete_confirm")}')){return true;} return false;">${_res.get("delete")}</a>
+                    </@shiro.hasPermission>
+                    <@shiro.hasPermission name="marketing.trial.edit">
+                    <a class="btn btn-success btn-sm" href="${base}/trial/switchTrialEnabled/${trial.id}?returnUrl=${returnUrl}">${_res.get("enable")}</a>
+                    </@shiro.hasPermission>
+                </#if>
+                <#if (trial.enabled)?? && (trial.enabled == 1)>
+                    <@shiro.hasPermission name="marketing.trial.edit">
+                    <a class="btn btn-warning btn-sm" href="${base}/trial/switchTrialEnabled/${trial.id}?returnUrl=${returnUrl}">${_res.get("disable")}</a>
+                    <a class="btn btn-primary btn-sm" href="${base}/trial/republish/${trial.id}?returnUrl=${returnUrl}"
+                       data-toggle="tooltip" data-placement="top" title="发布一个新的版本，参加过的用户就可以继续参加。">${_res.get("republish")}</a>
+                    </@shiro.hasPermission>
+                </#if>
+                <@shiro.hasPermission name="marketing.trial.edit">
+                <a class="btn btn-primary btn-sm" href="${base}/trial/edit/${trial.id}?returnUrl=${returnUrl}">${_res.get("edit")}</a>
+                </@shiro.hasPermission>
+            </td>
+        </tr>
+    </#list>
+    <#if trials.list?size == 0>
+        <td colspan="15">${_res.get("haven't.any.record")}</td>
+    </#if>
+</table>
+<@paginate currentPage=trials.pageNumber totalPage=trials.totalPage actionUrl="${base}/trial?pageNumber=" urlParas="&pageSize=${pageSize!}&enabled=${enabled!}&name=${name!}&categoryId=${categoryId!}&barCode=${barCode!}" />
+
+</@layout.layout>

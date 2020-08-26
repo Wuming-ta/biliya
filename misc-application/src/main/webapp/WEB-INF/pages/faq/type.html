@@ -1,0 +1,66 @@
+<#macro script>
+    <script>
+  $(document).ready(function(){
+    $("#form").validate();
+  });
+
+function checkTypeName(id) {
+    var name = $("#faq-type-name-"+id).val();
+    var $error = $("#faq-type-name-error-"+id);
+    if (name != null && name != "") {
+        $error.addClass("hidden");
+        return true;
+    }
+    else {
+        $error.removeClass("hidden");
+        return false;
+    }
+}
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.faq") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/faq": _res.get("breadcrumb.faq")}/>
+    <@nav menus _res.get("breadcrumb.type")/>
+    <@msg message />
+
+    <form id="form" class="form-inline"
+          action="${base}/faq/saveType"
+          method="post">
+        <div class="form-group">
+            <label></label>
+            <input type="text" name="faqType.name" class="form-control required" placeholder="新类型名称">
+        </div>
+        <button type="submit" class="btn btn-primary">添加</button>
+    </form>
+    <hr>
+    <table class="table table-hover">
+        <tr>
+            <th>编号</th>
+            <th>类名</th>
+            <th>操作</th>
+        </tr>
+        <#list types as type>
+            <form action="${base}/faq/updateType" method="post" onsubmit="return checkTypeName(${type.id});">
+                <input type="hidden" name="faqType.id" value="${type.id}">
+                <tr>
+                    <td class="col-lg-1">${type.id!}</td>
+                    <td class="col-lg-2">
+                        <input id="faq-type-name-${type.id}" class="form-control" type="text" name="faqType.name" value="${type.name!}">
+                        <label class="error hidden" id="faq-type-name-error-${type.id}">必须填写</label>
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-primary btn-sm">更新</button>
+                        <a class="btn btn-danger btn-sm" href="${base}/faq/deleteType/${type.id}"
+                           onclick="javascript:if (confirm('确定要删除吗？')){return true;} return false;">删除</a>
+                    </td>
+                </tr>
+            </form>
+        </#list>
+    </table>
+</@layout.layout>

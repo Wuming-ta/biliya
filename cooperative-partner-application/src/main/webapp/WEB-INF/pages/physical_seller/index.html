@@ -1,0 +1,118 @@
+<#macro script>
+  <#include "../common/pwd-validate-modal.js" />
+  <script>
+    $(document).ready(function(){
+
+    });
+
+    <#include "./physical_seller.js"/>
+  </script>
+  <#include "physical_seller.tpl.js"/>
+</#macro>
+<#macro css>
+    <style>
+        .mt {
+            margin-top: 4px;
+        }
+    </style>
+</#macro>
+<#macro modal>
+    <#include "../common/pwd-validate-modal.html" />
+</#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+
+<@layout.layout script css _res.get("breadcrumb.physicalSeller") modal>
+<#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.physicalSeller")/>
+    <@msg message />
+
+    <div class="search-box">
+        <form class="form-inline">
+            <div class="form-group">
+                <label>${_res.get("partner.seller.uid")}</label>
+                <input type="text" name="uid" class="form-control" value="${uid!}">
+            </div>
+            <div class="form-group">
+                <label>${_res.get("partner.physical_seller.real_name")}</label>
+                <input type="text" name="real_name" class="form-control" value="${real_name!}">
+            </div>
+            <div class="form-group">
+                <label>${_res.get("partner.physical_seller.province")}</label>
+                <select id="p-select" class="form-control" name="provinceQualify"></select>
+            </div>
+            <div class="form-group">
+                <label>${_res.get("partner.physical_seller.city")}</label>
+                <select id="c-select" class="form-control" name="cityQualify"></select>
+            </div>
+            <div class="form-group">
+                <label>${_res.get("partner.physical_seller.district")}</label>
+                <select id="d-select" class="form-control" name="districtQualify"></select>
+            </div>
+            <button type="submit" class="btn btn-primary">${_res.get("partner.seller.search")}</button>
+            <span class="vertical-separator"></span>
+            <a class="btn btn-info" href="${base}/physical_seller/purchaseJournalList">${_res.get("partner.physical_seller.view_purchase_journal")}</a>
+            <span class="vertical-separator"></span>
+            <a class="btn btn-info" href="${base}/physical_seller/physicalApplyTips">${_res.get("partner.physical_apply_tips")}</a>
+        </form>
+    </div>
+
+
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th style="width: 15%">${_res.get("partner.physical_seller.uid")}</th>
+            <th style="width: 15%">${_res.get("partner.physical_seller.name")}</th>
+            <th style="width: 10%"></th>
+            <th style="width: 13%">${_res.get("partner.physical_seller.created_date")}</th>
+            <th style="width: 47%">${_res.get("partner.physical_seller.action")}</th>
+        </tr>
+        <#list sellers.list as physicalSeller>
+            <tr>
+                <td>${physicalSeller.uid!}</td>
+                <td>
+                    <div><a href="${base}/physical_seller/detail?id=${physicalSeller.id}">${physicalSeller.user_name!}</a></div>
+                    <div><span class="small text-muted">${_res.get("partner.physical_seller.real_name")}: </span>${physicalSeller.real_name!'-'}</div>
+                    <div><span class="small text-muted">${_res.get("partner.physical_seller.phone")}: </span>${physicalSeller.phone!'-'}</div>
+                </td>
+                <td>
+                    <#assign seller = physicalSeller.seller />
+                    <div class="row">
+                        <div class="mt col-md-5">
+                            <span class=" label <#if seller.agent>label-success<#else>label-default</#if>">${_res.get("partner.agent")}</span>
+
+                        </div>
+                        <div class="mt col-md-5">
+                            <span class="label <#if seller.partner_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.partner")}</span>
+                        </div>
+                        <div class="mt col-md-5">
+                            <span class="label <#if seller.crown_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.crown")}</span>
+                        </div>
+                    </div>
+                </td>
+                <td>${physicalSeller.created_date!}</td>
+                <td>
+                    <a class="btn btn-danger btn-sm" data-toggle="modal" data-target="#myModal"
+                       data-id="${physicalSeller.seller_id!}"
+                       data-action="${base}/physical_seller/delete"
+                       data-return-url="/physical_seller?pageNumber=${pageNumber!}">
+                        ${_res.get("partner.physical_seller.delete")}
+                    </a>
+                    <#if seller.crown_ship == 1>
+                        <a class="btn btn-info btn-sm" href="${base}/physical_seller/purchaseSummaryList?uid=${physicalSeller.uid!}">${_res.get("partner.physical_seller.view_purchase_summary")}</a>
+                        <a class="btn btn-info btn-sm" href="${base}/physical_seller/purchaseJournalList/?uid=${physicalSeller.uid}">${_res.get("partner.physical_seller.view_purchase_journal")}</a>
+                        <a class="btn btn-info btn-sm" href="${base}/physical_seller/addPurchaseJournal/${physicalSeller.seller_id}">${_res.get("partner.physical_seller.add_purchase_journal")}</a>
+                    </#if>
+                    <#if seller.agent>
+                        <a class="btn btn-info btn-sm" href="${base}/physical_seller/agentSummaryList?uid=${physicalSeller.uid!}">${_res.get("partner.physical_seller.view_agent_summary")}</a>
+                    </#if>
+                </td>
+            </tr>
+        </#list>
+        <#if (sellers.list?size==0)>
+            <td colspan="20">No Data</td>
+        </#if>
+    </table>
+    <@paginate currentPage=sellers.pageNumber totalPage=sellers.totalPage actionUrl="${base}/physical_seller?pageNumber=" />
+</@layout.layout>

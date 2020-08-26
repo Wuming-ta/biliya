@@ -1,0 +1,31 @@
+<style>
+    .product-widget{
+        background-color: transparent;
+        border: 1px solid #f4f4f4;
+        height: 300px;
+    }
+    .product-widget-head{
+        border-left: 5px solid orange;
+        border-bottom: 1px solid #f4f4f4;
+        padding-left: 10px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+</style>
+<div class="product-widget">
+    <div class="product-widget-head">
+        <#if productWidgetDisplayName??>
+            ${productWidgetDisplayName!}
+        <#else>${productWidgetName!}
+        </#if>
+    </div>
+    <div id="product-widget-chart" style="width: 100%;height:260px;"></div>
+</div>
+
+<script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('product-widget-chart'));
+        option = ${option};
+        myChart.setOption(option);
+</script>

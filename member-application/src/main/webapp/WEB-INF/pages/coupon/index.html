@@ -1,0 +1,87 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "../template/pagination.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.coupon") modal>
+<#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.coupon")/>
+    <@msg message />
+
+    <div class="search-box">
+        <form role="form" class="form-inline">
+            <div class="form-group">
+                <label for="code">${_res.get("member.coupon.code")}</label>
+                <input type="text" class="form-control" id="code" name="code" value="${code!}">
+            </div>
+            <div class="form-group">
+                <label for="code">${_res.get("member.coupon.name")}</label>
+                <input type="text" class="form-control" id="name" name="name" value="${name!}">
+            </div>
+            <div class="form-group">
+                <label for="user">${_res.get("member.coupon.user")}</label>
+                <input type="text" class="form-control" id="user" name="user" value="${user!}">
+            </div>
+            <div class="form-group">
+                <label>${_res.get("member.coupon.status")}</label>
+                <select name="status" class="form-control">
+                    <option></option>
+                    <#list statuses as s>
+                    <option value="${s}" <#if (status??&&status==s)>selected="selected"</#if> >${_res.get("member.coupon.status." + s?lower_case)}</option>
+            </#list>
+            </select>
+            </div>
+            <button type="submit" class="btn btn-primary">${_res.get("member.coupon.search")}</button>
+        </form>
+    </div>
+
+    <table class="table table-hover ">
+        <tr>
+            <th style="width: 20%">${_res.get("member.coupon.name")}</th>
+            <th style="width: 10%">${_res.get("member.coupon.type")}</th>
+            <th style="width: 5%">${_res.get("member.coupon.status")}</th>
+            <th style="width: 15%">${_res.get("member.coupon.user")}</th>
+            <th style="width: 15%">${_res.get("member.coupon.valid_date")}</th>
+            <th style="width: 10%">${_res.get("member.coupon.action")}</th>
+        </tr>
+
+        <#list coupons.list as coupon>
+            <#assign returnUrl>/coupon%3fcode=${code!}%26user=${user!}%26status=${status!}%26pageNumber=${pageNumber!}</#assign>
+            <tr>
+                <td><a href="${base}/coupon/detail/${coupon.id}">${coupon.name!}</a></td>
+                <td>${_res.get("member.coupon.type." + coupon.type?lower_case)}</td>
+                <td><label class="label <#if coupon.status=='ACTIVATION'>label-success<#else>label-default</#if>">${_res.get("member.coupon.status." + coupon.status?lower_case)}</label></td>
+                <td><a href="${base}/member/detail/${coupon.user_id}">
+                    <div>${coupon.user_name!}</div>
+                    <div>${coupon.uid!}</div>
+                </a></td>
+                <td>${coupon.valid_date!}</td>
+                <td>
+                    <@shiro.hasPermission name="coupon.edit">
+                    <a class="btn btn-danger btn-sm" href="${base}/coupon/delete/${coupon.id}?returnUrl=${returnUrl!}"
+                       onclick="javascript:if (confirm('${_res.get("member.coupon.delete_confirm")}')){return true;} return false;">
+                    ${_res.get("member.coupon.delete")}</a>
+                    <#if (coupon.status=='NON_ACTIVATION')>
+                        <a class="btn btn-success btn-sm" href="${base}/coupon/activate/${coupon.id}?returnUrl=${returnUrl!}">${_res.get("member.coupon.activate")}</a>
+                    </#if>
+                    </@shiro.hasPermission>
+                </td>
+            </tr>
+        </#list>
+
+        <#if (coupons.list?size==0)>
+            <td colspan="10">No Data</td>
+        </#if>
+
+    </table>
+    <@paginate currentPage=coupons.pageNumber totalPage=coupons.totalPage actionUrl="${base}/coupon?pageNumber=" urlParas="&code=${code!}&user=${user!}&status=${status!}" />
+
+</@layout.layout>

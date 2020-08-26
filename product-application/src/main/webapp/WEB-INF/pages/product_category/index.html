@@ -1,0 +1,82 @@
+<#include "product_category_tree.ftl"/>
+<#macro script>
+<script src="${base}/assets/js/bootstrap-treeview.min.js"></script>
+<script>
+  $(document).ready(function(){
+    var tree = [<@tree productCategories/>];
+    if (tree.length > 0) {
+        $("#tree").treeview({data: tree,
+            nodeIcon: "glyphicon glyphicon-star-empty",
+            enableLinks: true,
+            levels: 3,
+            showTags: true,
+            onNodeSelected: function(event, data) {
+                var html = $("#detail-template").html()
+                    .replace(/#NAME#/g, data.text)
+                    .replace(/#COVER#/g, data.cover)
+                    .replace(/#DESCRIPITON#/g, data.description)
+                    .replace(/#PROMOTED#/g, data.promoted)
+                    .replace(/#ID#/g, data.id);
+                $("#detail").html(html);
+            },
+            onNodeUnselected: function(event, data) {
+                console.log("unselect" + data);
+            }
+        });
+    }
+    else {
+        $('#tree').html('<p class="well">no data</p>');
+    }
+  });
+</script>
+<script type="text/html" id="detail-template">
+    <div class="panel panel-primary">
+        <div class="panel-heading">产品类别详情</div>
+        <div class="panel-body">
+            <div class="thumbnail">
+                <img src="#COVER#" width="100%">
+                <div class="caption">
+                    <h3>#NAME#</h3>
+                    <p>#DESCRIPITON#</p>
+                    <p>
+                        <a href="${base}/product_category/edit/#ID#" class="btn btn-primary" role="button">编辑</a>
+                        <a href="${base}/product_category/add/?parent_id=#ID#" class="btn btn-primary" role="button">添加子类别</a>
+                        <a class="btn btn-danger" href="${base}/product_category/delete/#ID#"
+                           onclick="javascript:if (confirm('${_res.get("product_category.delete_confirm")}')){return true;} return false;">删除</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+</#macro>
+<#macro css>
+    <link href="${base}/assets/css/bootstrap-treeview.min.css" rel="stylesheet" />
+    <style>
+        .tag-white {
+          color: #fff;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("menu.product_category") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.product_category")/>
+    <@msg message />
+
+    <@shiro.hasPermission name="product.category.edit">
+    <div class="search-box">
+        <a class="btn btn-primary" href="${base}/product_category/add">${_res.get("product_category.btn.new")}</a>
+    </div>
+    </@shiro.hasPermission>
+
+    <div class="row">
+        <div id="tree" class="col-sm-12 col-md-6 col-lg-6"></div>
+        <div id="detail" class="col-sm-12 col-md-6 col-lg-6"></div>
+    </div>
+
+
+</@layout.layout>

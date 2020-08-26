@@ -1,0 +1,116 @@
+
+<#macro script>
+    <script>
+        //delete是关键字
+        function remove(link){
+            var linkVal=$(link).attr("val");
+            location.href="${base}/product_hit_word/delete/"+linkVal;
+        }
+
+        function showDeleteLink(deleteLinkId, spanId){
+            $("#" + deleteLinkId).css("display", "inline");
+            $("#" + spanId).css("display", "none");
+        }
+
+        function hideDeleteLink(deleteLinkId, spanId){
+            $("#" + deleteLinkId).css("display", "none");
+            $("#" + spanId).css("display", "inline");
+        }
+    </script>
+
+</#macro>
+<#macro css>
+    <style>
+        .thumb-preview{
+        width: 60px;
+        height: 60px;
+        border: 1px solid #E2E2E2;
+        }
+
+        .upload-file {
+        position: relative;
+        display: inline-block;
+        text-align: center;
+        color: #E2E2E2;
+        text-indent: 0;
+        line-height: 56px;
+        }
+
+        .add-box {
+        border: 2px dashed #DDDDDD;
+        font-size: 60px;
+        height: 150px;
+        }
+
+        .vertical-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        }
+
+        .div-container{
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom:5px;
+            height:125px;
+        }
+        .div-head {
+            background-color:rgb(198,209,229);
+            display:block;
+            height: 80px;
+            line-height:80px;
+            font-size: 14px;
+            overflow:hidden;
+            word-wrap:break-word;
+            word-break:break-all;
+
+        }
+
+        .div-body {
+            background-color: #fafafa;
+            height: 45px;
+            padding-top: 8px;
+            font-size:14px;
+        }
+
+        .div-col {
+            margin-bottom:15px;
+        }
+
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.product_hit_word") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.product_hit_word")/>
+    <@msg message />
+    <div class="search-box">
+            <form  class="form-inline" action="${base}/product_hit_word/save" method="post">
+                <@shiro.hasPermission name="product.edit">
+                <input aria-required="true" class="form-control required" name="name" required  placeholder="关键字" type="text">
+                <button  type="submit" class="btn btn-primary btn-large">${_res.get("product_hit_word.btn.new")}</button>
+            </@shiro.hasPermission>
+            </form>
+    </div>
+    <div class="row">
+        <#list productHitWords as productHitWord>
+            <div class="col-md-2 div-col"  onmouseover="showDeleteLink('link-${productHitWord.id!}','span-${productHitWord.id!}');"
+                 onmouseout="hideDeleteLink('link-${productHitWord.id!}','span-${productHitWord.id!}');">
+                <div class="div-container">
+                    <div class="div-head">${productHitWord.name!}</div>
+                    <div class="div-body">
+                        <a  class="btn btn-danger btn-small" id="link-${productHitWord.id!}" val="${productHitWord.id!}" style="display:none" onclick="remove(this);" >
+                            删除
+                        </a>
+                        <span id="span-${productHitWord.id!}" >热度<#if productHitWord.hit??>${productHitWord.hit!}</#if></span>
+                    </div>
+                </div>
+            </div>
+        </#list>
+    </div>
+</@layout.layout>

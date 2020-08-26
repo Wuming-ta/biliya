@@ -1,0 +1,44 @@
+<#macro script>
+    <script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "../template/pagination.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.coupon_strategy") modal>
+<#assign menus = {"/": _res.get("breadcrumb.home"), "/coupon_strategy": _res.get("breadcrumb.coupon_strategy")}>
+    <@nav menus _res.get("breadcrumb.view_share_link")/>
+    <@msg message />
+
+    <@shiro.hasPermission name="coupon.edit">
+    <div class="search-box">
+        <a class="btn btn-primary" href="${base}/coupon_strategy/genShareLink">${_res.get("member.coupon_strategy.share_link.btn.new")}</a>
+    </div>
+    </@shiro.hasPermission>
+
+    <table class="table table-bordered">
+        <tr>
+            <th style="width: 50%">${_res.get("member.coupon_share.link")}</th>
+            <th style="width: 15%">${_res.get("member.coupon_share.share_date")}</th>
+            <th style="width: 15%">${_res.get("member.coupon_share.valid_date")}</th>
+            <th style="width: 20%">${_res.get("member.coupon_share.action")}</th>
+        </tr>
+        <#list couponShareList as couponShare>
+            <tr <#if couponShare.valid>class="text-primary"<#else>class="text-muted"</#if> >
+                <td>${couponShare.link}</td>
+                <td>${couponShare.share_date}</td>
+                <td>${couponShare.valid_date}</td>
+                <td>
+                    <a class="btn btn-danger btn-sm" href="${base}/coupon_strategy/deleteCouponShare/${couponShare.id}" onclick="javascript:return confirm('${_res.get("member.coupon_share.delete_confirm")}');" >${_res.get("btn.delete")}</a>
+                </td>
+            </tr>
+        </#list>
+
+    </table>
+</@layout.layout>

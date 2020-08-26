@@ -1,0 +1,19 @@
+<div class="list-group" style="margin-top: 10px">
+    <#list products.list as product>
+        <a href="#" class="list-group-item" onclick="selectProduct('${product.id!}','${product.name!}')">
+            <img src="${product.cover!}" height="60">
+            ${product.name}
+        </a>
+    </#list>
+</div>
+
+<nav>
+    <ul class="pager">
+        <#if (products.pageNumber != 1) >
+            <li><a href="#" onclick="getProduct(${products.pageNumber - 1}, '${productName!}');">上一页</a></li>
+        </#if>
+        <#if (products.totalPage > products.pageNumber) >
+            <li><a href="#" onclick="getProduct(${products.pageNumber + 1}, '${productName!}');">下一页</a></li>
+        </#if>
+    </ul>
+</nav>

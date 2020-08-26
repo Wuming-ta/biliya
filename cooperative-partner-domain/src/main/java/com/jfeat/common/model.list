@@ -1,0 +1,27 @@
+# put the model here using full package.
+# it must be under model package.
+# such as there is a table t_abc_efg, then the model class should be AbcEfg
+#
+# example:
+#com.jfeat.test.model.AbcEfg
+com.jfeat.partner.model.Seller
+com.jfeat.partner.model.Agent
+com.jfeat.partner.model.MerchantOptions
+com.jfeat.partner.model.PcdQualify
+com.jfeat.partner.model.AgentPcdQualify
+com.jfeat.partner.model.SettlementProportion
+com.jfeat.partner.model.Apply
+com.jfeat.partner.model.PartnerLevel
+com.jfeat.partner.model.PhysicalSeller
+com.jfeat.partner.model.PhysicalPurchaseJournal
+com.jfeat.partner.model.PhysicalPurchaseSummary
+com.jfeat.partner.model.AgentSummary
+com.jfeat.partner.model.PhysicalSettlementProportion
+com.jfeat.partner.model.PhysicalSettlementDefinition
+com.jfeat.partner.model.CooperativeStatistic
+com.jfeat.partner.model.PhysicalAgentBonus
+com.jfeat.partner.model.PhysicalApplyTips
+com.jfeat.partner.model.AgentPurchaseJournal
+com.jfeat.partner.model.Copartner
+com.jfeat.partner.model.CopartnerSettlement
+com.jfeat.partner.model.Alliance

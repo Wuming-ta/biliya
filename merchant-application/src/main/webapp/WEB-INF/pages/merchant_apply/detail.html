@@ -1,0 +1,28 @@
+<#macro script>
+    <script>
+        $(document).ready(function(){
+
+        });
+    </script>
+</#macro>
+<#macro css>
+    <style>
+        <#include "../settled_merchant/common.css" />
+
+        p {
+        padding: 0px;
+        }
+    </style>
+
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+<#include "../settled_merchant/settled_merchant_status_label.ftl" />
+<@layout.layout script css _res.get("breadcrumb.apply_detail") modal>
+<#assign menus={"/": _res.get("breadcrumb.home")} />
+<@nav menus _res.get("breadcrumb.apply_detail") />
+
+<#include "../settled_merchant/common.ftl" />
+
+</@layout.layout>

@@ -1,0 +1,171 @@
+<#macro script>
+    <script>
+  $(document).ready(function(){
+
+    $("input:checkbox").each(function(){
+        this.checked = false;
+    })
+
+    $("#batch-approve").attr("disabled", true);
+    $("#batch-reject").attr("disabled", true);
+    $("input:checkbox").click(function(){
+        if($(this).attr("id")=="btnSelect"){
+              this.value = this.value == "全选"?"全不选":"全选";
+              $("input:checkbox").checkCbx();
+        }
+        var hasChecked = false;
+        $("input:checkbox").each(function(){
+            if(this.checked && $(this).attr("id")!="btnSelect"){
+                hasChecked = true;
+            }
+        })
+        if(hasChecked){
+            $("#batch-approve").attr("disabled", false);
+            $("#batch-reject").attr("disabled", false);
+        }else{
+            $("#batch-approve").attr("disabled", true);
+            $("#batch-reject").attr("disabled", true);
+        }
+    })
+
+    $.fn.checkCbx=function(){
+      return this.each(function(){
+        var disabled = $(this).prop("disabled");
+        if (!disabled) {
+            if($("#btnSelect").val() == "全不选"){
+                this.checked = false;
+            }else {
+                this.checked = true;
+            }
+        }
+      })
+    }
+
+    $("#batch-approve").click(function(){
+        $("#apply-form").attr("action","${base}/seller_apply/batchApprove").attr("method","post").submit();
+    })
+    $("#batch-reject").click(function(){
+        $("#apply-form").attr("action","${base}/seller_apply/batchReject").attr("method","post").submit();
+    })
+  });
+
+  function viewApply(id) {
+    $("#apply-view-modal-content").html("Loading...");
+    $.get("${base}/seller_apply/view/" + id, function(data) {
+        $("#apply-view-modal-content").html(data);
+    });
+    $("#apply-view-modal").modal("show");
+  }
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal>
+    <!-- Modal -->
+    <div class="modal fade" id="apply-view-modal" tabindex="-1" role="dialog" aria-labelledby="applyViewModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="applyViewModalLabel">查看详情</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="apply-view-modal-content"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.sellerApply") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.sellerApply")/>
+    <@msg message />
+
+    <div class="search-box">
+        <form class="form-inline">
+            <div class="form-group form-item">
+                <label></label>
+                <input type="text" name="uid" class="form-control" value="${uid!}" placeholder="${_res.get("partner.seller.uid")}">
+            </div>
+            <div class="form-group form-item">
+                <label>申请状态</label>
+                <select class="form-control" name="status">
+                    <option value="">全部</option>
+                    <option value="INIT" <#if status??&&status=="INIT">selected="selected"</#if>>${_res.get("partner.apply.status.init")}</option>
+                    <option value="APPROVE" <#if status??&&status=="APPROVE">selected="selected"</#if>>${_res.get("partner.apply.status.approve")}</option>
+                    <option value="REJECT" <#if status??&&status=="REJECT">selected="selected"</#if>>${_res.get("partner.apply.status.reject")}</option>
+                </select>
+            </div>
+            <div class="form-group form-item">
+                <label>申请类型</label>
+                <select class="form-control" name="type">
+                    <option value="">全部</option>
+                    <option value="SELLER" <#if type??&&type=="SELLER">selected="selected"</#if>>${_res.get("partner.apply.type.seller")}</option>
+                    <option value="AGENT" <#if type??&&type=="AGENT">selected="selected"</#if>>${_res.get("partner.apply.type.agent")}</option>
+                    <option value="PHYSICAL" <#if type??&&type=="PHYSICAL">selected="selected"</#if>>${_res.get("partner.apply.type.physical")}</option>
+                    <option value="CROWN" <#if type??&&type=="CROWN">selected="selected"</#if>>${_res.get("partner.apply.type.crown")}</option>
+                    <option value="COPARTNER" <#if type??&&type=="COPARTNER">selected="selected"</#if>>${_res.get("partner.apply.type.copartner")}</option>
+                </select>
+            </div>
+            <div class="form-group form-item">
+                <button type="submit" class="btn btn-primary">${_res.get("partner.seller.search")}</button>
+            </div>
+        </form>
+    </div>
+
+    <form id="apply-form" action="" class="form-inline">
+        <div class="btn-group box">
+            <button id="batch-approve" type="submit" class="btn btn-default">
+                <i class="fa fa-plus" aria-hidden="true"></i>批量通过
+            </button>
+            <button id="batch-reject" type="submit" class="btn btn-default">
+                <i class="fa fa-minus" aria-hidden="true"></i>批量拒绝
+            </button>
+        </div>
+        <table class="table table-hover ">
+            <tr>
+                <th style="width: 5%"><input id="btnSelect" type="checkbox" class="checkbox" value="全不选"></th>
+                <th style="width: 15%">UID</th>
+                <th style="width: 15%">名字</th>
+                <th style="width: 10%">类型</th>
+                <th style="width: 10%">状态</th>
+                <th style="width: 15%">申请日期</th>
+                <th style="width: 15%">通过/拒绝日期</th>
+                <th style="width: 15%">操作</th>
+            </tr>
+            <#list apply.list as a>
+                <tr>
+                    <td><input type="checkbox" name="apply[${a_index}].id" value="${a.id!}" <#if a.status??&&a.status!="INIT">disabled="disabled"</#if>></td>
+                    <td>${a.uid!}</td>
+                    <td>${a.name!}</td>
+                    <td>${_res.get("partner.apply.type."+a.type?lower_case)}</td>
+                    <td><span class="label <#if a.status=='APPROVE'>label-success<#elseif a.status=='REJECT'>label-danger<#else>label-default</#if>">${_res.get("partner.apply.status."+a.status?lower_case)}</span></td>
+                    <td>${a.apply_date!}</td>
+                    <td>
+                        <#if (a.status=="APPROVE")>${a.approve_date!}</#if>
+                        <#if (a.status=="REJECT")>${a.reject_date!}</#if>
+                    </td>
+                    <td>
+                        <#if (a.type == 'PHYSICAL' || a.type == 'COPARTNER')>
+                            <a class="btn btn-primary btn-sm" href="#" onclick="viewApply(${a.id});">查看</a>
+                        </#if>
+                        <#if (a.status == 'INIT')>
+                        <a class="btn btn-success btn-sm" href="${base}/seller_apply/approve/${a.id!}"
+                           onclick="javascript:if (confirm('确定要通过该申请吗？')){return true;} return false;">通过</a>
+                        <a class="btn btn-danger btn-sm" href="${base}/seller_apply/reject/${a.id!}"
+                           onclick="javascript:if (confirm('确定要拒绝该申请吗？')){return true;} return false;">拒绝</a>
+                        </#if>
+                    </td>
+                </tr>
+            </#list>
+        </table>
+    </form>
+    <@paginate currentPage=apply.pageNumber totalPage=apply.totalPage actionUrl="${base}/seller_apply?pageNumber=" urlParas="&userId=${userId!}&status=${status!}&type=${type!}"/>
+
+</@layout.layout>

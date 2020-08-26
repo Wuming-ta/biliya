@@ -1,0 +1,207 @@
+<#macro script>
+    <script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .col-head {
+          width: 150px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.seller") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/seller": _res.get("breadcrumb.seller")}/>
+    <@nav menus _res.get("breadcrumb.detail")/>
+
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">${_res.get("partner.seller.summary")}</h3>
+        </div>
+        <table class="table table-hover table-bordered">
+            <#assign user = seller.user >
+            <tr>
+                <td class="col-head">${_res.get("partner.seller.Id")}</td>
+                <td>${seller.id}</td>
+            </tr>
+            <tr>
+                <td>${_res.get("partner.seller.name")}</td>
+                <td><a href="${base}/seller/detail?sellerId=${seller.id}">${user.name!'-'} - ${user.uid}</a></td>
+            </tr>
+            <tr>
+                <td>${_res.get("identity.user.invitation_code")}</td>
+                <td>${user.invitation_code!}</td>
+            </tr>
+            <tr>
+                <td>${_res.get("partner.seller.parent_name")}</td>
+                <td><#if (seller.parent_id??)><a href="${base}/seller/detail?sellerId=${seller.parent_id!}">${seller.parent.user.name!}</a></#if></td>
+            </tr>
+            <#if (seller.partner_ship == 0)>
+            <tr>
+                <td>${_res.get("partner.seller.partner_name")}</td>
+                <td><#if (seller.partner_id??)><a href="${base}/seller/detail?sellerId=${seller.partner_id!}">${seller.partner.user.name!}</a></#if></td>
+            </tr>
+            </#if>
+            <tr>
+                <td>${_res.get("partner.seller.partnership")}</td>
+                <td>
+                    ${_res.get("partner.seller.partnership."+seller.partner_ship)}
+                    <#if (seller.partner_ship==1)>
+                        - ${_res.get("partner.seller.partnership.time")} - ${seller.partner_ship_time!}
+                    </#if>
+                </td>
+            </tr>
+            <tr>
+                <td>${_res.get("partner.seller.sellership")}</td>
+                <td>
+                    ${_res.get("partner.seller.sellership."+seller.seller_ship)}
+                    <#if (seller.seller_ship==1)>
+                        - ${_res.get("partner.seller.sellership.time")} - ${seller.seller_ship_time!}
+                    </#if>
+                </td>
+            </tr>
+            <tr>
+                <td>${_res.get("partner.seller.level.total")}</td>
+                <td>
+                    <#assign levelTotalCount = 0 >
+                    <#list level.levels as l>
+                        <#assign levelTotalCount = levelTotalCount + l >
+                        ${_res.format("partner.seller.level.count", l_index + 1, l)}
+                    </#list>
+                        ${_res.format("partner.seller.level.total_count", levelTotalCount)}
+                </td>
+            </tr>
+                <tr>
+                    <td>${_res.get("partner.seller.physicalsellership")}</td>
+                    <td>
+                        <#if physicalSeller??>
+                            是
+                            - ${_res.get("partner.seller.physicalsellership.time")} - ${physicalSeller.created_date!}
+                        <#else>
+                            否
+                        </#if>
+                    </td>
+                </tr>
+            <tr>
+                <td>${_res.get("partner.seller.crownship")}</td>
+                <td>
+                    ${_res.get("partner.seller.crownship."+seller.crown_ship)}
+                    <#if (seller.crown_ship_temp==1)>
+                        <span class="label label-info">临时</span>
+                    </#if>
+                    <#if (seller.crown_ship==1)>
+                        - ${_res.get("partner.seller.crownship.time")} - ${seller.crown_ship_time!}
+                    </#if>
+                    - ${_res.get("partner.seller.crown_apply_failure_times")} - ${seller.crown_apply_failure_times!}次
+                </td>
+            </tr>
+            <tr>
+                <td>是否合伙人</td>
+                <td>
+                    <#if copartner??>
+                        是 - ${copartner.create_time!} - ${copartner.status}
+                    <#else>
+                        否
+                    </#if>
+                </td>
+            </tr>
+            <tr>
+                <td>是否盟友</td>
+                <td>
+                    <#if alliance??>
+                        <#if alliance.alliance_ship == 1>
+                        是
+                        <#elseif alliance.alliance_ship == 2>
+                        临时 - ${alliance.alliance_ship_time!} <a href="/alliance/assignAllianceShip?userId=${seller.user_id}&returnUrl=/seller/detail%3FsellerId%3D${seller.id!}"">设置为正式盟友</a>
+                        <#elseif alliance.alliance_ship == 0>
+                        是 - 成为盟友时间：${alliance.alliance_ship_time!}
+                            <#if alliance.stockholder_ship?? && alliance.stockholder_ship == 0>
+                                <a class="btn btn-primary" href="/alliance/assignStockholderShip?userId=${seller.user_id}&returnUrl=/seller/detail%3FsellerId%3D${seller.id!}">设置为股东</a>
+                            <#else>
+                                成为股东时间：${alliance.stockholder_ship_time!}
+                            </#if>
+                        </#if>
+                    <#else>
+                        <a class="btn btn-primary" href="/alliance/assignAllianceShip?userId=${seller.user_id}&returnUrl=/seller">设置为盟友</a>
+                    </#if>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <#if (seller.partner_ship == 1)>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">${_res.get("partner.seller.partner_pool")}</h3>
+            </div>
+            <table class="table table-hover table-bordered">
+                <tr>
+                    <th>${_res.get("partner.seller.Id")}</th>
+                    <th>${_res.get("partner.seller.name")}</th>
+                    <th>${_res.get("partner.seller.sellership")}</th>
+                </tr>
+                <#list seller.verbosePartnerPool as p>
+                <tr>
+                    <td>${p.id}</td>
+                    <td><a href="${base}/seller/detail?sellerId=${p.id}">${p.user_name} - ${p.uid}</a></td>
+                    <td>${_res.get("partner.seller.sellership."+p.seller_ship)}</td>
+                </tr>
+                </#list>
+            </table>
+        </div>
+    </#if>
+
+    <#if seller.crown_ship == 1>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">${_res.get("partner.seller.crown_pool")}</h3>
+            </div>
+            <table class="table table-hover table-bordered">
+                <tr>
+                    <th>${_res.get("partner.seller.Id")}</th>
+                    <th>${_res.get("partner.seller.name")}</th>
+                    <th>${_res.get("partner.seller.sellership")}</th>
+                </tr>
+                <#list seller.verboseCrownPool as p>
+                    <tr>
+                        <td>${p.id}</td>
+                        <td><a href="${base}/seller/detail?sellerId=${p.id}">${p.user_name} - ${p.uid}</a></td>
+                        <td>${_res.get("partner.seller.sellership."+p.seller_ship)}</td>
+                    </tr>
+                </#list>
+            </table>
+        </div>
+    </#if>
+
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">${_res.get("partner.seller.child_sellers")}</h3>
+        </div>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th>${_res.get("partner.seller.Id")}</th>
+                <th>${_res.get("partner.seller.name")}</th>
+                <th>${_res.get("partner.seller.sellership")}</th>
+                <th>${_res.get("partner.seller.level")}</th>
+            </tr>
+            <#list children as c>
+                <tr>
+                    <td>${c.id}</td>
+                    <td><a href="${base}/seller/detail?sellerId=${c.id}">${c.user_name} - ${c.uid}</a></td>
+                    <td>${_res.get("partner.seller.sellership."+c.seller_ship)}</td>
+                    <td>${c.sa_level!}</td>
+                </tr>
+            </#list>
+        </table>
+
+    </div>
+
+</@layout.layout>

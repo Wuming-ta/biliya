@@ -1,0 +1,75 @@
+<#macro script>
+    <#include "../common/pwd-validate-modal.js" />
+    <script>
+      $(document).ready(function(){
+
+      });
+    </script>
+</#macro>
+<#macro css>
+    <style>
+    .form-search {
+    margin-bottom: 10px;
+    }
+    .col-summary-sm {
+    width: 160px;
+    }
+    </style>
+</#macro>
+<#macro modal>
+    <#include "../common/pwd-validate-modal.html" />
+</#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+
+
+<@layout.layout script css _res.get("breadcrumb.crown") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.crown")/>
+    <@msg message />
+
+    <div class="search-box">
+        <form class="form-inline">
+            <div class="form-group">
+                <label>${_res.get("partner.seller.Id")}</label>
+                <input type="text" name="sellerId" class="form-control" value="${sellerId!}">
+            </div>
+            <div class="form-group">
+                <label>${_res.get("partner.seller.uid")}</label>
+                <input type="text" name="uid" class="form-control" value="${uid!}">
+            </div>
+            <button type="submit" class="btn btn-primary">${_res.get("partner.seller.search")}</button>
+        </form>
+    </div>
+
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th>${_res.get("partner.seller.Id")}</th>
+            <th>${_res.get("partner.seller.name")}</th>
+            <th>${_res.get("partner.seller.crownship.time")}</th>
+            <th>${_res.get("partner.seller.action")}</th>
+        </tr>
+        <#list sellers as seller>
+            <tr>
+                <td>${seller.id}</td>
+                <td><a href="${base}/seller/detail?sellerId=${seller.id}">${seller.user_name!'-'}</a></td>
+                <td>${seller.crown_ship_time}</td>
+                <td>
+                    <a class="btn btn-danger btn-sm" data-toggle="modal" data-target="#myModal"
+                       data-id="${seller.id!}"
+                       data-action="${base}/crown/delete"
+                       data-return-url="/crown">
+                        ${_res.get("partner.crown.delete")}
+                    </a>
+                    <#if seller.isPhysicalSeller()==false>
+                    <a class="btn btn-primary btn-sm" href="${base}/physical_seller/assign?sellerId=${seller.id}&returnUrl=/crown">${_res.get("partner.set.physical_seller")}</a>
+                    </#if>
+                </td>
+            </tr>
+        </#list>
+        <#if (sellers?size==0)>
+            <td colspan="20">No Data</td>
+        </#if>
+    </table>
+</@layout.layout>

@@ -1,0 +1,17 @@
+# put the model here using full package.
+# it must be under model package.
+# such as there is a table t_abc_efg, then the model class should be AbcEfg
+#
+# example:
+#com.jfeat.test.model.AbcEfg
+com.jfeat.misc.model.Feedback
+com.jfeat.misc.model.FeedbackImage
+com.jfeat.misc.model.Faq
+com.jfeat.misc.model.AboutMall
+com.jfeat.misc.model.FaqType
+com.jfeat.misc.model.AdLinkDefinition
+com.jfeat.misc.model.Ad
+com.jfeat.misc.model.AdGroup
+com.jfeat.misc.model.CustomerServiceType
+com.jfeat.misc.model.KfQq
+com.jfeat.misc.model.SystemAnnouncement

@@ -1,0 +1,163 @@
+
+<#macro script>
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.config.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.all.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/lang/zh-cn/zh-cn.js"></script>
+    <script>
+      $(document).ready(function(){
+        UE.getEditor('physicalCrownTipsEditor');
+        UE.getEditor('physicalStarTipsEditor');
+        UE.getEditor('announceTipsEditor');
+        $("form").validate();
+
+
+        $('a[role=tab]').click(function(){
+            localStorage.tabName = $(this).prop('id');
+        });
+
+        if(!localStorage.tabName){
+           localStorage.tabName = 'physical_crown_tips_link';
+        }
+        $('#'+localStorage.tabName).tab('show');
+
+      });
+    </script>
+</#macro>
+<#macro css>
+    <style>
+        .tab-pane {
+            padding-top: 15px;
+        }
+    </style>
+    <link href="${base}/assets/ueditor-1.4.3.3/themes/default/css/ueditor.css" type="text/css" rel="stylesheet">
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+    <#include "../template/breadcrumb.ftl"/>
+    <#include "../template/message.ftl"/>
+    <@layout.layout script css _res.get("breadcrumb.physical_apply_tips") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/physical_seller": _res.get("breadcrumb.physicalSeller")}/>
+    <@nav menus _res.get("breadcrumb.physical_apply_tips")/>
+    <@msg message />
+
+    <div>
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a id="physical_crown_tips_link" href="#physical_crown_tips" aria-controls="physical_crown_tips" role="tab" data-toggle="tab">${_res.get("breadcrumb.physical_crown_tips")}</a>
+            </li>
+            <li role="presentation">
+                <a id="physical_star_tips_link" href="#physical_star_tips" aria-controls="physical_star_tips" role="tab" data-toggle="tab">${_res.get("breadcrumb.physical_star_tips")}</a>
+            </li>
+            <li role="presentation">
+                <a id="announce_tips_link" href="#announce_tips" aria-controls="announce_tips" role="tab" data-toggle="tab">${_res.get("breadcrumb.announce_tips")}</a>
+            </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="physical_crown_tips">
+                <form class="form-horizontal" action="${base}/physical_seller/updatePhysicalCrownTips" method="post">
+                    <input type="hidden" name="physicalApplyTips.id" value="${physicalCrownTips.id!}">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">${_res.get("partner.physical_crown_tips.name")}</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control required" name="physicalApplyTips.name" value="${physicalCrownTips.name!}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">${_res.get("partner.physical_crown_tips.enabled")}</label>
+                        <div class="col-md-8">
+                            <label class="radio-inline">
+                                <input type="radio" name="physicalApplyTips.enabled" value="1" <#if physicalCrownTips.enabled==1>checked</#if> >${_res.get("partner.physical_crown_tips.enabled.1")}
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="physicalApplyTips.enabled" value="0" <#if physicalCrownTips.enabled==0>checked</#if>>${_res.get("partner.physical_crown_tips.enabled.0")}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">${_res.get("partner.physical_crown_tips.content")}</label>
+                        <div class="col-md-8">
+                            <script type="text/plain" id="physicalCrownTipsEditor" name="physicalApplyTips.content" style="width: 100%; min-height: 400px">${physicalCrownTips.content!}</script>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <button type="submit" class="btn btn-primary">${_res.get("btn.update")}</button>
+                    <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+                </form>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="physical_star_tips">
+            <form class="form-horizontal" action="${base}/physical_seller/updatePhysicalStarTips" method="post">
+                <input type="hidden" name="physicalApplyTips.id" value="${physicalStarTips.id!}">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">${_res.get("partner.physical_star_tips.name")}</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control required" name="physicalApplyTips.name" value="${physicalStarTips.name!}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">${_res.get("partner.physical_star_tips.enabled")}</label>
+                    <div class="col-md-8">
+                        <label class="radio-inline">
+                            <input type="radio" name="physicalApplyTips.enabled" value="1" <#if physicalStarTips.enabled==1>checked</#if> >${_res.get("partner.physical_star_tips.enabled.1")}
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="physicalApplyTips.enabled" value="0" <#if physicalStarTips.enabled==0>checked</#if>>${_res.get("partner.physical_star_tips.enabled.0")}
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">${_res.get("partner.physical_star_tips.content")}</label>
+                    <div class="col-md-8">
+                        <script type="text/plain" id="physicalStarTipsEditor" name="physicalApplyTips.content" style="width: 100%; min-height: 400px">${physicalStarTips.content!}</script>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <button type="submit" class="btn btn-primary">${_res.get("btn.update")}</button>
+                    <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+                </form>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="announce_tips">
+                <form class="form-horizontal" action="${base}/physical_seller/updateAnnounceTips" method="post">
+                    <input type="hidden" name="physicalApplyTips.id" value="${announceTips.id!}">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">${_res.get("partner.announce_tips.name")}</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control required" name="physicalApplyTips.name" value="${announceTips.name!}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">${_res.get("partner.announce_tips.enabled")}</label>
+                        <div class="col-md-8">
+                            <label class="radio-inline">
+                                <input type="radio" name="physicalApplyTips.enabled" value="1" <#if announceTips.enabled==1>checked</#if> >${_res.get("partner.announce_tips.enabled.1")}
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="physicalApplyTips.enabled" value="0" <#if announceTips.enabled==0>checked</#if>>${_res.get("partner.announce_tips.enabled.0")}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">${_res.get("partner.announce_tips.content")}</label>
+                        <div class="col-md-8">
+                            <script type="text/plain" id="announceTipsEditor" name="physicalApplyTips.content" style="width: 100%; min-height: 400px">${announceTips.content!}</script>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <button type="submit" class="btn btn-primary">${_res.get("btn.update")}</button>
+                    <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+</@layout.layout>

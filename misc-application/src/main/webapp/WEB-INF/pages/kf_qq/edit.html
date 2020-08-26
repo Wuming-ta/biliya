@@ -1,0 +1,49 @@
+<#macro script>
+    <script>
+      $(document).ready(function(){
+        $("#form").validate();
+      });
+    </script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.kf_qq") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/kf_qq": _res.get("breadcrumb.kf_qq")}>
+    <@nav menus _res.get("breadcrumb.edit")/>
+
+    <form id="form" class="form-horizontal" role="form" action="${base}/kf_qq/update" method="post">
+        <input type="hidden" name="kfQq.id" value="${qq.id}">
+        <div class="form-group">
+            <label for="name" class="col-lg-2 col-md-2 control-label">${_res.get("misc.kfqq.name")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="text" class="form-control required" id="name" name="kfQq.name" value="${qq.name!}">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label">${_res.get("misc.kfqq.number")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="text" class="form-control required" id="number" name="kfQq.number" value="${qq.number!}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label">${_res.get("misc.kfqq.enabled")}</label>
+            <div class="col-lg-4 col-md-6">
+                <label class="radio-inline"> 
+                    <input type="radio" name="kfQq.enabled" value="1" <#if qq.enabled==1>checked</#if> >${_res.get("misc.kfqq.enabled.1")}
+                </label>
+                 <label class="radio-inline"> 
+                <input type="radio" name="kfQq.enabled" value="0" <#if qq.enabled==0>checked</#if> >${_res.get("misc.kfqq.enabled.0")}
+            </label>
+            </div>
+        </div>
+
+
+        <hr>
+        <button type="submit" class="btn btn-primary">${_res.get("btn.update")}</button>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+    </form>
+
+</@layout.layout>

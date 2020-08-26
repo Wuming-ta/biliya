@@ -1,0 +1,48 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "../template/pagination.ftl"/>
+<@layout.layout script css _res.get("menu.purchase_strategy") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.purchase_strategy")/>
+    <@msg message />
+
+    <div class="search-box">
+        <a class="btn btn-primary" href="${base}/purchase_strategy/add">${_res.get("purchase_strategy.btn.new")}</a>
+    </div>
+
+    <table class="table table-hover ">
+        <tr>
+            <th>${_res.get("purchase_strategy.id")}</th>
+            <th style="width: 20%">${_res.get("purchase_strategy.name")}</th>
+            <th style="width: 40%">${_res.get("purchase_strategy.description")}</th>
+            <th>${_res.get("purchase_strategy.product_count")}</th>
+            <th>${_res.get("product.action")}</th>
+        </tr>
+        <#if (strategies?size=0)>
+            <td colspan="10">No Data</td>
+        </#if>
+        <#list strategies as strategy>
+            <tr>
+                <td>${strategy.id}</td>
+                <td>${strategy.name}</td>
+                <td>${strategy.description!}</td>
+                <td><a href="${base}/product?purchaseStrategyId=${strategy.id}">${strategy.productCount}</a></td>
+                <td>
+                    <a class="btn btn-primary btn-sm" href="${base}/purchase_strategy/edit/${strategy.id}">${_res.get("btn.edit")}</a>
+                    <a class="btn btn-danger btn-sm" href="${base}/purchase_strategy/delete/${strategy.id}"
+                       onclick="javascript:if (confirm('${_res.get("purchase_strategy.delete_confirm")}')){return true;} return false;">${_res.get("btn.delete")}</a>
+                </td>
+            </tr>
+        </#list>
+    </table>
+</@layout.layout>

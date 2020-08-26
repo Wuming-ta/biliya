@@ -1,0 +1,36 @@
+.panel-top {
+  margin-top: 10px;
+}
+
+.col-name {
+  width: 150px;
+}
+
+.pcd-span {
+  display: inline-block;
+  font-size: 16px;
+  margin: 15px 0;
+}
+.pcd-box {
+  background: green;
+  color: white;
+  padding: 10px;
+}
+.pcd-box-delete {
+  visibility: hidden;
+  padding:10px;
+  background: orange;
+}
+
+.pcd-div {
+  display: inline;
+  font-size:16px;
+}
+.pcd-plus {
+  border: 2px dashed #DDDDDD;
+  padding: 8px;
+}
+.pcd-plus a {
+  margin-left: 20px;
+  margin-right: 20px;
+}

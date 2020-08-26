@@ -1,0 +1,53 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+    $("#form").validate({
+        rules: {
+            "memberLevel.name": {
+                required: true,
+                remote: {
+                    url: "${base}/member_level/nameVerify",
+                    type: "POST",
+                    data: {
+                      "name": function() { return $("#name").val(); }
+                    }
+                }
+            }
+        },
+        messages: {
+            "memberLevel.name": {
+                remote: "${_res.get("member.level.name.exist")}"
+            }
+        }
+    });
+
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.member_level") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/member_level": _res.get("breadcrumb.member_level")}>
+    <@nav menus _res.get("breadcrumb.add")/>
+    <form id="form" class="form-horizontal" role="form" action="${base}/member_level/save" method="post">
+        <div class="form-group">
+            <label for="name" class="col-lg-2 col-md-2 control-label">${_res.get("member.level.name")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="text" class="form-control required" id="name" name="memberLevel.name" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="point" class="col-lg-2 col-md-2 control-label">${_res.get("member.level.point")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="number" class="form-control required" id="point" name="memberLevel.point" required>
+            </div>
+        </div>
+
+        <hr>
+        <button id="submitBtn" type="submit" class="btn btn-primary">${_res.get("btn.submit")}</button>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+
+    </form>
+</@layout.layout>

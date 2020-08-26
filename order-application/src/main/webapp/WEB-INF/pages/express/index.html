@@ -1,0 +1,43 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.express") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.express")/>
+    <@msg message />
+
+    <div class="search-box">
+        <a class="btn btn-primary" href="${base}/express/add">${_res.get("btn.express.new")}</a>
+    </div>
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th>${_res.get("express.id")}</th>
+            <th>${_res.get("express.name")}</th>
+            <th>${_res.get("express.code")}</th>
+            <th>${_res.get("express.is_default")}</th>
+            <th>${_res.get("express.action")}</th>
+        </tr>
+        <#list expresses as express>
+            <tr>
+                <td>${express.id}</td>
+                <td>${express.name}</td>
+                <td>${express.code}</td>
+                <td><span class="label <#if express.is_default==1>label-primary<#else>label-default</#if>">${_res.get("express.is_default."+express.is_default)}</span></td>
+                <td>
+                    <a class="btn btn-primary btn-sm" href="${base}/express/edit/${express.id}">${_res.get("btn.express.edit")}</a>
+                    <a class="btn btn-danger btn-sm" href="${base}/express/delete/${express.id}">${_res.get("btn.express.delete")}</a>
+                </td>
+            </tr>
+        </#list>
+    </table>
+
+</@layout.layout>

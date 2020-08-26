@@ -1,0 +1,29 @@
+<#macro script>
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.config.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.all.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/lang/zh-cn/zh-cn.js"></script>
+
+    <#include "common.js" />
+    <#include "edit.js" />
+    <#include "../product_select/listProducts.js" />
+    <#include "../region_select/listRegions.js" />
+</#macro>
+<#macro css>
+    <link href="${base}/assets/ueditor-1.4.3.3/themes/default/css/ueditor.css" type="text/css" rel="stylesheet">
+    <style><#include "common.css"/></style>
+</#macro>
+<#macro modal>
+    <#include "../product_select/_modal.html" />
+    <#include "../region_select/_modal.html"/>
+</#macro>
+<#import "../template/layout.ftl" as layout>
+    <#include "../template/breadcrumb.ftl"/>
+    <@layout.layout script css _res.get("breadcrumb.wholesale") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/wholesale": _res.get("breadcrumb.wholesale")}>
+        <@nav menus _res.get("breadcrumb.edit")/>
+        <#assign returnUrl><#if returnUrl??>${returnUrl}<#else>/wholesale</#if></#assign>
+        <form id="form" role="form" enctype="multipart/form-data" action="${base}/wholesale/update/?returnUrl=${returnUrl?replace('&','%26')}" method="post">
+            <input type="hidden" name="wholesale.id" value="${wholesale.id!}">
+            <#include "_form.html"/>
+        </form>
+    </@layout.layout>

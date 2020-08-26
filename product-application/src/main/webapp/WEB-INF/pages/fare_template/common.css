@@ -1,0 +1,15 @@
+table > tbody > tr > th {
+    text-align: center;
+}
+.carry-mode{
+    border: 1px solid #efefef;
+    padding: 5px;
+    margin: 5px;
+}
+.required-field{
+    color: red;
+}
+.form-control-inline{
+    display: inline;
+    width: 80%;
+}

@@ -1,0 +1,53 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.withdraw_account") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.withdraw_account")/>
+    <@msg message />
+
+    <div class="search-box">
+        <@shiro.hasPermission name="SettlementApplication.view">
+        <form class="form-inline form-search">
+            <div class="form-group">
+                <label></label>
+                <input type="text" name="id" class="form-control" value="${id!}" placeholder="${_res.get("settlement.withdraw_account.search.id")}">
+            </div>
+            <button type="submit" class="btn btn-primary">${_res.get("settlement.withdraw_account.search")}</button>
+        </form>
+        </@shiro.hasPermission>
+    </div>
+
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th>${_res.get("settlement.withdraw_account.user_id")}</th>
+            <th>${_res.get("settlement.withdraw_account.user_name")}</th>
+            <th>${_res.get("settlement.withdraw_account.count")}</th>
+            <th>${_res.get("settlement.withdraw_account.action")}</th>
+        </tr>
+        <#list accounts.list as account>
+            <tr>
+                <td>${account.user_id}</td>
+                <td>${account.user_name!'-'}</td>
+                <td>${account.count!"0"}</td>
+                <td><a class="btn btn-primary btn-sm" href="${base}/withdraw_account/detail/${account.user_id}">${_res.get("btn.withdraw_account.detail")}</a></td>
+            </tr>
+        </#list>
+        <#if (accounts.list?size==0)>
+            <td colspan="10">No Data</td>
+        </#if>
+    </table>
+    <@paginate currentPage=accounts.pageNumber totalPage=accounts.totalPage actionUrl="${base}/withdraw_account?pageNumber=" urlParas=""/>
+
+</@layout.layout>

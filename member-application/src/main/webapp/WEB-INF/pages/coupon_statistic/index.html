@@ -1,0 +1,61 @@
+<#macro script>
+    <script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+    <script src="${base}/assets/js/echarts.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.datepicker').datepicker();
+            var myChart = echarts.init(document.getElementById('coupon-statistic-chart'));
+            option = ${option};
+            myChart.setOption(option);
+        });
+    </script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.coupon_statistic") modal>
+<#assign menus={"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.coupon_statistic")/>
+
+    <div class="search-box">
+        <form class="form-inline">
+            <div class="form-group">
+                <label for="startDate">${_res.get("coupon.statistic.start_date")}</label>
+                <input id="startDate" name="startDate" class="form-control datepicker" data-date-format="yyyy-mm-dd" value="${startDate!}">
+                <label for="endDate">${_res.get("coupon.statistic.end_date")}</label>
+                <input id="endDate" name="endDate" class="form-control datepicker" data-date-format="yyyy-mm-dd" value="${endDate!}">
+            </div>
+
+            <button type="submit" class="btn btn-primary">${_res.get("search")}</button>
+        </form>
+    </div>
+
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">统计</h3>
+    </div>
+    <table class="table table-bordered">
+        <#assign total = 0 />
+        <#list couponStatuses as s>
+        <#assign total = total + couponCounts[s] />
+        <tr>
+            <td style="width: 25%">${_res.get("member.coupon.status." + s?lower_case)}</td>
+            <td>${couponCounts[s]}</td>
+        </tr>
+        </#list>
+        <tr>
+            <td>总计</td>
+            <td>${total}</td>
+        </tr>
+    </table>
+
+    <div class="panel-body">
+        <div id="coupon-statistic-chart" style="width: 100%;height:400px;"></div>
+    </div>
+</div>
+
+
+
+</@layout.layout>

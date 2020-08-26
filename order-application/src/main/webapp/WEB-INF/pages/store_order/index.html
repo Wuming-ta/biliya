@@ -1,0 +1,283 @@
+<#macro script>
+<script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+<script>
+  function setExportUrl() {
+      var url = "#";
+      if (/\?.+/gi.test(window.location.href)) {
+        url = window.location.href + "&export=true";
+      }
+      else {
+        url = window.location.href + "?export=true";
+      }
+      var tempArray = [];
+      $('input[name=id]').each(function() {
+        if ($(this).is(":checked") == true) {
+          tempArray.push($(this).val());
+        }
+      });
+      url = url + "&ids=" + tempArray.join("-");
+      $('#export-button-a').attr("href", url);
+  }
+
+  function setDeleteUrl() {
+      var url = "${base}/order/batchDelete/";
+      var tempArray = [];
+      $('input[name=id]').each(function() {
+        if ($(this).is(":checked") == true) {
+          tempArray.push($(this).val());
+        }
+      });
+      url = url + tempArray.join("-") + "?returnUrl=/store_order";
+      $('#delete-button-a').attr("href", url);
+  }
+
+  $(document).ready(function(){
+        $('.datepicker').datepicker();
+        $("#export-button").click(function() {
+            setExportUrl();
+        });
+        $("#delete-button").click(function() {
+            if (confirm('${_res.get("order.delete.confirm")}')) {
+                setDeleteUrl();
+            }
+        });
+
+
+        $('input[name=id]').click(function(){
+          var checked = false;
+          $('input[name=id]').each(function(){
+              if ($(this).is(":checked") == true) {
+                  checked = true;
+              }
+          });
+          if (checked == false) {
+              $("#export-button").addClass("disabled");
+              $("#delete-button")>addClass("disabled");
+              $("#select-all").prop("checked", false);
+          }
+          else {
+              $("#export-button").removeClass("disabled");
+              $("#delete-button").removeClass("disabled");
+          }
+        });
+
+        $("#select-all").click(function() {
+            $('input[name=id]').prop("checked", this.checked);
+            if (this.checked == true) {
+              $("#export-button").removeClass("disabled");
+              $("#delete-button").removeClass("disabled");
+            }
+            else {
+              $("#export-button").addClass("disabled");
+              $("#delete-button").addClass("disabled");
+            }
+        });
+  });
+
+    function clearForm(objE){//objE为form表单
+        $(objE).find(':input').each(
+            function(){
+                switch(this.type){
+                    case 'passsword':
+                    case 'select-multiple':
+                    case 'select-one':
+                    case 'text':
+                    case 'textarea':
+                    case 'number':
+                    case 'hidden':
+                        $(this).val('');
+                        break;
+                    case 'checkbox':
+                    case 'radio':
+                        this.checked = false;
+                }
+            }
+        );
+    }
+
+    function openWindow(link) {
+        window.open(link, 'print', 'dialog=yes,modal=yes');
+    }
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .btn {
+            margin-top: 1px;
+            margin-bottom: 1px;
+        }
+        .row {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .col-label {
+            line-height: 30px;
+            text-align: right;
+        }
+
+        .price{
+            color: red;
+        }
+        .col-description{
+            width: 150px;
+        }
+        .col-address{
+            width: 150px;
+        }
+        .col-time{
+            width: 90px;
+        }
+        .card form [class*="col-"] {
+            padding: 0px;
+        }
+        .card .col-label {
+            line-height: 48px;
+        }
+        .cover-image {
+          height: 60px;
+          width: 60px;
+          background-size: cover;
+          background-position: center;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../order/order_status_label.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.store_order") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.store_order")/>
+    <@msg message />
+
+    <div class="search-box">
+    <form>
+        <div class="row">
+            <div class="col-lg-2 col-md-3 show-grid"><input type="text" name="orderNumber" class="form-control" value="${orderNumber!}" placeholder="${_res.get("order.order_number")}"></div>
+            <div class="col-lg-2 col-md-3 show-grid"><input type="text" name="contactUser" class="form-control" value="${contactUser!}" placeholder="${_res.get("order.contact_user")}"></div>
+            <div class="col-lg-2 col-md-3 show-grid"><input type="text" name="phone" class="form-control" value="${phone!}" placeholder="${_res.get("order.phone")}"></div>
+            <div class="col-lg-2 col-md-3 show-grid"><input id="startTime" name="startTime" class="form-control datepicker" data-date-format="yyyy-mm-dd" value="${startTime!}" placeholder="${_res.get("order.start_time")}"></div>
+            <div class="col-lg-2 col-md-3 show-grid"><input id="endTime" name="endTime" class="form-control datepicker" data-date-format="yyyy-mm-dd" value="${endTime!}" placeholder="${_res.get("order.end_time")}"></div>
+            <div class="col-lg-2 col-md-3 show-grid">
+                <select name="status" class="form-control">
+                    <option value="">${_res.get("order.status")}</option>
+                    <#list statuses as s>
+                    <option value="${s}" <#if (status??&&s==status)>selected="selected"</#if> >${_res.get("order.store_status."+s)}</option>
+                    </#list>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-3 show-grid">
+                    <select name="paymentType" class="form-control">
+                        <option value="">${_res.get("order.payment_type")}</option>
+                        <#list paymentTypes as p>
+                        <option value="${p}" <#if (paymentType??&&p==paymentType)>selected="selected"</#if> >${_res.get("order.payment_type."+p?lower_case)}</option>
+                </#list>
+                </select>
+            </div>
+            <div class="col-lg-10 col-md-12 show-grid text-right">
+                <button type="button" class=" btn btn-sm btn-default" onclick="clearForm(this.form);">${_res.get("order.clear_form")}</button>
+                <span class="vertical-separator"></span>
+                <button type="submit" class=" btn btn-sm btn-primary">${_res.get("order.search")}</button>
+                <span class="vertical-separator"></span>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-sm btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        操作
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li id="export-button" class="disabled">
+                            <a id="export-button-a" target="_blank">${_res.get("btn.export")}</a>
+                        </li>
+                        <@shiro.hasPermission name="order.delete">
+                        <li id="delete-button" class="disabled">
+                            <a id="delete-button-a">${_res.get("btn.order.batch.delete")}</a>
+                        </li>
+                    </@shiro.hasPermission>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </form>
+    </div>
+
+    <table class="table table-hover ">
+        <tr>
+            <th><input type="checkbox" id="select-all"></th>
+            <th class="hidden-xs hidden-sm"></th>
+            <th></th>
+            <th>${_res.get("order.status")}</th>
+            <th class="hidden-xs hidden-sm">${_res.get("order.created_date")}</th>
+            <th class="hidden-xs hidden-sm">${_res.get("order.payment_type")}</th>
+            <th>${_res.get("order.store_name")}/${_res.get("order.store_user_name")}</th>
+            <th>${_res.get("order.action")}</th>
+        </tr>
+
+        <#list orders.list as order>
+            <tr>
+                <td><input type="checkbox" name="id" value="${order.id}"></td>
+                <td class="hidden-xs hidden-sm">
+                    <a href="${base}/store_order/detail/${order.id}" data-toggle="tooltip" data-placement="top" title="${order.description!}">
+                        <div class="cover-image" style="background-image: url(${order.cover!});"></div>
+                    </a>
+                </td>
+                <td>
+                    <div><span class="small">${_res.get("order.order_number")}:</span><b>${order.order_number!}</b></div>
+                    <div>
+                        <span class="small">${_res.get("order.total_price")}:</span><span class="price"><i class="fa fa-jpy" aria-hidden="true"></i>${order.total_price!}</span>
+                        <#if order.refund_fee gt 0>
+                        <span class="small">${_res.get("order.refund_fee")}:</span><span class="text-muted"><i class="fa fa-jpy" aria-hidden="true"></i>${order.refund_fee!}</span>
+                        </#if>
+                    </div>
+                    <#if order.coupon_price gt 0 || order.credit_price gt 0>
+                    <div>
+                        <#if order.coupon_price gt 0>
+                        <span class="small">${_res.get("order.coupon_price")}:</span><span class="text-muted"><s><i class="fa fa-jpy" aria-hidden="true"></i>${order.coupon_price!'-'}</s></span>
+                        </#if>
+                        <#if order.credit_price gt 0>
+                        <span class="small">${_res.get("order.credit_price")}:</span><span class="text-muted"><s><i class="fa fa-jpy" aria-hidden="true"></i>${order.credit_price!'-'}</s></span>
+                        </#if>
+                    </div>
+                    </#if>
+                    <#if order.marketing_id?? && order.marketing??>
+                        <div>
+                            <span class="label label-primary">${nameMap.get(order.marketing)!}</span>
+                        </div>
+                    </#if>
+                    <#if order.mid?? && order.mname??>
+                        <div>
+                            <span class="label label-info">${order.mname!}</span>
+                        </div>
+                    </#if>
+                </td>
+                <td><span class="small label <@statusLabel order.status/> ">${_res.get("order.status."+order.status?lower_case)}</span></td>
+                <td class="hidden-xs hidden-sm small">${order.created_date!}</td>
+                <td class="hidden-xs hidden-sm">
+                    <#if order.payment_type??>
+                        ${_res.get("order.payment_type."+order.payment_type?lower_case)}
+                    </#if>
+                </td>
+                <td>
+                    <div>${order.store_name!}</div>
+                    <div>${order.store_user_name!}</div>
+                </td>
+                <td>
+                    <a class="btn btn-primary btn-sm" href="${base}/store_order/detail/${order.id}">${_res.get("btn.order.detail")}</a>
+                    <#if (order.status=="CONFIRMED_DELIVER_PENDING" || order.status=='DELIVERING')>
+                    <a href="javascript:openWindow('${base}/print_preview?id=${order.id}')" class="btn btn-info btn-sm">打印</a>
+                    </#if>
+                </td>
+            </tr>
+        </#list>
+
+        <#if (orders.list?size==0)>
+            <td colspan="12">No Data</td>
+        </#if>
+
+    </table>
+    <@paginate currentPage=orders.pageNumber totalPage=orders.totalPage actionUrl="${base}/store_order?pageNumber="
+        urlParas="&pageSize=${pageSize!}&startTime=${startTime!}&endTime=${endTime!}&status=${status!}&paymentType=${paymentType!}&marketing=${marketing!}&mname=${mname!}" />
+
+
+</@layout.layout>

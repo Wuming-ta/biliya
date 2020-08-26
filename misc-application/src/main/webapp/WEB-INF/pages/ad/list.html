@@ -1,0 +1,70 @@
+<#macro script>
+<script>
+    $(document).ready(function(){
+        
+    });
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .add-box {
+        border: 2px dashed #DDDDDD;
+        font-size: 60px;
+        height: 150px;
+        }
+        .vertical-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.ad") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/ad": _res.get("breadcrumb.ad")}>
+    <@nav menus group.name />
+    <@msg message />
+
+    <#list ads as ad>
+        <#if (ad_index%4 == 0)>
+            <#if (ad_index != 0)>
+                </div>
+            </#if>
+            <div class="row">
+        </#if>
+
+        <div class="col-md-3">
+            <#if (ad.id??)>
+                <div class="thumbnail text-center">
+                    <a href="${ad.image!}">
+                        <img src="${ad.image!}">
+                    </a>
+                    <div class="caption">
+                        <a class="btn btn-info btn-sm" role="button" href="${base}/ad/edit/${ad.id}">${_res.get("btn.edit")}</a>
+                        <#if (ad.enabled==true)>
+                            <a class="btn btn-default btn-sm" href="${base}/ad/disable/${ad.id}">${_res.get("btn.disable")}</a>
+                        <#else>
+                            <a class="btn btn-success btn-sm" href="${base}/ad/enable/${ad.id}">${_res.get("btn.enable")}</a>
+                        </#if>
+                        <a class="btn btn-danger btn-sm" role="button" href="${base}/ad/delete/${ad.id}"
+                           onclick="javascript:if (confirm('${_res.get("ad.delete.confirm")}')){return true;} return false;">${_res.get("btn.delete")}</a>
+                    </div>
+                </div>
+            <#else>
+                <div class="add-box">
+                    <a class="vertical-center glyphicon glyphicon-plus" href="${base}/ad/add?groupId=${group.id}"></a>
+                </div>
+            </#if>
+        </div>
+
+        <#if (!ad_has_next)>
+            </div>
+        </#if>
+    </#list>
+
+</@layout.layout>

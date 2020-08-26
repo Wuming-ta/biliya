@@ -1,0 +1,1 @@
+insert into t_widget (name, url, width, sort_order) values ('partner.overview', '/seller/widget', 8, 2);

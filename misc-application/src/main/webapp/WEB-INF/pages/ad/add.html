@@ -1,0 +1,100 @@
+<#include "category_tree.ftl"/>
+<#macro script>
+<script src="${base}/assets/js/bootstrap-treeview.min.js"></script>
+<script>
+    <#include "ad.js"/>
+</script>
+</#macro>
+<#macro css>
+    <link href="${base}/assets/css/bootstrap-treeview.min.css" rel="stylesheet" />
+</#macro>
+<#macro modal>
+    <#include "_modal.html"/>
+</#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.ad") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/ad": _res.get("breadcrumb.ad")}/>
+    <@nav menus _res.get("breadcrumb.add")/>
+    <@msg message />
+
+    <form id="form" class="form-horizontal" action="${base}/ad/save"
+          enctype="multipart/form-data" method="post">
+
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label">${_res.get("ad.name")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="text" class="form-control required" id="name" name="ad.name">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label">${_res.get("ad.group")}</label>
+            <div class="col-lg-2 col-md-4">
+                <select class="form-control" name="ad.group_id">
+                    <#list groups as group>
+                        <option value="${group.id}" <#if (groupId??&&groupId==group.id.toString())>selected="selected"</#if> >${group.name}</option>
+                    </#list>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label">${_res.get("ad.enabled")}</label>
+            <div class="col-lg-4 col-md-6">
+                <label class="radio-inline">
+                    <input type="radio" name="ad.enabled"  value="1" checked > ${_res.get("ad.enabled.1")}
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="ad.enabled" value="0" > ${_res.get("ad.enabled.0")}
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label">${_res.get("ad.carousel.strategy")}</label>
+            <div class="col-lg-8 col-md-8">
+                <#list carouselStrategies as strategy>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" name="strategyStr" value="${strategy}"> ${_res.get("ad.carousel.strategy."+strategy?lower_case)}
+                    </label>
+                </#list>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label">${_res.get("ad.type")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="text" class="form-control required" id="type" name="ad.type">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label">${_res.get("ad.image")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="file" class="form-control required" accept="image/*" id="ad" name="ad">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="target_url" class="col-lg-2 col-md-2 control-label">${_res.get("ad.target_url")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="text" class="form-control" id="target_url" name="ad.target_url">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2"></label>
+            <div class="col-lg-4 col-md-6">
+                <a href="#" class="btn btn-info" data-toggle="modal" data-target="#myModal">选择链接</a>
+            </div>
+        </div>
+
+
+        <hr>
+        <button type="submit" class="btn btn-primary">${_res.get("btn.save")}</button>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+
+    </form>
+
+</@layout.layout>

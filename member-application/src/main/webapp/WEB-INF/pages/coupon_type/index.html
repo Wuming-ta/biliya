@@ -1,0 +1,122 @@
+<#macro script>
+    <script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .table > tbody > tr > td {
+        max-width: 200px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "../template/pagination.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.coupon_type") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.coupon_type")/>
+    <@msg message />
+
+    <@shiro.hasPermission name="coupon.edit">
+    <div class="search-box">
+        <#if productCouponTemplate?size gt 0>
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                ${_res.get("member.coupon_type.new.type_product")} <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <#list productCouponTemplate as template>
+                    <li><a href="${base}/coupon_type/add?templateId=${template.id}">${template.name}</a></li>
+                </#list>
+            </ul>
+        </div>
+        </#if>
+        <#if orderCouponTemplate?size gt 0>
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                ${_res.get("member.coupon_type.new.type_order")} <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <#list orderCouponTemplate as template>
+                    <li><a href="${base}/coupon_type/add?templateId=${template.id}">${template.name}</a></li>
+                </#list>
+            </ul>
+        </div>
+        </#if>
+        <#if marketingCouponTemplate?size gt 0>
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                ${_res.get("member.coupon_type.new.type_marketing")} <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <#list marketingCouponTemplate as template>
+                    <li><a href="${base}/coupon_type/add?templateId=${template.id}">${template.name}</a></li>
+                </#list>
+            </ul>
+        </div>
+        </#if>
+    </div>
+    </@shiro.hasPermission>
+
+    <div class="search-box">
+        <form role="form" class="form-inline">
+            <div class="form-group">
+                <label for="name">${_res.get("member.coupon_type.name")}</label>
+                <input type="text" class="form-control" id="name" name="name" value="${name!}">
+            </div>
+            <div class="form-group">
+                <label for="name">${_res.get("member.coupon_type.type")}</label>
+                <select name="type" class="form-control">
+                    <option></option>
+                    <#list types as t>
+                    <option value="${t}" <#if (type??&&type==t)>selected="selected"</#if> >${_res.get("member.coupon_type.type." + t?lower_case)}</option>
+            </#list>
+            </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">${_res.get("member.coupon.search")}</button>
+        </form>
+
+    </div>
+
+
+    <table class="table table-hover ">
+        <tr>
+            <th style="width: 30%">${_res.get("member.coupon_type.name")}</th>
+            <th style="width: 15%">${_res.get("member.coupon_type.type")}</th>
+            <th style="width: 10%">${_res.get("member.coupon_type.enabled")}</th>
+            <th style="width: 10%">${_res.get("member.coupon_type.valid_days")}</th>
+            <th style="width: 10%">${_res.get("member.coupon_type.money")}</th>
+            <th style="width: 10%">${_res.get("member.coupon_type.discount")}</th>
+            <th style="width: 15%">${_res.get("member.coupon_type.action")}</th>
+        </tr>
+
+        <#list couponTypes as couponType>
+            <tr>
+                <td><a href="${base}/coupon_type/edit/${couponType.id}">${couponType.name!}</a></td>
+                <td>${_res.get("member.coupon_type.type." + couponType.type?lower_case)}</td>
+                <td><label class="label <#if couponType.enabled==1>label-success<#else>label-default</#if>">${_res.get("member.coupon_type.enabled." + couponType.enabled)}</label></td>
+                <td>${couponType.valid_days!}</td>
+                <td><#if (couponType.money>0)>${couponType.money!}<#else>-</#if></td>
+                <td><#if (couponType.discount>0)>${couponType.discount!}<#else>-</#if></td>
+                <td>
+                    <@shiro.hasPermission name="coupon.edit">
+                    <a class="btn btn-danger btn-sm" href="${base}/coupon_type/delete/${couponType.id}" onclick="javascript:return confirm('${_res.get("member.conpon_type.delete_confirm")}');" >${_res.get("member.coupon_type.delete")}</a>
+                    <a class="btn btn-primary btn-sm" href="${base}/coupon_type/edit/${couponType.id}">${_res.get("member.coupon_type.edit")}</a>
+                    </@shiro.hasPermission>
+                </td>
+            </tr>
+        </#list>
+        <#if couponTypes?size == 0>
+        <tr>
+            <td colspan="15">No Data</td>
+        </tr>
+        </#if>
+
+    </table>
+</@layout.layout>

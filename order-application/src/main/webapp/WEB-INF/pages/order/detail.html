@@ -1,0 +1,749 @@
+<#macro script>
+<script>
+
+  $(document).ready(function(){
+
+       var title = "${_res.get("order.express_info")}";
+       var $popover = $("[data-toggle='popover']");
+       var popoverShown = false;
+       $('.express-info').click(function(e) {
+           console.log('xx');
+           e.preventDefault();
+           var button = $(this);
+           var id = button.data('id');
+           if (popoverShown == false) {
+               $popover.popover({
+                  trigger: 'manual',
+                  placement: 'bottom',
+                  container: 'body',
+                  title: title,
+                  html: 'true',
+                  content: function() {
+                    var url = "${base}/order/expressInfo/"+id;
+                    return contentMethod(url, "express-info-" + $.now());
+                  }
+               });
+               $popover.popover('show');
+               popoverShown = true;
+           }
+           else {
+               $popover.popover('hide');
+               popoverShown = false;
+           }
+
+           $(document).on("click", function() {
+               $popover.popover('hide');
+               popoverShown = false;
+           });
+
+           e.stopPropagation();
+
+        });
+
+        function contentMethod(url, div_id) {
+            $.ajax(url).done(function(response) {
+                $('#'+div_id).html(response);
+            });
+            return '<div id="'+ div_id +'">Loading...</div>';
+        }
+
+  });
+
+function openWindow(link) {
+    window.open(link, 'print', 'dialog=yes,modal=yes');
+}
+
+</script>
+
+<script>
+$(document).ready(function(){
+    jQuery.validator.addMethod("decimal", function(value, element) {
+        var decimal = /^-?\d+(\.\d{1,2})?$/;
+        return this.optional(element) || (decimal.test(value));
+    }, $.validator.format("小数位数不能超过两位!"));
+
+   $("#customer-service-returned-form").validate();
+   $("#update-contact-info-form").validate();
+   $("#customer-service-reply-form").validate();
+   $("#update-refund-fee-form").validate({
+        rules: {
+            refundFee: {
+                required: true,
+                decimal: true,
+                max: ${order.total_price!0}
+            }
+        }
+   });
+
+   $("#update-contact-info-modal").on("shown.bs.modal", function(e) {
+      $("#p-select").trigger("change");
+   });
+
+   $('#p-select').change(function() {
+      $('#c-select').empty();
+      $('#d-select').empty();
+      var emptyElement = $('#pcd-select-template').html().replace(/#value#/g, "").replace(/#name#/g, "").replace(/#selected#/g, "");
+      $('#c-select').append(emptyElement);
+      var id = $(this).val();
+      if (id != null && id != "") {
+          $.get("${base}/order/ajaxPcd/"+id, function(data) {
+              var currentCity = "${order.city!}";
+              for (var p in data) {
+                  var selected = data[p].name === currentCity ? "selected=\"selected\"" : "";
+                  var html = $('#pcd-select-template').html().replace(/#value#/g, data[p].id).replace(/#name#/g, data[p].name).replace(/#selected#/g, selected);
+                  $('#c-select').append(html);
+              }
+
+              $('#c-select').trigger('change');
+          });
+      }
+  });
+
+  $('#c-select').change(function() {
+      $('#d-select').empty();
+      var emptyElement = $('#pcd-select-template').html().replace(/#value#/g, "").replace(/#name#/g, "").replace(/#selected#/g, "");
+      $('#d-select').append(emptyElement);
+      var id = $(this).val();
+      if (id != null && id != "") {
+          $.get("${base}/order/ajaxPcd/"+id, function(data) {
+              var currentDistrict = "${order.district!}";
+              for (var p in data) {
+                  var selected = data[p].name === currentDistrict ? "selected=\"selected\"" : "";
+                  var html = $('#pcd-select-template').html().replace(/#value#/g, data[p].id).replace(/#name#/g, data[p].name).replace(/#selected#/g, selected);
+                  $('#d-select').append(html);
+              }
+          });
+      }
+  });
+
+});
+</script>
+
+<script type="text/html" id="pcd-select-template">
+    <option value="#value#" #selected#>#name#</option>
+</script>
+
+<script type="text/html" id="express-template">
+    <td class="col-key">
+        ${_res.get("order.express_company")}
+    </td>
+    <td class="col-value">
+        <select class="form-control" name="expressId">
+            <#list expresses as express>
+                <option value="${express.id}">${express.name}</option>
+            </#list>
+        </select>
+    </td>
+    <td class="col-key">${_res.get("order.express_number")}</td>
+    <td class="col-value">
+        <input type="text" class="express" style="width: auto" name="expressNumber">
+        <button type="submit" class="btn btn-primary btn-sm" onclick="expressSubmit(this);">提交</button>
+        <a class="btn btn-default btn-sm" onclick="expressCancel();">取消</a>
+    </td>
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .price{
+            color: red;
+        }
+        .col-key {
+          width: 20%;
+        }
+        .col-value {
+          width: 30%;
+        }
+        .order-header {
+          border-left: 4px solid orange;
+          font-size: 14px;
+          font-weight: bold;
+          margin: 5px 0px;
+          padding-left: 10px;
+        }
+        .express {
+        background-color: #FFFFFF;
+        background-image: none;
+        border: 1px solid #CCCCCC;
+        color: #555555;
+        font-size: 14px;
+        height: 34px;
+        line-height: 1.42857;
+        padding: 6px 12px;
+        width: 250px;
+        }
+        .express-warn {
+          border: 1px solid red;
+        }
+        .my-form-control{
+          width: 85%;
+          display: inline-block;
+          vertical-align: middle;
+        }
+    </style>
+</#macro>
+<#macro modal>
+
+    <!-- Modal -->
+    <div class="modal fade" id="update-contact-info-modal" tabindex="-1" role="dialog" aria-labelledby="update-contact-info-modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">更新联系人信息</h4>
+                </div>
+                <form id="update-contact-info-form" class="form-horizontal" action="${base}/order/updateContact/${order.id}" method="post">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">${_res.get("order.contact.user")}</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control required" name="contactUser" value="${order.contact_user!}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">${_res.get("order.contact.phone")}</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control required" name="phone" value="${order.phone!}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">${_res.get("order.contact.address")}</label>
+                            <div class="col-md-10">
+                                <div class="col-sm-4">
+                                    <select id="p-select" class="form-control required" name="province">
+                                        <#list pcds as pcd>
+                                            <option value="${pcd.id!}" <#if pcd.name==order.province!''>selected="selected"</#if> >${pcd.name!}</option>
+                                        </#list>
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <select id="c-select" class="form-control required" name="city"></select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <select id="d-select" class="form-control required" name="district"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">${_res.get("order.contact.detail")}</label>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control required" name="detail" value="${order.detail!}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+</#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "order_status_label.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.order_detail") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/order": _res.get("breadcrumb.order")}/>
+    <@nav menus _res.get("breadcrumb.order_detail")/>
+    <@msg message />
+
+    <div class="order-header">${_res.get("order.basic")}</div>
+    <table class="table table-hover table-bordered">
+        <tr>
+            <td class="col-key">${_res.get("order.order_number")}</td>
+            <td class="col-value">${order.order_number!}</td>
+            <td class="col-key">${_res.get("order.trade_number")}</td>
+            <td class="col-value">${order.trade_number!"-"}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.status")}</td>
+            <td class="col-value"><span class="label <@statusLabel order.status/> ">${_res.get("order.status."+order.status?lower_case)}</span></td>
+            <td class="col-key">${_res.get("order.payment_type")}</td>
+            <td class="col-value">
+                <#if order.payment_type??>
+                    ${_res.get("order.payment_type."+order.payment_type?lower_case)}
+                </#if>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.delivery_type")}</td>
+            <td class="col-value">
+                <#if order.delivery_type??>
+                    ${_res.get("order.delivery_type."+order.delivery_type)}
+                </#if>
+            </td>
+            <td class="col-key">${_res.get("order.origin")}</td>
+            <td class="col-value">
+                <#if order.origin??>
+                    ${_res.get("order.origin."+order.origin)}
+                </#if>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.total_price")}</td>
+            <td class="col-value"><span class="price">${order.total_price!}</span></td>
+            <td class="col-key">${_res.get("order.origin_price")}</td>
+            <td class="col-value">${order.origin_price!}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.coupon_price")}</td>
+            <td class="col-value">${order.coupon_price!}</td>
+            <td class="col-key">${_res.get("order.freight")}</td>
+            <td class="col-value">${order.freight!}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.credit_price")}</td>
+            <td class="col-value">${order.credit_price!}</td>
+            <td class="col-key">${_res.get("order.pay_credit")}</td>
+            <td class="col-value">${order.pay_credit!}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.refund_fee")}</td>
+            <td class="col-value"><span class="price">${order.refund_fee!'-'}</span></td>
+            <td class="col-key">${_res.get("order.supplementary_fee")}</td>
+            <td class="col-value"><span class="price">${order.supplementary_fee!'-'}</span></td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.created_date")}</td>
+            <td class="col-value">${order.created_date!"-"}</td>
+            <td class="col-key">${_res.get("order.pay_date")}</td>
+            <td class="col-value">${order.pay_date!"-"}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.confirm_date")}</td>
+            <td class="col-value">${order.confirm_date!"-"}</td>
+            <td class="col-key">${_res.get("order.deliver_date")}</td>
+            <td class="col-value">${order.deliver_date!"-"}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.delivered_date")}</td>
+            <td class="col-value">${order.delivered_date!"-"}</td>
+            <td class="col-key">${_res.get("order.deal_date")}</td>
+            <td class="col-value">${order.deal_date!"-"}</td>
+        </tr>
+        <#if order.coupon_info??>
+        <tr>
+            <td class="col-key">${_res.get("order.coupon_info")}</td>
+            <td colspan="3">${order.coupon_info!"-"}</td>
+        </tr>
+        </#if>
+        <#if order.marketing_admin_url??>
+        <tr>
+            <td class="col-key">${_res.get("order.marketing")}</td>
+            <td colspan="3">
+                <span class="label label-primary">${nameMap.get(order.marketing)!}</span>
+                <a href="${base}${order.marketing_admin_url!}">${order.marketing_description!"-"}</a>
+            </td>
+        </tr>
+        </#if>
+        <tr>
+            <td class="col-key">${_res.get("order.user")}</td>
+            <td colspan="3">
+                <#assign user = order.user />
+                <#if user??>
+                    <small class="text-muted">昵称: </small>
+                    <a href="${base}/user/edit/${order.user_id}">${user.name!"-"}</a>
+                    <small class="text-muted">真实姓名: </small>${user.real_name!"-"}
+                    <small class="text-muted">UID: </small> ${user.uid!"-"}
+                <#else>
+                    ${order.user_id}
+                </#if>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.inviter_name")}</td>
+            <td colspan="3">${order.inviter_user_name!'-'}</td>
+        </tr>
+
+        <#if (order.invoice==1)>
+        <tr>
+            <td class="col-key">${_res.get("order.invoice_title")}</td>
+            <td colspan="3">${order.invoice_title!"-"}</td>
+        </tr>
+        </#if>
+        <#if order.receiving_time??>
+        <tr>
+            <td class="col-key">${_res.get("order.receiving_time")}</td>
+            <td colspan="3">${order.receiving_time!"-"}</td>
+        </tr>
+        </#if>
+        <#if order.remark??>
+        <tr>
+            <td class="col-key">${_res.get("order.remark")}</td>
+            <td colspan="3">${order.remark!}</td>
+        </tr>
+        </#if>
+    </table>
+
+
+    <#list merchantOrderItemMap.keySet() as key>
+        <div class="order-header">${_res.get("order.items")} - 商家: ${merchantMap.get(key).name!}</div>
+        <form action="/order/addOrderExpress" method="post">
+            <table class="table table-hover table-bordered">
+                <tr>
+                    <th style="width: 5%"></th>
+                    <th style="width: 10%"></th>
+                    <th style="width: 8%">${_res.get("order.item.status")}</th>
+                    <th style="width: 25%">${_res.get("order.item.product.name")}/${_res.get("order.item.product.specification")}</th>
+                    <th style="width: 20%">${_res.get("order.item.barcode")}</th>
+                    <th style="width: 8%">${_res.get("order.item.product.price")}</th>
+                    <th style="width: 8%">${_res.get("order.item.product.cost_price")}</th>
+                    <th style="width: 8%">${_res.get("order.item.product.count")}</th>
+                    <th style="width: 8%">${_res.get("order.item.product.final_price")}</th>
+                </tr>
+                <#list merchantOrderItemMap.get(key) as item>
+                <tr>
+                    <td><input type="checkbox" name="item_id" value="${item.id}" /></td>
+                    <td><img src="${item.cover!}" height="60"> </td>
+                    <td>${_res.get("order.item.status." + item.status?lower_case)}</td>
+                    <td>
+                        <div>
+                            <a href="${base}/product/edit/${item.product_id}">${item.product_name!}</a>
+                        </div>
+                        <div>
+                            ${item.product_specification_name!}
+                        </div>
+                    </td>
+                    <td>
+                        <div>${item.barcode!}</div>
+                        <div>${item.store_location!}</div>
+                    </td>
+                    <td>${item.price!}</td>
+                    <td>${item.cost_price!}</td>
+                    <td>${item.quantity!}</td>
+                    <td><span class="price">${item.final_price!}</span></td>
+                </tr>
+                </#list>
+            </table>
+            <#if (order.status=="CONFIRMED_DELIVER_PENDING") || (order.status=='DELIVERING') || (order.status=='DELIVERED_CONFIRM_PENDING')>
+            <span>
+                <select class="express" name="express_id">
+                    <#list expresses as express>
+                        <option value="${express.id}">${express.name}</option>
+                    </#list>
+                </select>
+                <input class="express" name="express_number" type="text" placeholder="${_res.get("order.express_number")}">
+            </span>
+            <input type="hidden" name="order_id" value="${order.id}" />
+            <input type="hidden" name="mid" value="${key}" />
+            <button type="submit" class="btn btn-primary">${_res.get("btn.order.delivering")}</button>
+            </#if>
+        </form>
+        <br/>
+        <table class="table">
+            <tr>
+                <th>创建时间</th>
+                <th>快递公司</th>
+                <th>快递单号</th>
+                <th>操作</th>
+            </tr>
+            <#if orderExpressMap.get(key)?exists>
+            <#list orderExpressMap.get(key) as orderExpress>
+            <tr>
+                <td>${orderExpress.create_date!}</td>
+                <td>${orderExpress.express_company!}</td>
+                <td>${orderExpress.express_number!}</td>
+                <td>
+                    <a class="btn btn-link" target="_blank" href="${base}/order/expressInfo/${orderExpress.id}">查看物流轨迹</a>
+                    <#if (order.status=="CONFIRMED_DELIVER_PENDING") || (order.status=='DELIVERING') || (order.status=='DELIVERED_CONFIRM_PENDING')>
+                    <a class="btn btn-danger" href="${base}/order/deleteOrderExpress/${orderExpress.id}">删除</a>
+                    </#if>
+                </td>
+            </tr>
+            </#list>
+            </#if>
+        </table>
+        <hr/>
+    </#list>
+
+    <#if storeEnabled>
+    <div class="order-header">${_res.get("order.store")}</div>
+    <table class="table table-hover table-bordered">
+        <tr>
+            <td class="col-key">${_res.get("order.store_name")}</td>
+            <td class="col-value">${order.store_name!'-'}</td>
+            <td class="col-key">${_res.get("order.store_user_name")}</td>
+            <td class="col-value">${order.store_user_name!'-'}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.followed_store_name")}</td>
+            <td class="col-value">${order.followed_store_name!'-'}</td>
+            <td class="col-key">${_res.get("order.store_guide_user_name")}</td>
+            <td class="col-value">${order.store_guide_user_name!'-'}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.binding_store_name")}</td>
+            <td class="col-value">${order.binding_store_name!'-'}</td>
+            <td class="col-key"></td>
+            <td class="col-value"></td>
+        </tr>
+    </table>
+    </#if>
+
+
+    <#if order.type == 'ORDER'>
+    <div class="order-header" id="contact">
+        ${_res.get("order.contact")}
+        <#if order.status=='CONFIRMED_DELIVER_PENDING'>
+        <a class="btn btn-link" href="#" data-toggle="modal" data-target="#update-contact-info-modal">更新</a>
+        </#if>
+    </div>
+    <table class="table table-hover table-bordered">
+        <tr>
+            <td class="col-key">${_res.get("order.contact.user")}</td>
+            <td>${order.contact_user!}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.contact.phone")}</td>
+            <td>${order.phone!}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("order.contact.address")}</td>
+            <td>
+                <div>${order.province!} ${order.city!} ${order.district!}</div>
+                <div>${order.street!}</div>
+                <div>${order.detail!}</div>
+            </td>
+        </tr>
+    </table>
+    </#if>
+
+    <#list order.orderCustomerService as orderCustomerService>
+    <div id="customer-service-${orderCustomerService.id}" class="order-header">
+        <span style="margin-right:10px;">${_res.get("order.customer.service")}</span>
+    </div>
+    <div>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <td class="col-key">${_res.get("order.customer.service.type")}</td>
+                <td class="col-value">${_res.get("order.customer.service.type."+orderCustomerService.service_type?lower_case)}</td>
+                <td class="col-key">${_res.get("order.customer.service.created_date")}</td>
+                <td class="col-value">${orderCustomerService.created_date!}</td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("order.customer.service.status")}</td>
+                <td colspan="col-value">${_res.get("order.customer.service.status."+orderCustomerService.status?lower_case)}</td>
+                <td class="col-key">${_res.get("order.customer.service.reason")}</td>
+                <td colspan="col-value">${orderCustomerService.reason!}</td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("order.customer.service.refund_fee")}</td>
+                <td class="col-value">${orderCustomerService.refund_fee!}</td>
+                <td class="col-key">${_res.get("order.customer.service.refund_way")}</td>
+                <td class="col-value">${_res.get("order.customer.service.refund_way."+orderCustomerService.refund_way?lower_case)}</td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("order.customer.service.express_company")}</td>
+                <td class="col-value">${orderCustomerService.express_company!}</td>
+                <td class="col-key">${_res.get("order.customer.service.express_number")}</td>
+                <td>${orderCustomerService.express_number!}</td>
+            </tr>
+
+            <#assign returns = orderCustomerService.returns />
+            <#assign exchanges = orderCustomerService.exchanges />
+
+            <#if returns?size gt 0>
+            <tr>
+                <td class="col-key">退回清单</td>
+                <td colspan="3">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th style="width: 10%"></th>
+                            <th style="width: 50%">${_res.get("order.item.product.name")}/${_res.get("order.item.product.specification")}</th>
+                            <th style="width: 10%">${_res.get("order.item.product.count")}</th>
+                            <th style="width: 20%">${_res.get("order.customer.service.refund_fee")}</th>
+                        </tr>
+                        <#list orderCustomerService.returns as r>
+                        <tr>
+                            <td><img src="${r.cover!}" height="60"> </td>
+                            <td>${r.product_name!} ${r.product_specification_name!}</td>
+                            <td>${r.quantity!}</td>
+                            <td>${r.refund_fee!}</td>
+                        </tr>
+                        </#list>
+                    </table>
+                </td>
+            </tr>
+            </#if>
+            <#if exchanges?size gt 0>
+            <tr>
+                <td class="col-key">置换清单</td>
+                <td colspan="3">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th style="width: 10%"></th>
+                            <th style="width: 50%">${_res.get("order.item.product.name")}/${_res.get("order.item.product.specification")}</th>
+                            <th style="width: 10%">${_res.get("order.item.product.count")}</th>
+                            <th style="width: 20%">${_res.get("order.item.product.price")}</th>
+                        </tr>
+                        <#list orderCustomerService.exchanges as r>
+                        <tr>
+                            <td><img src="${r.cover!}" height="60"> </td>
+                            <td>${r.product_name!} ${r.product_specification_name!}</td>
+                            <td>${r.quantity!}</td>
+                            <td>${r.price!}</td>
+                        </tr>
+                        </#list>
+                    </table>
+                </td>
+            </tr>
+            </#if>
+
+            <tr>
+                <td class="col-key">${_res.get("order.customer.service.images")}</td>
+                <td colspan="3">
+                    <#list orderCustomerService.imagesToList as image>
+                        <a href="${image}" title="${_res.get("order.customer.service.view_large_image")}">
+                            <img src="${image}" width="160" >
+                        </a>
+                    </#list>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("order.customer.service.log")}</td>
+                <td colspan="3">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th class="col-key">${_res.get("order.customer.service.log.name")}</th>
+                            <th class="col-key">${_res.get("order.customer.service.log.time")}</th>
+                            <th>${_res.get("order.customer.service.log.content")}</th>
+                        </tr>
+                        <#list orderCustomerService.logToListMap as map>
+                            <tr>
+                                <td>${map.user!}</td>
+                                <td>${map.time!}</td>
+                                <td>${map.content!}</td>
+                            </tr>
+                        </#list>
+                    </table>
+                </td>
+            </tr>
+            <#if orderCustomerService.status != "CANCELED" && orderCustomerService.status != "REFUNDED" && showReply??>
+            <tr>
+                <td class="col-key">${_res.get("order.customer.service.add_log")}</td>
+                <td colspan="3">
+                    <form id="customer-service-reply-form" action="${base}/order_customer_service/reply" method="post">
+                        <input type="hidden" name="id" value="${orderCustomerService.id}">
+                        <input type="hidden" name="returnUrl" value="/order/detail/${order.id}#customer-service-${orderCustomerService.id}">
+                        <textarea name="content" class="form-control my-form-control required" rows="2"></textarea>
+                        <button type="submit" class="btn btn-primary">${_res.get("btn.customer.service.reply")}</button>
+                    </form>
+                </td>
+            </tr>
+            </#if>
+            <#if orderCustomerService.status=="CREATED">
+            <tr>
+                <td class="col-key"></td>
+                <td colspan="3">
+                    <form id="customer-service-form" action="${base}/order_customer_service/disagree" method="post">
+                        <input type="hidden" name="id" value="${orderCustomerService.id}">
+                        <input type="hidden" name="returnUrl" value="/order/detail/${order.id}#customer-service-${orderCustomerService.id}">
+                        <textarea name="content" class="form-control my-form-control required" rows="2"></textarea>
+                        <button type="submit" class="btn btn-primary">${_res.get("btn.customer.service.disagree")}</button>
+                        <a href="${base}/order_customer_service/agree/${orderCustomerService.id}?returnUrl=/order/detail/${order.id}#customer-service-${orderCustomerService.id}" class="btn btn-primary">${_res.get("btn.customer.service.agree")}</a>
+                    </form>
+                </td>
+            </tr>
+            </#if>
+            <#if (orderCustomerService.status=="RETURN_PENDING")>
+                <tr>
+                    <td class="col-key"></td>
+                    <td colspan="3">
+                        <form id="customer-service-returned-form" action="${base}/order_customer_service/returned" method="post">
+                            <input type="hidden" name="id" value="${orderCustomerService.id}">
+                            <input type="hidden" name="returnUrl" value="/order/detail/${order.id}#customer-service-${orderCustomerService.id}">
+                            <#if wmsEnabled>
+                            <select class="express required" name="warehouseId">
+                                <#list warehouses as w>
+                                <option value="${w.id}">${w.warehouseName!}</option>
+                                </#list>
+                            </select>
+                            </#if>
+                            <button type="submit" class="btn btn-primary">${_res.get("btn.order.returned")}</button>
+                        </form>
+                    </td>
+                </tr>
+            </#if>
+            <#if (orderCustomerService.status=="REFUND_PENDING")>
+                <tr>
+                    <td class="col-key">${_res.get("order.customer.service.refund_fee")}</td>
+                    <td colspan="3">
+                        <form class="form" id="update-refund-fee-form" action="${base}/order_customer_service/updateRefundFee" method="post">
+                            <input type="hidden" name="id" value="${orderCustomerService.id}">
+                            <input type="hidden" name="returnUrl" value="/order/detail/${order.id}#customer-service">
+                            <input type="number" name="refundFee" id="refundFee" class="form-control my-form-control" style="width: 20%" value="${orderCustomerService.refund_fee!}">
+                            <button type="submit" class="btn btn-primary">${_res.get("btn.customer.service.refund_fee")}</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-key"></td>
+                    <td colspan="3">
+                        <a href="${base}/order_customer_service/refunded/${orderCustomerService.id}?otherWay=true&returnUrl=/order/detail/${order.id}#customer-service" class="btn btn-primary">${_res.get("btn.order.refunded_other_way")}</a>
+                        <a href="${base}/order_customer_service/refunded/${orderCustomerService.id}?returnUrl=/order/detail/${order.id}#customer-service" class="btn btn-primary">${_res.get("btn.order.refunded")}</a>
+                    </td>
+                </tr>
+            </#if>
+        </table>
+    </div>
+    </#list>
+
+
+    <div class="order-header">
+        <span style="margin-right:10px;">处理记录</span>
+        <a data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample" style="font-weight:normal;">
+            查看
+        </a>
+    </div>
+    <div class="collapse" id="collapseExample">
+        <div style="margin-top:10px;">
+            <#if orderProcessLogs?size gt 0>
+                <table class="table table-hover table-bordered">
+                    <tr>
+                        <th class="col-key">${_res.get("order.order_process_log.process_date")}</th>
+                        <th style="width:80%">${_res.get("order.order_process_log.content")}</th>
+                    </tr>
+                    <#list orderProcessLogs as orderProcessLog>
+                    <tr>
+                        <td>${orderProcessLog.process_date!}</td>
+                        <td>${orderProcessLog.content!}</td>
+                    </tr>
+                    </#list>
+                </table>
+            <#else>暂无订单处理流水
+            </#if>
+        </div>
+    </div>
+
+
+
+    <hr>
+    <@shiro.hasPermission name="order.edit">
+    <#if (order.status=="CREATED_PAY_PENDING")>
+        <a href="${base}/order/cancel/${order.id}?returnUrl=/order/detail/${order.id}" class="btn btn-warning">${_res.get("btn.order.cancel")}</a>
+    </#if>
+    <#if (order.status=="PAID_CONFIRM_PENDING")>
+        <a href="${base}/order/confirm/${order.id}?returnUrl=/order/detail/${order.id}" class="btn btn-primary" title="${_res.get("order.preparing.deliver")}">${_res.get("btn.order.confirm")}</a>
+        <a href="${base}/order/cancel/${order.id}?returnUrl=/order/detail/${order.id}" class="btn btn-warning">${_res.get("btn.order.cancel")}</a>
+    </#if>
+    <#if (order.status=="DELIVERING")>
+        <a href="${base}/order/delivered/${order.id}?returnUrl=/order/detail/${order.id}" class="btn btn-primary">${_res.get("btn.order.delivered")}</a>
+    </#if>
+    </@shiro.hasPermission>
+    <@shiro.hasPermission name="order.delete">
+    <#if (order.status=='CLOSED_PAY_TIMEOUT' || order.status=='CLOSED_CANCELED' || order.status=='CLOSED_REFUNDED' || (order.status=='CLOSED_CONFIRMED' && order.settled==1))>
+    <a href="${base}/order/delete/${order.id}" class="btn btn-danger"
+       onclick="javascript:if (confirm('${_res.get("order.delete.confirm")}')){return true;} return false;">${_res.get("btn.order.delete")}</a>
+    </#if>
+    </@shiro.hasPermission>
+    <a href="javascript:openWindow('${base}/print_preview?id=${order.id}')" class="btn btn-info btn-sm">打印</a>
+
+    <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+
+
+
+
+</@layout.layout>

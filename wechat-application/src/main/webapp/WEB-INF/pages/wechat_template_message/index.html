@@ -1,0 +1,96 @@
+<#macro script>
+<script>
+    $(document).ready(function () {
+        $("form").validate();
+    });
+</script>
+</#macro>
+<#macro css>
+    <style>
+
+        .row-wrapper {
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .type-name {
+            border-left: 4px solid orange;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 5px 0px;
+            padding-left: 10px;
+        }
+
+        .box {
+            display: block;
+            padding: 4px;
+            margin-bottom: 20px;
+            line-height: 1.42857143;
+            border: 1px solid #ccc;
+            text-align: center;
+            height: 120px;
+        }
+
+        .box-child {
+            margin-top: 20px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .enabled-box {
+            border: 1px solid green;
+        }
+
+        .plus-box {
+            border: dashed 2px #ddd;
+            line-height: 110px;
+            font-size: 30px;
+        }
+
+    </style>
+
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.wechat_template_message") modal>
+<#assign menus={"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.wechat_template_message")/>
+    <@msg message />
+
+    <#list wechatMessageTypes as wechatMessageType>
+        <div  class="row-wrapper">
+            <span class="type-name">${wechatMessageType.display_name!}</span>
+            <div class="row" >
+                <#list wechatMessageType.wechatTemplateMessages as wechatTemplateMessage>
+                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3"  >
+                        <div class="box <#if wechatTemplateMessage.enabled == 1>enabled-box</#if>"  >
+                            <div class="box-child"><a href="${base}/wechat_template_message/edit/${wechatTemplateMessage.id!}">${wechatTemplateMessage.name!}</a></div>
+                            <div class="box-child">
+                                <#if wechatTemplateMessage.enabled == 0>
+                                    <a class="btn btn-sm btn-success" href="${base}/wechat_template_message/enable/${wechatTemplateMessage.id!}">启用</a>
+                                </#if>
+                                <#if wechatTemplateMessage.enabled == 1>
+                                    <a class="btn btn-sm btn-warning" href="${base}/wechat_template_message/disable/${wechatTemplateMessage.id!}">停用</a>
+                                </#if>
+                                <a class="btn btn-sm btn-info" href="${base}/wechat_template_message/edit/${wechatTemplateMessage.id!}">${_res.get("btn.edit")}</a>
+                                <a class="btn btn-sm btn-danger" href="${base}/wechat_template_message/delete/${wechatTemplateMessage.id!}"
+                                   onclick="return confirm('确实要删除吗？')">${_res.get("btn.delete")}</a>
+                            </div>
+                        </div>
+                    </div>
+                </#list>
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                    <a href="${base}/wechat_template_message/add/${wechatMessageType.id}">
+                        <div class="box plus-box text-primary">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </#list>
+
+</@layout.layout>

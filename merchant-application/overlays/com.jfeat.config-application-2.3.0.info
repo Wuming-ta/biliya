@@ -1,0 +1,3 @@
+1597626282761
+(?:[^/]+/)*?[^/]*?
+WEB-INF/classes(?:$|/.+), WEB-INF/lib(?:$|/.+), WEB-INF/pages/error(?:$|/.+), WEB-INF/pages/index\.html, WEB-INF/pages/template(?:$|/.+), WEB-INF/shiro\.ini, WEB-INF/web\.xml, assets(?:$|/.+)

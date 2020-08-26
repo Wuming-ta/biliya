@@ -1,0 +1,74 @@
+
+<#macro script>
+    <script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "_product_status_label.ftl"/>
+<@layout.layout script css _res.get("menu.product") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/product": _res.get("breadcrumb.product")}/>
+    <@nav menus _res.get("breadcrumb.product_stock_balance_limited")/>
+
+    <div class="search-box">
+        <form role="form" class="form-inline">
+            <div class="form-group form-item">
+                <label for="limit">${_res.get("product.stock_balance.limit")}</label>
+                <input type="number" class="form-control" id="limit" name="limit" value="${limit!}">
+            </div>
+            <div class="form-group form-item">
+                <label>${_res.get("product.status")}</label>
+                <select name="status" class="form-control">
+                    <option></option>
+                    <#list statuses as s>
+                        <option value="${s}" <#if (status??&&status==s)>selected="selected"</#if> >${_res.get("product.status." + s?lower_case)}</option>
+                    </#list>
+                </select>
+            </div>
+            <div class="form-group form-item">
+                <button type="submit" class="btn btn-primary">${_res.get("product.search")}</button>
+            </div>
+        </form>
+    </div>
+    <table class="table table-hover ">
+        <tr>
+            <th>${_res.get("product.id")}</th>
+            <th>${_res.get("product.cover")}</th>
+            <th style="width: 25%">${_res.get("product.name")}</th>
+            <th>规格名称</th>
+            <th>${_res.get("product.status")}</th>
+            <th>${_res.get("product.stock_balance")}</th>
+            <th>${_res.get("product.action")}</th>
+        </tr>
+        <#if (products?size=0)>
+            <td colspan="10">No Data</td>
+        </#if>
+        <#list products as product>
+            <tr>
+                <#assign returnUrl>/product/stockBalanceLimited?limit=${limit!}&status=${status!}</#assign>
+                <td>${product.id}</td>
+                <td><#if (product.cover??)><img src="${product.cover!}" height="50"></#if></td>
+                <td><a href="${base}/settled_merchant_product/edit/${product.id}?returnUrl=${returnUrl!}">${product.name}</a></td>
+                <td>${product.specification_name!'-'}</td>
+                <td><span class="label <@labelStatus product.status/>" >${_res.get("product.status." + product.status?lower_case)}</span></td>
+                <td>
+                    <#if product.specification_stock_balance??>
+                        ${product.specification_stock_balance!}
+                    <#else>
+                        ${product.stock_balance!}
+                    </#if>
+                </td>
+                <td>
+                    <@shiro.hasPermission name="product.edit">
+                    <a class="btn btn-info btn-sm" href="${base}/settled_merchant_product/edit/${product.id}?returnUrl=${returnUrl}">${_res.get("btn.edit")}</a>
+                    </@shiro.hasPermission>
+                </td>
+            </tr>
+        </#list>
+    </table>
+</@layout.layout>

@@ -1,0 +1,38 @@
+<div class="list-group" style="margin-top: 10px">
+    <#list item.list as i>
+        <div class="list-group-item">
+            <div>
+                <a href="javascript:selectLink('#CONTROLLER_KEY#',
+                    '#ID#',
+                    '${(i.content.news_item[0].title)!}',
+                    '${(i.content.news_item[0].digest)!}',
+                    '${(i.media_id)!}',
+                    '${(i.content.news_item[0].url)!}',
+                    '${(i.content.news_item[0].thumb_url)!}',
+                    '${(i.content.create_time)!}');"
+                   style="font-size:20px; color:black;" >
+                    ${(i.content.news_item[0].title)!}
+                </a>
+                <span style="float:right">
+                    ${(i.content.update_time?number*1000)?number_to_date}
+                </span>
+            </div>
+            <div>
+                <span class="text-muted">${(i.content.news_item[0].digest)!}</span>
+                <a href="${(i.content.news_item[0].url)!}" target="_blank">查看</a>
+            </div>
+        </div>
+    </#list>
+</div>
+
+
+<nav>
+    <ul class="pager">
+        <#if item.pageNumber != 1 >
+            <li><a href="#" onclick="getItem(${item.pageNumber - 1}, '#CONTROLLER_KEY#', '#ID#');">上一页</a></li>
+        </#if>
+        <#if (item.totalPage > item.pageNumber) >
+            <li><a href="#" onclick="getItem(${item.pageNumber + 1}, '#CONTROLLER_KEY#', '#ID#');">下一页</a></li>
+        </#if>
+    </ul>
+</nav>

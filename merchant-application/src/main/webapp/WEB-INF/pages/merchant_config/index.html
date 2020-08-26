@@ -1,0 +1,124 @@
+<#macro script>
+    <script src="${base}/assets/js/bootstrap-switch.min.js"></script>
+
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.config.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.all.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/lang/zh-cn/zh-cn.js"></script>
+    <script>
+      $(document).ready(function(){
+        $("#settlement-proportion-form").validate();
+        $('#settled_term_form').validate();
+        UE.getEditor('myEditor');
+
+        $("input:checkbox").bootstrapSwitch();
+      });
+
+      function showForm(show) {
+        $('#for-display').css('display',show?'none':'');
+        $('#settled_term_form').css('display',show?'':'none');
+      }
+    </script>
+</#macro>
+<#macro css>
+    <link rel="stylesheet" type="text/css" href="${base}/assets/css/bootstrap-switch.min.css" />
+    <link href="${base}/assets/ueditor-1.4.3.3/themes/default/css/ueditor.css" type="text/css" rel="stylesheet">
+
+    <style>
+        .no-padding {
+            padding: 0px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl" />
+<#include "../template/message.ftl"/>
+
+    <@layout.layout script css _res.get("breadcrumb.merchant_config") modal>
+    <#assign menus={"/": _res.get("breadcrumb.home")}>
+        <@nav menus _res.get("breadcrumb.merchant_config") />
+        <@msg message />
+
+        <div>
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" <#if !(active??)>class="active"</#if> ><a href="#settled_term" aria-controls="settled_term" role="tab" data-toggle="tab">${_res.get("tab.settled_term")}</a></li>
+                <li role="presentation" <#if (active?? && active=="settled_merchant_type")>class="active"</#if> ><a href="#settled_merchant_type" aria-controls="settled_merchant_type" role="tab" data-toggle="tab">${_res.get("tab.settled_merchant_type")}</a></li>
+                <li role="presentation" <#if (active?? && active=="settled_merchant_settlement_proportion")>class="active"</#if> ><a href="#settled_merchant_settlement_proportion" aria-controls="settled_merchant_settlement_proportion" role="tab" data-toggle="tab">${_res.get("tab.settled_merchant_settlement_proportion")}</a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane <#if !(active??)>active</#if>" id="settled_term">
+                    <div class="row" id="for-display" style="margin-top:10px;">
+                        <div class="col-md-10 col-md-offset-1">
+                            <div class="text-center">
+                                <span style="margin-right:10px;font-size:20px;">${settledTerm.name!}</span>
+                                <a href="javascript:showForm(true);">${_res.get("edit")}</a>
+                            </div>
+                            <div style="text-indent:20px;"> ${settledTerm.content!}</div>
+                        </div>
+                    </div>
+                    <form id="settled_term_form" style="display:none;margin-top:10px;" class="form-horizontal" role="form" action="${base}/merchant_config/updateSettledTerm" method="post">
+                        <input type="hidden" name="settledTerm.id" value="${settledTerm.id!}" />
+                        <div class="text-center">
+                            <span style="margin-right:10px;font-size:20px;">${settledTerm.name!}</span>
+                        </div>
+                        <div class="form-group" style="margin-top:10px;">
+                            <div class="col-md-10 col-md-offset-1">
+                                <script type="text/plain" id="myEditor" name="settledTerm.content" style="width: 100%; min-height: 400px">${settledTerm.content!}</script>
+                            </div>
+                        </div>
+                        <hr>
+                        <button type="submit" class="btn btn-primary">更新</button>
+                        <button type="button" class="btn btn-default" onclick="showForm(false);">返回</button>
+                    </form>
+                </div>
+                <div role="tabpanel" class="tab-pane <#if (active?? && active=="settled_merchant_type")>active</#if>" id="settled_merchant_type">
+                    <div class="search-box" style="margin-top:10px;">
+                        <a class="btn btn-primary" href="${base}/merchant_config/addSettledMerchantType">${_res.get("merchant.settled_merchant_type.add")}</a>
+                    </div>
+
+                    <table class="table table-hover ">
+                        <tr>
+                            <th>${_res.get("merchant.settled_merchant_type.name")}</th>
+                            <th>${_res.get("merchant.settled_merchant_type.product_count")}</th>
+                            <th>${_res.get("merchant.settled_merchant_type.deposit")}</th>
+                            <th>${_res.get("action")}</th>
+                        </tr>
+                        <#list settledMerchantTypes as settledMerchantType>
+                            <tr>
+                                <td>${settledMerchantType.name!}</td>
+                                <td>${settledMerchantType.product_count!}</td>
+                                <td>${settledMerchantType.deposit!}</td>
+                                <td>
+                                    <a class="btn btn-primary btn-sm btn-danger" href="${base}/merchant_config/deleteSettledMerchantType/${settledMerchantType.id!}"
+                                       onclick="return confirm('${_res.get("merchant.settled_merchant_type.delete_confirm")}');">${_res.get("delete")}</a>
+                                    <a class="btn btn-primary btn-sm" href="${base}/merchant_config/editSettledMerchantType/${settledMerchantType.id!}">${_res.get("edit")}</a>
+                                </td>
+                            </tr>
+                        </#list>
+                        <#if settledMerchantTypes?size == 0>
+                            <tr>
+                                <td colspan="10">没有任何数据</td>
+                            </tr>
+                        </#if>
+                    </table>
+                </div>
+
+                <div role="tabpanel" class="tab-pane <#if (active?? && active=="settled_merchant_settlement_proportion")>active</#if>" id="settled_merchant_settlement_proportion">
+                    <div style="margin-top:10px;">
+                    <form id="settlement-proportion-form" class="form-inline" action="${base}/merchant_config/updateSettlementProportion" method="post">
+                        <div class="form-group">
+                            <label>分成比例</label>
+                            <input type="hidden" name="settledMerchantSettlementProportion.id" value="${settlementProportion.id!}">
+                            <input type="number" name="settledMerchantSettlementProportion.percentage" class="form-control required" min="0" max="100" value="${settlementProportion.percentage!}">
+                        </div>
+                        <button type="submit" class="btn btn-primary">更新</button>
+                    </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </@layout.layout>

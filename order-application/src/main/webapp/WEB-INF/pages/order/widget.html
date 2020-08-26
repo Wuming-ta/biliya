@@ -1,0 +1,108 @@
+<style>
+    .order-widget{
+        background-color: transparent;
+        border: 1px solid #f4f4f4;
+        min-height: 250px;
+    }
+    .order-widget-head{
+        border-left: 5px solid orange;
+        border-bottom: 1px solid #f4f4f4;
+        padding-left: 10px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+    .order-widget-row{
+        margin-left: 0px;
+        margin-right: 0px;
+        margin-top: 60px;
+    }
+    .order-widget-box{
+        background-color: #fafafa;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+    }
+    .order-widget-count{
+        height: 60px;
+        padding-top: 15px;
+    }
+    .order-widget-title{
+        height: 30px;
+        padding-top: 10px;
+        font-size: 14px;
+    }
+    .order-widget-bar{
+        border-bottom: 8px solid green;
+        margin-bottom: 0px;
+    }
+    .order-widget-bar-deliver-pending{
+        border-color: yellow;
+    }
+    .order-widget-bar-delivering{
+        border-color: pink;
+    }
+    .order-widget-bar-return{
+        border-color: orange;
+    }
+    .order-widget-bar-reminder{
+        border-color: red;
+    }
+</style>
+
+<div class="order-widget">
+    <div class="order-widget-head">
+        <#if orderWidgetDisplayName??>
+            ${orderWidgetDisplayName!}
+        <#else>${orderWidgetName!}
+        </#if>
+    </div>
+    <div class="row order-widget-row">
+        <div class="col-md-2 col-sm-4">
+            <div class="order-widget-box">
+                <a href="${base}/order">
+                    <div class="order-widget-title">总订单数</div>
+                    <div class="order-widget-count">${totalOrderCount}</div>
+                    <div class="order-widget-bar"></div>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4">
+            <div class="order-widget-box">
+                <a href="${base}/order?status=CONFIRMED_DELIVER_PENDING">
+                    <div class="order-widget-title">待发货订单数</div>
+                    <div class="order-widget-count">${deliverPendingOrderCount}</div>
+                    <div class="order-widget-bar order-widget-bar-deliver-pending"></div>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4">
+            <div class="order-widget-box">
+                <a href="${base}/order?status=DELIVERING">
+                    <div class="order-widget-title">发货中订单数</div>
+                    <div class="order-widget-count">${deliveringOrderCount}</div>
+                    <div class="order-widget-bar order-widget-bar-delivering"></div>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4">
+            <div class="order-widget-box">
+                <a href="${base}/return_refund_order">
+                    <div class="order-widget-title">退货退款订单数</div>
+                    <div class="order-widget-count">${returnRefundOrderCount}</div>
+                    <div class="order-widget-bar order-widget-bar-return"></div>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-4">
+            <div class="order-widget-box">
+                <a href="${base}/order?reminder=1">
+                    <div class="order-widget-title">提醒发货订单数</div>
+                    <div class="order-widget-count">${deliverReminderOrderCount}</div>
+                    <div class="order-widget-bar order-widget-bar-reminder"></div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

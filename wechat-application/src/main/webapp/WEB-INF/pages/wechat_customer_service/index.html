@@ -1,0 +1,73 @@
+<#macro script>
+    <#include "../common/invite-modal.js" />
+    <script>
+        $(document).ready(function(){
+
+        });
+    </script>
+</#macro>
+<#macro css><style></style></#macro>
+<#macro modal><#include "../common/invite-modal.html" /></#macro>
+
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+<#include "../template/message.ftl" />
+
+<@layout.layout script css _res.get("breadcrumb.wechat_customer_service") modal>
+    <#assign menus={"/": _res.get("breadcrumb.home")} />
+    <@nav menus _res.get("breadcrumb.wechat_customer_service") />
+    <@msg message />
+
+    <div class="search-box">
+        <a class="btn btn-primary" href="${base}/wechat_customer_service/add">${_res.get("wechat_customer_service.btn.new")}</a>
+    </div>
+    <table class="table table-bordered table-striped table-hover">
+        <tr>
+            <th style="width:30%">客服信息</th>
+            <th style="width:40%">绑定微信号</th>
+            <th style="width:30%">${_res.get("action")}</th>
+        </tr>
+        <#if wechatCustomerServices??>
+            <#list wechatCustomerServices as wechatCustomerService>
+                <tr>
+                    <td>
+                        <#if wechatCustomerService.kf_headimgurl??>
+                            <img src="${wechatCustomerService.kf_headimgurl}" style="height:60px;" />
+                        </#if>
+                        ${wechatCustomerService.kf_account!}
+                    </td>
+                    <td>
+                        <#if wechatCustomerService.kf_wx??>
+                            <div>
+                                ${wechatCustomerService.kf_wx!}
+                                <#if onlineKfIds?contains(wechatCustomerService.kf_id?string)>
+                                    <span class="label label-success">在线</span>
+                                <#else>
+                                    <span class="label label-default">离线</span>
+                                </#if>
+                            </div>
+                            <div>${wechatCustomerService.kf_nick!}</div>
+                        <#else>未绑定<i class="fa fa-question" aria-hidden="true"></i>
+                        </#if>
+                    </td>
+                    <td>
+                        <#if !wechatCustomerService.kf_wx?? >
+                            <a class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal"
+                               data-action="${base}/wechat_customer_service/invite"
+                               data-kf_account="${wechatCustomerService.kf_account!}">
+                                绑定
+                            </a>
+                        </#if>
+
+                        <a class="btn btn-primary btn-sm" href="${base}/wechat_customer_service/edit/${wechatCustomerService.kf_id!}">${_res.get("edit")}</a>
+                        <a class="btn btn-danger btn-sm" onclick="return confirm('确定要删除此客服吗？');" href="${base}/wechat_customer_service/delete/${wechatCustomerService.kf_account!}">${_res.get("delete")}</a>
+                    </td>
+                </tr>
+            </#list>
+        </#if>
+
+    </table>
+
+    <div><a href="https://mpkf.weixin.qq.com/">微信公众平台客服登录</a></div>
+
+</@layout.layout>

@@ -1,0 +1,58 @@
+<#macro script>
+    <script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.ownerBalance") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.ownerBalance")/>
+    <@msg message />
+
+    <@shiro.hasPermission name="SettlementApplication.view">
+    <div class="search-box">
+        <form class="form-inline">
+            <div class="form-group">
+                <label></label>
+                <input type="text" name="id" class="form-control" value="${id!}" placeholder="${_res.get("settlement.seller.search.id")}">
+            </div>
+            <button type="submit" class="btn btn-primary">${_res.get("settlement.seller.search")}</button>
+        </form>
+    </div>
+    </@shiro.hasPermission>
+
+    <#if ownerBalances??>
+        <table class="table table-hover ">
+            <tr>
+                <th></th>
+                <th>${_res.get("settlement.ownerBalance.name")}</th>
+                <th>${_res.get("settlement.ownerBalance.balance")}</th>
+                <th>${_res.get("settlement.ownerBalance.history_pending_settlement")}</th>
+                <th>${_res.get("settlement.ownerBalance.history_settled")}</th>
+            </tr>
+            <#list ownerBalances.list as ownerBalance>
+                <tr>
+                    <td>${ownerBalance.user_id}</td>
+                    <td>
+                        <a href="${base}/reward_cash?id=${ownerBalance.user_id}" title="${_res.get("settlement.ownerBalnace.view.cash.history")}">${ownerBalance.name!'-'}</a>
+                    </td>
+                    <td>${ownerBalance.balance!"-"}</td>
+                    <td>${ownerBalance.pending_reward!"-"}</td>
+                    <td>${ownerBalance.settled_reward!"-"}</td>
+                </tr>
+            </#list>
+        </table>
+        <#if (ownerBalances.list?size>1)>
+            <@paginate currentPage=ownerBalances.pageNumber totalPage=ownerBalances.totalPage actionUrl="${base}/owner_balance?pageNumber=" urlParas="&id=${id!}"/>
+        </#if>
+    </#if>
+
+</@layout.layout>

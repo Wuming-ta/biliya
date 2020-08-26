@@ -1,0 +1,158 @@
+<#macro script>
+    <script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+<script>
+  $(document).ready(function(){
+    $('.datepicker').datepicker();
+    $("#user_form").validate({
+        rules: {
+            "user.login_name": {
+                required: true,
+                remote: {
+                    url: "${base}/staff/loginNameVerify",
+                    type: "POST",
+                    data: {
+                      "login_name": function() { return $("#login_name").val(); },
+                      "user_id": function() { return $("#id").val(); }
+                    }
+                }
+            },
+            "user.phone": {
+                remote: {
+                    url: "${base}/staff/phoneVerify",
+                    type: "POST",
+                    data: {
+                      "phone": function() { return $("#phone").val(); },
+                      "user_id": function() { return $("#id").val(); }
+                    }
+                }
+            },
+            "user.weixin": {
+                remote: {
+                    url: "${base}/staff/weixinVerify",
+                    type: "POST",
+                    data: {
+                      "weixin": function() { return $("#weixin").val(); },
+                      "user_id": function() { return $("#id").val(); }
+                    }
+                }
+            }
+        },
+        messages: {
+            "user.login_name": {
+                remote: "${_res.get("identity.user.login_name.exist")}"
+            },
+            "user.weixin": {
+                remote: "${_res.get("identity.user.weixin.exist")}"
+            },
+            "user.phone": {
+                remote: "${_res.get("identity.user.phone.exist")}"
+            }
+        }
+    });
+  });
+</script>  
+</#macro>
+<#macro css>
+    <style>
+    .col-key{
+    text-align: center;
+    width:15%;
+    }
+    .col-value{
+    width: 20%;
+    }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.staff") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/staff": _res.get("breadcrumb.staff")}>
+    <@nav menus _res.get("breadcrumb.edit")/>
+    <form id="user_form" role="form" action="${base}/staff/update" method="post">
+        <input type="hidden" id="id" name="user.id" value="${user.id!}">
+        <table class="table table-bordered">
+            <tr>
+                <td class="col-key">${_res.get("identity.user.register_date")}</td>
+                <td class="col-value">${user.register_date!}</td>
+                <td class="col-key">${_res.get("identity.user.last_login_date")}</td>
+                <td class="col-value">${user.last_login_date!}</td>
+            </tr>
+            <tr>
+                <td class="col-key required-label">${_res.get("identity.user.login_name")}</td>
+                <td class="col-value"><input type="text" class="form-control required" id="login_name" name="user.login_name" value="${user.login_name!}"></td>
+                <td class="col-key required-label">${_res.get("identity.user.name")}</td>
+                <td class="col-value"><input type="text" class="form-control required" id="name" name="user.name" value="${user.name!}"></td>
+            </tr>
+            <tr>
+                <td class="col-key required-label">${_res.get("identity.user.real_name")}</td>
+                <td class="col-value"><input type="text" class="form-control required" id="real_name" name="user.real_name" value="${user.real_name!}"></td>
+                <td class="col-key">${_res.get("identity.user.password")}</td>
+                <td class="col-value"><input type="password" class="form-control" id="password" name="user.password" value="" placeholder="${_res.get("identity.user.password.not.changed")}"></td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("identity.user.contact_phone")}</td>
+                <td class="col-value"><input type="tel" class="form-control" id="contact_phone" name="user.contact_phone" value="${user.contact_phone!}"></td>
+                <td class="col-key">${_res.get("identity.user.email")}</td>
+                <td class="col-value"><input type="email" class="form-control" id="email" name="user.email" value="${user.email!}"></td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("identity.user.birthday")}</td>
+                <td class="col-value"><input class="form-control datepicker" data-date-format="yyyy-mm-dd" name="user.birthday" value="${user.birthday!}"></td>
+                <td class="col-key">${_res.get("identity.user.contact_wx_number")}</td>
+                <td class="col-value"><input type="text" class="form-control" id="contact_wx_number" name="contact_wx_number" value="${user.contact_wx_number!}"></td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("identity.user.status")}</td>
+                <td class="col-value">
+                    <select name="user.status" class="form-control">
+                        <#list statuses as status>
+                            <#if status = user.status>
+                                <option value="${status}" selected>${_res.get("identity.user.status."+status?lower_case)}</option>
+                            <#else>
+                                <option value="${status}">${_res.get("identity.user.status."+status?lower_case)}</option>
+                            </#if>
+                        </#list>
+                    </select>
+                </td>
+                <td class="col-key">${_res.get("identity.user.sex")}</td>
+                <td class="col-value">
+                    <select name="user.sex" class="form-control">
+                        <option value="0" <#if user.sex==0>selected="selected"</#if> >${_res.get("identity.user.sex.0")}</option>
+                        <option value="1" <#if user.sex==1>selected="selected"</#if> >${_res.get("identity.user.sex.1")}</option>
+                        <option value="2" <#if user.sex==2>selected="selected"</#if> >${_res.get("identity.user.sex.2")}</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("identity.user.details")}</td>
+                <td colspan="3"><textarea rows="2" class="form-control" name="user.details">${user.details!}</textarea></td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("identity.user.role")}</td>
+                <td class="col-value">
+                    <#assign currentRoles=user.roleList/>
+                    <#list roles as role>
+                        <div class="checkbox">
+                            <label>
+                                <#if currentRoles?seq_contains(role.name) >
+                                    <input name="role" type="checkbox" value="${role.id}" checked>${role.name} - ${role.description!}
+                                <#else>
+                                    <input name="role" type="checkbox" value="${role.id}">${role.name} - ${role.description!}
+                                </#if>
+                            </label>
+                        </div>
+                    </#list>
+                </td>
+                <td class="col-key"></td>
+                <td class="col-value"></td>
+            </tr>
+        </table>
+
+        <hr>
+        <@shiro.hasPermission name="identity.edit"><button id="submitBtn" type="submit" class="btn btn-primary">${_res.get("btn.update")}</button></@shiro.hasPermission>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+
+    </form>
+
+</@layout.layout>

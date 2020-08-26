@@ -1,0 +1,58 @@
+<#macro script>
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.config.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.all.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/lang/zh-cn/zh-cn.js"></script>
+    <#include "../product/common.js"/>
+    <#include "../product/edit.js"/>
+    <script>
+        $(document).ready(function(){
+            $('#form').validate();
+            UE.getEditor('myEditor');
+        });
+    </script>
+</#macro>
+<#macro css>
+    <style>
+        <link href="${base}/assets/ueditor-1.4.3.3/themes/default/css/ueditor.css" type="text/css" rel="stylesheet">
+    </style>
+    <style>
+        <#include "../product/common.css"/>
+    </style>
+</#macro>
+<#macro modal></#macro>
+
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+
+<@layout.layout script css _res.get("breadcrumb.product_brand") modal>
+<#assign menus={"/": _res.get("breadcrumb.home"), "/product_brand": _res.get("breadcrumb.product_brand")} />
+<@nav menus _res.get("breadcrumb.edit") />
+<form id="form" class="form-horizontal" role="form" method="post" enctype="multipart/form-data" action="${base}/product_brand/update">
+    <input type="hidden" name="productBrand.id" value="${productBrand.id!}" />
+    <div class="form-group">
+        <label class="col-md-2 control-label">${_res.get("product_brand.name")}</label>
+        <div class="col-md-8">
+            <input type="text" name="productBrand.name" class="form-control required" value="${productBrand.name!}" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">${_res.get("product_brand.logo")}</label>
+        <div class="col-md-2">
+            <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);" style="cursor:pointer;"></span>
+                <img class="cover" src="${productBrand.logo!}" />
+            </div>
+            <input type="file" class="cover-form-control" accept="image/*" name="logo"  onchange="previewCover(this);">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">${_res.get("product_brand.description")}</label>
+        <div class="col-md-8">
+            <script type="text/plain" id="myEditor" name="productBrand.description" style="width: 100%; min-height: 400px">${productBrand.description!}</script>
+        </div>
+    </div>
+    <hr/>
+    <button type="submit" class="btn btn-primary">${_res.get("btn.submit")}</button>
+    <a class="btn btn-default" onclick="javascript:history.back();">${_res.get("btn.back")}</a>
+</form>
+</@layout.layout>

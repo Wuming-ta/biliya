@@ -1,0 +1,109 @@
+<#macro script>
+    <script>
+  $(document).ready(function(){
+    $("#form").validate();
+  });
+</script>
+
+</#macro>
+<#macro css>
+    <style>
+        .gap {
+            margin-bottom:8px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+    <#include "../template/breadcrumb.ftl"/>
+    <#include "../template/message.ftl" />
+    <@layout.layout script css _res.get("breadcrumb.wechat_template_message") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/wechat_template_message": _res.get("breadcrumb.wechat_template_message")}/>
+        <@nav menus _res.get("breadcrumb.edit")/>
+        <@msg _res.get("wechat_template_message_tips") />
+
+        <form id="form" class="form-horizontal" role="form" action="${base}/wechat_template_message/update" method="post">
+            <input type="hidden" name="wechatTemplateMessage.id" value="${wechatTemplateMessage.id!}" />
+            <input type="hidden" name="wechatTemplateMessage.type_id" value="${wechatTemplateMessage.type_id!}" />
+            <div class="form-group">
+                <label class="col-lg-2 col-md-2 control-label">
+                    ${_res.get("wechat.wechat_template_message.type")}
+                </label>
+                <div class="col-lg-4 col-md-6">
+                    <p class="form-control-static">${wechatTemplateMessage.type_display_name!}</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 col-md-2 control-label">是否启用</label>
+                <div class="col-lg-4 col-md-6">
+                    <label class="radio-inline"><input type="radio" value="1" name="wechatTemplateMessage.enabled" <#if wechatTemplateMessage.enabled==1>checked</#if> />启用</label>
+                    <label class="radio-inline"><input type="radio" value="0" name="wechatTemplateMessage.enabled" <#if wechatTemplateMessage.enabled==0>checked</#if> />禁用</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 col-md-2 control-label">
+                    ${_res.get("wechat.wechat_template_message.template_id")}
+                    &nbsp;<font color="red" size="3">*</font>
+                </label>
+                <div class="col-lg-10 col-md-10">
+                    <p class="form-control-static">${wechatTemplateMessage.template_id!}</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 col-md-2 control-label">
+                    ${_res.get("wechat.wechat_template_message.name")}
+                    &nbsp;<font color="red" size="3">*</font>
+                </label>
+                <div class="col-lg-4 col-md-6">
+                    <input type="text" name="wechatTemplateMessage.name"
+                           value="${wechatTemplateMessage.name!}"
+                           class="form-control required"
+                           placeholder="${_res.get("wechat.wechat_template_message.name.placeholder")}" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 col-md-2 control-label">
+                    ${_res.get("wechat.wechat_template_message.field")}
+                </label>
+                <div class="col-lg-8 col-md-10">
+                    <table class="table">
+                        <caption>
+                            <div class="text-muted">提示：请只填写您在微信公众号中添加的模板中的域对应的项。如果某些项在公众号的模板中没有对应的域，则这些项将不显示</div>
+                        </caption>
+                        <tr>
+                            <th>属性名</th>
+                            <th>模板消息属性</th>
+                            <th>固定显示值</th>
+                        </tr>
+                        <#list wechatTemplateMessage.wechatMessageType.wechatMessageTypeProps as wechatMessageTypeProp>
+                            <input type="hidden" name="wechatField[${wechatMessageTypeProp_index}].prop_id" value="${wechatMessageTypeProp.id!}" />
+                            <input type="hidden" name="wechatMessageTypeProp[${wechatMessageTypeProp_index}].id" value="${wechatMessageTypeProp.id!}" />
+
+                            <tr>
+                                <td>${wechatMessageTypeProp.display_name!}</td>
+                                <td>
+                                    <input type="text" name="wechatField[${wechatMessageTypeProp_index}].name" class="form-control"
+                                    <#list wechatTemplateMessage.wechatFields as wechatField>
+                                        <#if wechatField.prop_id == wechatMessageTypeProp.id>
+                                            value="${wechatField.name!}"
+                                        </#if>
+                                    </#list>
+                                    placeholder="${_res.get("wechat.wechat_template_message.prop.placeholder")}"/>
+                                </td>
+                                <td>
+                                    <input type="text" name="wechatMessageTypeProp[${wechatMessageTypeProp_index}].display_value" value="${wechatMessageTypeProp.display_value!}" class="form-control"
+                                           placeholder="${_res.get("wechat.wechat_template_message.display_value.placeholder")}"/>
+                                </td>
+                            </tr>
+                        </#list>
+                    </table>
+
+                </div>
+            </div>
+
+            <hr>
+            <button id="submitBtn" type="submit" class="btn btn-primary" >${_res.get("btn.submit")}</button>
+            <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+
+        </form>
+    </@layout.layout>

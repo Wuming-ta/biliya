@@ -1,0 +1,241 @@
+
+<#macro script>
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.config.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.all.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/lang/zh-cn/zh-cn.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#form').validate({
+                ignore: [],
+            });
+            UE.getEditor('myEditor');
+
+            function getUrl(pageNum, keyWord) {
+                return "${base}/settled_merchant/userList?pageNum=" + pageNum + "&name=" + keyWord;
+            }
+            //search user
+            var PAGE_NUMBER = 1;
+            function loadSuppliers(pageNum, keyWord) {
+                $('#pageNumberSize').remove();
+                $.get(getUrl(pageNum, keyWord), function(data) {
+                    $('#supplierModalBody').append(data);
+                    PAGE_NUMBER = parseInt($('#pageNumber').attr("value"));
+                    var totalPage = parseInt($('#totalPage').attr("value"));
+                    if (PAGE_NUMBER < totalPage) {
+                        $('#more').show();
+                    }
+                    else {
+                        $('#more').hide();
+                    }
+                    if (totalPage == 0) {
+                        $('#supplierModalBody').append("没有数据");
+                    }
+                });
+            }
+
+
+            $('#btnModalSave').click(function() {
+                var suppliers = $('input[name="supplierCheckbox"]:checked').val();
+                console.log(suppliers);
+                var res = suppliers.split("#");
+                $('#user_id').val(res[0]);
+                $('#user_name').html(res[1]);
+                $('#agent_uid').modal('hide');
+            });
+
+            //search btn
+            $('#searchSupplier').click(function() {
+                var keyWord = $('#searchSupplierKeyWord').val();
+                $('#supplierModalBody').empty();
+                loadSuppliers(1, keyWord);
+            });
+
+            $('#more').click(function() {
+                var keyWord = $('#searchSupplierKeyWord').val();
+                loadSuppliers(PAGE_NUMBER + 1, keyWord);
+            });
+
+            $('#agent_uid').on('shown.bs.modal', function () {
+              $('#more').hide();
+              loadSuppliers(PAGE_NUMBER, '');
+            });
+            $('#agent_uid').on('hidden.bs.modal', function () {
+              $('#supplierModalBody').empty();
+              $('#more').hide();
+            });
+        });
+
+    </script>
+    <#include "../settled_merchant/common.js" />
+    <#include "../settled_merchant/add.js" />
+</#macro>
+<#macro css>
+    <link href="${base}/assets/ueditor-1.4.3.3/themes/default/css/ueditor.css" type="text/css" rel="stylesheet">
+    <style>
+        <#include "../settled_merchant/common.css" />
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+        .form-control-inline {
+            display: inline;
+            width: 50%;
+        }
+    </style>
+
+</#macro>
+<#macro modal>
+    <!-- User Modal -->
+    <div class="modal fade" id="agent_uid" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <input style="width:200px;float:left;" placeholder="用户名/UID/手机" id="searchSupplierKeyWord" type="text" class="form-control">
+                    <button style="margin-left:5px;" id="searchSupplier" type="button" class="btn btn-default">查找</button>
+                </div>
+                <div id="supplierModalBody" class="modal-body">
+                    <br>
+                </div>
+                <button id="more" type="button" class="btn btn-info btn-block">更多</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button id="btnModalSave" type="button" class="btn btn-primary">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</#macro>
+
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+<#include "../merchant_config/settled_merchant_type_select_option.ftl" />
+<@layout.layout script css _res.get("breadcrumb.merchant.add") modal>
+<#assign menus={"/": _res.get("breadcrumb.home"), "/settled_merchant": _res.get("breadcrumb.settled_merchant")} />
+<@nav menus _res.get("breadcrumb.merchant.add") />
+
+<form id="form" role="form" enctype="multipart/form-data" action="${base}/settled_merchant/save/" method="post">
+    <div class="header">基本信息</div>
+    <table class="table table-bordered table-hover">
+        <tr>
+            <td class="col-key">选择用户<span class="star-required">*</span></td>
+            <td class="col-value" colspan="3">
+                <input type="hidden" id="user_id" name="user_id" class="required">
+                <span id="user_name"></span>
+                <button id="loadSuppliers" type="button" class="btn btn-info" data-toggle="modal" data-target="#agent_uid">选择</button>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("merchant.settled_merchant.name")}<span class="star-required">*</span></td>
+            <td class="col-value">
+                <input type="text" id="name" class="form-control required" name="settledMerchant.name" />
+            </td>
+            <td class="col-key">${_res.get("merchant.settled_merchant_type.name")}<span class="star-required">*</span></td>
+            <td class="col-value">
+                <select class="form-control required" name="settledMerchant.type_id" id="type_id">
+                    <@select settledMerchantTypes />
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("merchant.settled_merchant.phone")}<span class="star-required">*</span></td>
+            <td class="col-value">
+                <input type="text" id="phone" class="form-control required" name="settledMerchant.phone" />
+            </td>
+            <td class="col-key">${_res.get("merchant.settled_merchant.contact_user")}<span class="star-required">*</span></td>
+            <td class="col-value">
+                <input type="text" id="contact_user" class="form-control required" name="settledMerchant.contact_user" />
+            </td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("merchant.settled_merchant.contact_phone")}<span class="star-required">*</span></td>
+            <td class="col-value">
+                <input type="text" id="contact_phone" class="form-control required" name="settledMerchant.contact_phone" />
+            </td>
+            <td class="col-key">${_res.get("merchant.settled_merchant.contact_email")}</td>
+            <td class="col-value">
+                <input type="text" class="form-control" name="settledMerchant.contact_email" />
+            </td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("merchant.settled_merchant.id_number")}</td>
+            <td class="col-value">
+                <input type="text" class="form-control" name="settledMerchant.id_number" />
+            </td>
+            <td class="col-key">${_res.get("merchant.settled_merchant.business_license_number")}</td>
+            <td class="col-value">
+                <input type="text" class="form-control" name="settledMerchant.business_license_number" />
+            </td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("merchant.settled_merchant.address")}</td>
+            <td class="col-value" colspan="3">
+                <input type="text" class="form-control" name="settledMerchant.address" />
+            </td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("merchant.settled_merchant.description")}</td>
+            <td class="col-value" colspan="3">
+                <textarea type="text" style="width:100%" rows="5" class="form-control" name="settledMerchant.description" ></textarea>
+            </td>
+        </tr>
+    </table>
+
+    <div class="header">图片上传</div>
+    <table class="table table-bordered table-hover">
+        <tr>
+            <td class="col-key">${_res.get("merchant.settled_merchant.logo")}</td>
+            <td class="col-value">
+                <div class="col-sm-6">
+                    <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                        <span class="glyphicon glyphicon-trash cover-delete hidden cursor-pointer" onclick="coverDeleteClick(this);"></span>
+                        <img width="100%">
+                    </div>
+                    <input type="file" class="cover-form-control" accept="image/*" name="logo" onchange="previewCover(this);">
+                </div>
+            </td>
+            <td class="col-key">${_res.get("merchant.settled_merchant.business_license_image")}</td>
+            <td class="col-value">
+                <div class="col-sm-6">
+                    <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                        <span class="glyphicon glyphicon-trash cover-delete hidden cursor-pointer" onclick="coverDeleteClick(this);"></span>
+                        <img width="100%">
+                    </div>
+                    <input type="file" class="cover-form-control" accept="image/*" name="business_license_image" onchange="previewCover(this);">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("merchant.settled_merchant.id_front")}</td>
+            <td class="col-value">
+                <div class="col-sm-6">
+                    <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                        <span class="glyphicon glyphicon-trash cover-delete hidden cursor-pointer" onclick="coverDeleteClick(this);"></span>
+                        <img width="100%">
+                    </div>
+                    <input type="file" class="cover-form-control" accept="image/*" name="id_front" onchange="previewCover(this);">
+                </div>
+            </td>
+            <td class="col-key">${_res.get("merchant.settled_merchant.id_back")}</td>
+            <td class="col-value">
+                <div class="col-sm-6">
+                    <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                        <span class="glyphicon glyphicon-trash cover-delete hidden cursor-pointer" onclick="coverDeleteClick(this);" ></span>
+                        <img width="100%">
+                    </div>
+                    <input type="file" class="cover-form-control" accept="image/*" name="id_back" onchange="previewCover(this);">
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="header">店铺介绍</div>
+    <div>
+        <script type="text/plain" id="myEditor" name="settledMerchantIntroduction.introduction" style="width:100%; min-height:400px;"></script>
+    </div>
+    <hr/>
+    <button type="submit" class="btn btn-primary">${_res.get("submit")}</button>
+    <button type="button" class="btn btn-default" onclick="history.back();">${_res.get("back")}</button>
+</form>
+
+</@layout.layout>

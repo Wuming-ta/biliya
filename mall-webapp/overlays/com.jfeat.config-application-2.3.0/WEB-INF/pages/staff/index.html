@@ -1,0 +1,105 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+</script>  
+</#macro>
+<#macro css>
+<style>
+    .cover-image {
+        height: 60px;
+        width: 60px;
+        background-size: cover;
+        background-position: center;
+    }
+</style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.staff") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.staff")/>
+    <@msg message />
+
+    <div class="search-box">
+        <form class="form-inline">
+            <div class="form-group">
+                <label>${_res.get("identity.user.name")}/${_res.get("identity.user.login_name")}</label>
+                <input type="text" name="name" class="form-control" value="${name!}">
+            </div>
+            <div class="form-group">
+                <label>${_res.get("identity.user.status")}</label>
+                <select class="form-control" name="status">
+                    <option></option>
+                    <#list statuses as s>
+                    <option value="${s}" <#if (status??&&status==s)>selected="selected"</#if> >${_res.get("identity.user.status."+s?lower_case)}</option>
+            </#list>
+            </select>
+            </div>
+            <div class="form-group">
+                <label>${_res.get("identity.user.role")}</label>
+                <select class="form-control" name="roleId">
+                    <option></option>
+                    <#list roles as role>
+                        <option value="${role.id}" <#if (roleId??&&roleId==role.id?string)>selected="selected"</#if> >${role.name}</option>
+                    </#list>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">${_res.get("identity.user.search")}</button>
+            <@shiro.hasPermission name="identity.edit">
+                <span class="vertical-separator"></span>
+                <a class="btn btn-primary" href="${base}/staff/add">${_res.get("identity.user.btn.new")}</a>
+            </@shiro.hasPermission>
+        </form>
+    </div>
+
+    <table class="table table-hover">
+        <tr>
+            <th>${_res.get("identity.user.id")}</th>
+            <th>${_res.get("identity.user.avatar")}</th>
+            <th>${_res.get("identity.user.login_name")}</th>
+            <th>${_res.get("identity.user.real_name")}</th>
+            <th>${_res.get("identity.user.status")}</th>
+            <th>${_res.get("identity.user.online")}</th>
+            <th>${_res.get("identity.user.action")}</th>
+        </tr>
+        <#list users.list as user>
+            <tr>
+                <td>${user.id}</td>
+                <td>
+                    <#if user.avatar??>
+                    <div class="cover-image" style="background-image: url(${user.avatar!});"></div>
+                    <#else>
+                    <div class="cover-image" style="background-image: url(${base}/assets/img/find_user.png);"></div>
+                    </#if>
+                </td>
+                <td>
+                    <@shiro.hasPermission name="identity.view"><a href="${base}/staff/edit/${user.id}"></@shiro.hasPermission>
+                    ${user.login_name!'-'}
+                    <@shiro.hasPermission name="identity.view"></a></@shiro.hasPermission>
+                </td>
+                <td>${user.real_name!}</td>
+                <td><label class="label <#if user.status=='NORMAL'>label-info<#else>label-default</#if>">${_res.get("identity.user.status."+user.status?lower_case)}</label></td>
+                <td><label class="label <#if user.online==0>label-default<#else>label-success</#if>">${user.online!}</label></td>
+                <td>
+                    <@shiro.hasPermission name="identity.edit">
+                    <a class="btn btn-primary btn-sm" href="${base}/staff/edit/${user.id}">${_res.get("btn.edit")}</a>
+                    </@shiro.hasPermission>
+                    <@shiro.hasPermission name="identity.delete">
+                    <a class="btn btn-danger btn-sm" href="${base}/staff/delete/${user.id}"
+                       onclick="javascript:if (confirm('${_res.get("identity.user.delete_confirm")}')){return true;} return false;">${_res.get("btn.delete")}</a>
+                    </@shiro.hasPermission>
+                </td>
+            </tr>
+        </#list>
+        <#if users.list?size == 0>
+        <td colspan="15">No Data</td>
+        </#if>
+    </table>
+    <@paginate currentPage=users.pageNumber totalPage=users.totalPage actionUrl="${base}/staff?pageNumber=" urlParas="&name=${name!}&roleId=${roleId!}"/>
+
+</@layout.layout>

@@ -1,0 +1,44 @@
+<#macro script>
+    <script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.aboutMall") modal>
+<#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.aboutMall")/>
+    <@msg message />
+
+    <form  class="form-horizontal" action="${base}/about_mall/update" enctype="multipart/form-data" method="post">
+
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label">图片</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="hidden" name="aboutMall.image" value="${about.image!}">
+                <a href="${about.image!}"><img src="${about.image!}" height="160"></a>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label"></label>
+            <div class="col-lg-4 col-md-6">
+                <input type="file" accept="image/*" id="about" name="about">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="content" class="col-lg-2 col-md-2 control-label">文字说明</label>
+            <div class="col-lg-4 col-md-6">
+                <textarea class="form-control" id="content" name="aboutMall.content">${about.content!}</textarea>
+            </div>
+        </div>
+        <hr>
+        <button type="submit" class="btn btn-primary">更新</button>
+        <a class="btn btn-default" href="javascript:history.back();">返回</a>
+    </form>
+</@layout.layout>

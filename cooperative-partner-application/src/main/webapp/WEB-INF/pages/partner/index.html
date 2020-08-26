@@ -1,0 +1,98 @@
+<#macro script>
+    <#include "../common/pwd-validate-modal.js" />
+    <script>
+      $(document).ready(function(){
+
+      });
+    </script>
+
+
+</#macro>
+<#macro css>
+    <style>
+    .col-summary-sm {
+        width: 160px;
+    }
+    </style>
+</#macro>
+<#macro modal>
+    <#include "../common/pwd-validate-modal.html" />
+</#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+
+<@layout.layout script css _res.get("breadcrumb.partner") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.partner")/>
+    <@msg message />
+
+    <div class="search-box">
+        <form class="form-inline">
+            <div class="form-group">
+                <label>${_res.get("partner.seller.Id")}</label>
+                <input type="text" name="sellerId" class="form-control" value="${sellerId!}">
+            </div>
+            <div class="form-group">
+                <label>${_res.get("partner.seller.uid")}</label>
+                <input type="text" name="uid" class="form-control" value="${uid!}">
+            </div>
+            <button type="submit" class="btn btn-primary">${_res.get("partner.seller.search")}</button>
+        </form>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">${_res.get("partner.seller.common")}</h3>
+        </div>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <td class="col-summary-sm">${_res.get("partner.partner.total_partners")}</td>
+                <td>${totalPartnerCount}</td>
+            </tr>
+        </table>
+    </div>
+
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th>${_res.get("partner.seller.Id")}</th>
+            <th>${_res.get("partner.seller.name")}</th>
+            <th>${_res.get("partner.seller.partnership.time")}</th>
+            <th>${_res.get("partner.seller.partner_pool")}</th>
+            <th>${_res.get("partner.level")}</th>
+            <th>${_res.get("partner.seller.action")}</th>
+        </tr>
+        <#list sellers.list as seller>
+            <tr>
+                <td>${seller.id}</td>
+                <td><a href="${base}/seller/detail?sellerId=${seller.id}">${seller.user_name!'-'}</a></td>
+                <td>${seller.partner_ship_time!}</td>
+                <td>${seller.partnerPool.size()}</td>
+                <td>${seller.partner_level_name}</td>
+                <td>
+                    <a class="btn btn-danger btn-sm" data-toggle="modal" data-target="#myModal"
+                       data-id="${seller.id!}"
+                       data-action="${base}/partner/delete"
+                       data-return-url="/partner?pageNumber=${pageNumber!}&uid=${uid!}" >
+                        ${_res.get("partner.partner.delete")}
+                    </a>
+                    <div class="btn-group">
+                        <button type="button" id="batch-give-coupon" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            ${_res.get("partner.level.update")} <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <#list partnerLevels as level>
+                                <li><a href="${base}/partner/updateLevel?sellerId=${seller.id}&level=${level.level}&returnUrl=/partner">${level.name!}</a></li>
+                            </#list>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        </#list>
+        <#if (sellers.list?size==0)>
+            <td colspan="20">No Data</td>
+        </#if>
+    </table>
+    <@paginate currentPage=sellers.pageNumber totalPage=sellers.totalPage actionUrl="${base}/partner?pageNumber=" urlParas="&sellerId=${sellerId!}&uid=${uid!}"/>
+</@layout.layout>

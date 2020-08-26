@@ -1,0 +1,94 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+
+<#macro css>
+    <style>
+    .col-key {
+      width: 20%;
+      font-weight: bold;
+    }
+    .col-value {
+      width: 30%
+    }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.withdraw_account") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/reward_cash": _res.get("breadcrumb.rewardCash")}/>
+    <@nav menus _res.get("breadcrumb.view")/>
+    <@msg message />
+
+    <table class="table table-hover table-bordered">
+        <tr>
+            <td class="col-key">${_res.get("settlement.rewardCash.id")}</td>
+            <td class="col-value">${rewardCash.id}</td>
+            <td class="col-key">${_res.get("settlement.rewardCash.name")}</td>
+            <td class="col-value">${rewardCash.user.name}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("settlement.rewardCash.status")}</td>
+            <td class="col-value">${_res.get("settlement.rewardCash.status."+rewardCash.status?lower_case)}</td>
+            <td class="col-key">${_res.get("settlement.rewardCash.cash")}</td>
+            <td class="col-value">${rewardCash.cash}</td>
+        </tr>
+            <td class="col-key">${_res.get("settlement.rewardCash.apply_time")}</td>
+            <td class="col-value">${rewardCash.apply_time!}</td>
+            <#if (rewardCash.status=="COMPLETED")>
+                <td class="col-key">${_res.get("settlement.rewardCash.complete_time")}</td>
+                <td class="col-value">${rewardCash.complete_time}</td>
+            <#elseif (rewardCash.status=="REJECTED")>
+                <td class="col-key">${_res.get("settlement.rewardCash.reject_time")}</td>
+                <td class="col-value">${rewardCash.reject_time}</td>
+            <#else>
+                <td class="col-key"></td>
+                <td class="col-value"></td>
+            </#if>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("settlement.rewardCash.account_type")}</td>
+            <td class="col-value">${_res.get("settlement.withdraw_account.type."+rewardCash.account_type?lower_case)}</td>
+            <td class="col-key">${_res.get("settlement.rewardCash.account_name")}</td>
+            <td class="col-value">${rewardCash.account_name!}</td>
+        </tr>
+        <tr>
+            <td class="col-key">${_res.get("settlement.rewardCash.account_number")}</td>
+            <td class="col-value">${rewardCash.account_number!}</td>
+            <#if (rewardCash.account_type=="BANK")>
+                <td class="col-key">${_res.get("settlement.rewardCash.bank_name")}</td>
+                <td class="col-value">${rewardCash.bank_name!}</td>
+            <#else>
+                <td class="col-key"></td>
+                <td class="col-value"></td>
+            </#if>
+        </tr>
+        <#if rewardCash.note??>
+            <tr>
+                <td class="col-key">${_res.get("settlement.rewardCash.note")}</td>
+                <td colspan="3">
+                    ${rewardCash.note!}
+                </td>
+            </tr>
+        </#if>
+    </table>
+
+    <hr>
+    <#if (rewardCash.status=='APPLYING')>
+        <a class="btn btn-danger" href="${base}/reward_cash/reject/${rewardCash.id}">${_res.get("btn.withdraw_account.reject")}</a>
+        <a class="btn btn-primary" href="${base}/reward_cash/agree/${rewardCash.id}">${_res.get("btn.withdraw_account.agree")}</a>
+    </#if>
+    <#if (rewardCash.status=='HANDLING')>
+        <a class="btn btn-danger" href="${base}/reward_cash/reject/${rewardCash.id}">${_res.get("btn.withdraw_account.reject")}</a>
+        <a class="btn btn-success" href="${base}/reward_cash/complete/${rewardCash.id}">${_res.get("btn.withdraw_account.complete")}</a>
+    </#if>
+    <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+
+</@layout.layout>

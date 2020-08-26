@@ -1,0 +1,55 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.withdraw_account") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/withdraw_account": _res.get("breadcrumb.withdraw_account")}/>
+    <@nav menus _res.get("breadcrumb.view")/>
+    <@msg message />
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">${_res.get("settlement.withdraw_account.detail")}</h3>
+        </div>
+        <div class="panel-body">
+            <div>
+                <b>${_res.get("settlement.withdraw_account.user_name")} : </b>${user.name}
+            </div>
+            <div>
+                <b>${_res.get("settlement.withdraw_account.count")} : </b>${accounts?size}
+            </div>
+        </div>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th>${_res.get("settlement.withdraw_account.id")}</th>
+                <th>${_res.get("settlement.withdraw_account.owner_name")}</th>
+                <th>${_res.get("settlement.withdraw_account.type")}</th>
+                <th>${_res.get("settlement.withdraw_account.account")}</th>
+                <th>${_res.get("settlement.withdraw_account.bank_name")}</th>
+            </tr>
+            <#list accounts as account>
+                <tr>
+                    <td>${account.id}</td>
+                    <td>${account.owner_name!}</td>
+                    <td>${_res.get("settlement.withdraw_account.type."+account.type?lower_case)}</td>
+                    <td>${account.account!}</td>
+                    <td>${account.bank_name!"-"}</td>
+                </tr>
+            </#list>
+        </table>
+    </div>
+
+    <hr>
+    <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+
+</@layout.layout>

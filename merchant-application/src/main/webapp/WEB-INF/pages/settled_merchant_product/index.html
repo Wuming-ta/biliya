@@ -1,0 +1,195 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+  function clearForm(objE){//objE为form表单
+        $(objE).find(':input').each(
+            function(){
+                switch(this.type){
+                    case 'passsword':
+                    case 'select-multiple':
+                    case 'select-one':
+                    case 'text':
+                    case 'textarea':
+                    case 'number':
+                        $(this).val('');
+                        break;
+                    case 'checkbox':
+                    case 'radio':
+                        this.checked = false;
+                }
+            }
+        );
+    }
+</script>
+</#macro>
+<#macro css>
+    <style>
+    .col-label {
+    line-height: 30px;
+    text-align: right;
+    }
+    .row {
+        margin-right: auto;
+        margin-left: auto;
+    }
+    .card form [class*="col-"] {
+        padding: 0px;
+    }
+    .card .col-label {
+        line-height: 48px;
+    }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../product_category/product_category_select_option.ftl"/>
+<#include "_product_status_label.ftl"/>
+<@layout.layout script css _res.get("menu.product") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.settled_merchant_product")/>
+    <@msg message />
+
+    <#assign returnUrl>/settled_merchant_product%3fpageNumber=${pageNumber!}%26pageSize=${pageSize!}%26name=${name!}%26status=${status!}%26categoryId=${categoryId!}%26promoted=${promoted!}%26zone=${zone!}</#assign>
+    <div class="search-box">
+        <form role="form">
+            <div class="row">
+                <div class="col-lg-1 col-md-2 show-grid col-label">${_res.get("product.name")}</div>
+                <div class="col-lg-3 col-md-4 show-grid"><input type="text" class="form-control" id="name" name="name" value="${name!}"></div>
+                <div class="col-lg-1 col-md-2 show-grid col-label">${_res.get("product.barcode")}</div>
+                <div class="col-lg-3 col-md-4 show-grid"><input type="text" class="form-control" id="barCode" name="barCode" value="${barCode!}"></div>
+                <div class="col-lg-1 col-md-2 show-grid col-label">${_res.get("product.store_location")}</div>
+                <div class="col-lg-3 col-md-4 show-grid"><input type="text" class="form-control" id="store_location" name="storeLocation" value="${storeLocation!}"></div>
+                <div class="col-lg-1 col-md-2 show-grid col-label">${_res.get("product.status")}</div>
+                <div class="col-lg-3 col-md-4 show-grid">
+                    <select name="status" class="form-control">
+                    <option></option>
+                    <#list statuses as s>
+                        <option value="${s}" <#if (status??&&status==s)>selected="selected"</#if> >${_res.get("product.status." + s?lower_case)}</option>
+                    </#list>
+                </select>
+                </div>
+                <div class="col-lg-1 col-md-2 show-grid col-label">${_res.get("product.category")}</div>
+                <div class="col-lg-3 col-md-4 show-grid">
+                    <select name="categoryId" class="form-control">
+                    <#if !(categoryId??) || (categoryId=="")>
+                        <#assign cid = 0>
+                    </#if>
+                    <#if (categoryId??) && (categoryId!="")>
+                        <#assign cid = categoryId>
+                    </#if>
+                    <option></option>
+                    <@select productCategories cid?eval />
+                    </select>
+                </div>
+                <div class="col-lg-1 col-md-2 show-grid col-label">${_res.get("product.promoted")}</div>
+                <div class="col-lg-3 col-md-4 show-grid">
+                    <select name="promoted" class="form-control">
+                        <option></option>
+                        <option value="0" <#if (promoted??&&promoted=="0")>selected="selected"</#if> >${_res.get("product.promoted.0")}</option>
+                        <option value="1" <#if (promoted??&&promoted=="1")>selected="selected"</#if> >${_res.get("product.promoted.1")}</option>
+                    </select>
+                </div>
+                <div class="col-lg-1 col-md-2 show-grid col-label">${_res.get("product.zone")}</div>
+                <div class="col-lg-3 col-md-4 show-grid">
+                    <select name="zone" class="form-control">
+                        <option></option>
+                        <#list partnerLevelZones as z>
+                            <option value="${z.key}" <#if (zone??&&zone==z.key)>selected="selected"</#if>>${z.name}</option>
+                        </#list>
+                    </select>
+                </div>
+                <div class="col-lg-1 col-md-2 show-grid col-label">${_res.get("product.purchase_strategy")}</div>
+                <div class="col-lg-3 col-md-4 show-grid">
+                    <select name="purchaseStrategyId" class="form-control">
+                        <option></option>
+                        <#list purchaseStrategies as strategy>
+                            <option value="${strategy.id}" <#if purchaseStrategyId??&&purchaseStrategyId==strategy.id.toString()>selected="selected"</#if> >${strategy.name}</option>
+                        </#list>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 col-sm-12 show-grid text-left">
+                    <a href="${base}/settled_merchant_product/stockBalanceLimited" class="btn btn-default">查看库存不足的产品</a>
+                    <span class="vertical-separator"></span>
+                    <@shiro.hasPermission name="product.add">
+                    <a href="${base}/settled_merchant_product/add?returnUrl=${returnUrl}" class="btn btn-primary">${_res.get("product.btn.new")}</a>
+                    </@shiro.hasPermission>
+                </div>
+                <div class="col-md-6 col-sm-12 show-grid text-right">
+                    <button type="button" class=" btn btn-default" onclick="clearForm(this.form);">${_res.get("product.clear_form")}</button>
+                    <span class="vertical-separator"></span>
+                    <button type="submit" class="btn btn-primary">${_res.get("product.search")}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <table class="table table-hover ">
+        <tr>
+            <th>${_res.get("product.id")}</th>
+            <th>${_res.get("product.cover")}</th>
+            <th>${_res.get("product.brand_name")}</th>
+            <th style="width: 25%">${_res.get("product.name")}</th>
+            <th>${_res.get("product.category")}</th>
+            <th>${_res.get("product.status")}</th>
+            <th>${_res.get("product.price")}</th>
+            <th>${_res.get("product.fare_template")}</th>
+            <th>${_res.get("product.sort_order")}</th>
+            <th>${_res.get("product.action")}</th>
+        </tr>
+        <#if (products.list?size=0)>
+            <td colspan="10">No Data</td>
+        </#if>
+        <#list products.list as product>
+            <tr>
+                <td>${product.id}</td>
+                <td><#if (product.cover??)><img src="${product.cover!}" height="50"></#if></td>
+                <td>
+                    <#if (product.brand.logo)??>
+                        <img  style="height:35px;" src="${product.brand.logo}" />
+                    </#if>
+                    ${(product.brand.name)!}
+                </td>
+                <td><a href="${base}/settled_merchant_product/edit/${product.id}?returnUrl=${returnUrl!}">${product.name}</a></td>
+                <td>${product.category_name}</td>
+                <td><span class="label <@labelStatus product.status/>" >${_res.get("product.status." + product.status?lower_case)}</span></td>
+                <td>${product.price}</td>
+                <td>${product.fareTemplate!"-"}</td>
+                <td>${product.sort_order}</td>
+                <td>
+                    <@shiro.hasPermission name="product.delete">
+                    <a class="btn btn-danger btn-sm" href="${base}/settled_merchant_product/delete/${product.id}?returnUrl=${returnUrl}"
+                       onclick="javascript:if (confirm('${_res.get("product.delete_confirm")}')){return true;} return false;">${_res.get("btn.delete")}</a>
+                    </@shiro.hasPermission>
+                    <@shiro.hasPermission name="product.edit">
+                    <a class="btn btn-primary btn-sm" href="${base}/settled_merchant_product/edit/${product.id}?returnUrl=${returnUrl}">${_res.get("btn.edit")}</a>
+                    </@shiro.hasPermission>
+                    <#if (product.status=="PENDING_APPROVAL")>
+                        <@shiro.hasPermission name="product.approve">
+                        <a href="${base}/settled_merchant_product/approve/${product.id}?returnUrl=${returnUrl}" class="btn btn-info btn-sm">${_res.get("btn.approve")}</a>
+                    </@shiro.hasPermission>
+                    </#if>
+                    <#if (product.status=="APPROVED") >
+                        <a href="${base}/settled_merchant_product/onsell/${product.id}?returnUrl=${returnUrl}" class="btn btn-info btn-sm">${_res.get("btn.onsell")}</a>
+                    </#if>
+                    <#if (product.status=="DRAFT") >
+                        <a href="${base}/product/publish/${product.id}?returnUrl=${returnUrl}" class="btn btn-info btn-sm">${_res.get("btn.publish")}</a>
+                    </#if>
+                    <#if (product.status=="ONSELL") >
+                        <a href="${base}/settled_merchant_product/offsell/${product.id}?returnUrl=${returnUrl}" class="btn btn-info btn-sm">${_res.get("btn.offsell")}</a>
+                    </#if>
+                    <#if (product.status=="OFFSELL") >
+                        <a href="${base}/settled_merchant_product/onsell/${product.id}?returnUrl=${returnUrl}" class="btn btn-info btn-sm">${_res.get("btn.onsell")}</a>
+                    </#if>
+                </td>
+            </tr>
+        </#list>
+    </table>
+    <@paginate currentPage=products.pageNumber totalPage=products.totalPage actionUrl="${base}/settled_merchant_product?pageNumber=" urlParas="&pageSize=${pageSize!}&name=${name!}&status=${status!}&categoryId=${categoryId!}&promoted=${promoted!}&zone=${zone!}&barCode=${barCode!}&storeLocation=${storeLocation!}" />
+</@layout.layout>

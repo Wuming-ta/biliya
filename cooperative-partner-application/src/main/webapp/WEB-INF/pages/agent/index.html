@@ -1,0 +1,84 @@
+<#macro script>
+    <script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .col-summary-sm {
+        width: 160px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.agent") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.agent")/>
+    <@msg message />
+
+    <div class="search-box">
+        <form class="form-inline">
+            <div class="form-group">
+                <label></label>
+                <input type="text" name="agentId" class="form-control" value="${agentId!}" placeholder="${_res.get("partner.agent.search.key")}">
+            </div>
+            <button type="submit" class="btn btn-primary">${_res.get("partner.agent.search")}</button>
+            <a class="btn btn-info" href="${base}/agent/add">${_res.get("partner.agent.btn.new")}</a>
+            <a class="btn btn-info" href="${base}/agent/editPcdQualify">${_res.get("partner.pcd_qualify.edit")}</a>
+            <a class="btn btn-info" href="${base}/agent/editPhysicalAgentBonus">${_res.get("partner.physical_agent_bonus.edit")}</a>
+        </form>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">${_res.get("partner.seller.common")}</h3>
+        </div>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <td class="col-summary-sm">${_res.get("partner.agent.total_agents")}</td>
+                <td>${agentCount}</td>
+                <td class="col-summary-sm">${_res.get("partner.agent.province.count")}</td>
+                <td>${provinceAgentCount}</td>
+                <td class="col-summary-sm">${_res.get("partner.agent.city.count")}</td>
+                <td>${cityAgentCount}</td>
+                <td class="col-summary-sm">${_res.get("partner.agent.district.count")}</td>
+                <td>${districtAgentCount}</td>
+            </tr>
+        </table>
+    </div>
+
+    <table class="table table-hover ">
+        <tr>
+            <th>${_res.get("partner.agent.Id")}</th>
+            <th>${_res.get("partner.agent.user_name")}</th>
+            <th>${_res.get("partner.agent.pcd_name")}</th>
+            <th>${_res.get("partner.agent.action")}</th>
+        </tr>
+        <#list agents.list as agent>
+            <tr>
+                <td>${agent.id!}</td>
+                <td>${agent.user_name!}</td>
+                <td>
+                    <#list agent.agentAreaList as a>
+                        ${_res.get("partner.agent.type."+a.pcd_type)} - ${a.pcd_name};
+                    </#list>
+                </td>
+                <td>
+                    <a class="btn btn-primary btn-sm" href="${base}/agent/edit/${agent.id}">编辑</a>
+                    <a class="btn btn-danger btn-sm" href="${base}/agent/delete/${agent.id}"
+                       onclick="javascript:if (confirm('确定要删除吗？')){return true;} return false;">删除</a>
+                </td>
+            </tr>
+        </#list>
+        <#if (agents.list?size==0)>
+            <td colspan="20">No Data</td>
+        </#if>
+    </table>
+    <@paginate currentPage=agents.pageNumber totalPage=agents.totalPage actionUrl="${base}/agent?pageNumber=" urlParas="&agentId=${agentId!}"/>
+</@layout.layout>

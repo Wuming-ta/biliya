@@ -1,0 +1,75 @@
+<#macro script>
+    <#include "../wechat_autoreply/common.js" />
+    <#include "../wechat_autoreply/listItem.js" />
+    <#include "edit.js" />
+</#macro>
+<#macro css>
+    <#include "../wechat_autoreply/common.css" />
+    <style>
+        .col-key{
+            text-align: center;
+            width:30%;
+        }
+        .col-value{
+            width: 70%;
+        }
+
+        .btn-keyword{
+            border: 2px dashed orange;
+        }
+    </style>
+</#macro>
+<#macro modal>
+    <#include "../wechat_autoreply/_modal.html" />
+</#macro>
+<#import "../template/layout.ftl" as layout />
+<#import "../wechat_autoreply/index.ftl" as index />
+<#include "../template/breadcrumb.ftl" />
+<#include "../template/message.ftl" />
+<@layout.layout script css _res.get("breadcrumb.wechat_autoreply") modal>
+<#assign menus={"/": _res.get("breadcrumb.home"), "/wechat_autoreply": _res.get("breadcrumb.wechat_autoreply")} />
+<@nav menus _res.get("breadcrumb.wechat_keyword_autoreply.edit") />
+    <@msg message />
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            基本
+        </div>
+        <div class="panel-body">
+            <form id="form" method="post" action="${base}/wechat_keyword_autoreply/update">
+                <input type="hidden" name="wechatKeywordAutoreply.id" value="${wechatKeywordAutoreply.id!}" />
+                <table class="table table-hover table-bordered">
+                    <tr>
+                        <td class="col-key">规则名称</td>
+                        <td class="col-value"><input type="text" class="form-control required" name="wechatKeywordAutoreply.name" value="${wechatKeywordAutoreply.name!}"/></td>
+                    </tr>
+                    <tr>
+                        <td class="col-key">关键词</td>
+                        <td class="col-value">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th style="width:70%;">关键词</th>
+                                    <th style="width:30%;">${_res.get("action")}</th>
+                                </tr>
+                                <#if wechatKeywordAutoreply.keyword??>
+                                    <#list wechatKeywordAutoreply.keyword?split('|') as keyword>
+                                        <tr>
+                                            <td><input class="form-control" name="keyword" value="${keyword!}"></td>
+                                            <td><a class="btn btn-danger btn-sm" onclick="removeKeyword(this);">${_res.get("delete")}</a></td>
+                                        </tr>
+                                    </#list>
+                                </#if>
+                                <tr>
+                                    <td colspan="10">
+                                        <a id="keyword-create-btn" class="btn btn-default btn-keyword">+</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <button type="submit" class="btn btn-primary">${_res.get("save")}</button>
+            </form>
+        </div>
+    </div>
+    <@index.index wechatKeywordAutoreply.text wechatKeywordAutoreply.newses "wechat_keyword_autoreply" wechatKeywordAutoreply.id></@index.index>
+</@layout.layout>

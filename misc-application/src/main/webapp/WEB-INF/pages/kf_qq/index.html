@@ -1,0 +1,43 @@
+<#macro script>
+    <script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.kf_qq") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.kf_qq")/>
+    <@msg message />
+
+    <div class="search-box">
+        <a class="btn btn-primary" href="${base}/kf_qq/add">${_res.get("misc.kfqq.btn.new")}</a>
+    </div>
+
+    <table class="table table-hover">
+        <tr>
+            <th>${_res.get("misc.kfqq.name")}</th>
+            <th>${_res.get("misc.kfqq.number")}</th>
+            <th>${_res.get("misc.kfqq.enabled")}</th>
+            <th>${_res.get("misc.kfqq.action")}</th>
+        </tr>
+        <#list qqList as qq>
+            <tr>
+                <td>${qq.name!}</td>
+                <td>${qq.number!}</td>
+                <td><span class="label <#if qq.enabled==1>label-success<#else>label-default</#if>" >${_res.get("misc.kfqq.enabled."+qq.enabled)}</span></td>
+                <td>
+                    <a class="btn btn-primary btn-sm" href="${base}/kf_qq/edit/${qq.id}">${_res.get("btn.edit")}</a>
+                    <a class="btn btn-danger btn-sm" href="${base}/kf_qq/delete/${qq.id}"
+                       onclick="javascript:if (confirm('${_res.get("misc.kfqq.delete_confirm")}？')){return true;} return false;">${_res.get("btn.delete")}</a>
+                </td>
+            </tr>
+        </#list>
+    </table>
+</@layout.layout>

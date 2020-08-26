@@ -1,0 +1,89 @@
+<#macro script>
+    <script>
+      $(document).ready(function(){
+        $("#form").validate({
+            focusCleanup: true,
+        	errorPlacement: function(error, element) {
+                element.addClass('error');
+            }
+        });
+      });
+    </script>
+</#macro>
+
+<#macro css>
+    <style>
+        .error {
+            border: 2px solid red;
+        }
+        #errorMsg {
+            color: red;
+        }
+
+        .last-row {
+            line-height:45px;
+        }
+        .submit-btn {
+            height:45px;
+            margin:0px 0px;
+        }
+        #captcha {
+            cursor: pointer;
+        }
+    </style>
+</#macro>
+
+<#import "./login.ftl" as layout>
+<@layout.layout script css _res.get("login.title")+productName!'KQD'>
+    <#if message??>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="alert alert-danger">
+                    <span>${message!}</span>
+                </div>
+            </div>
+        </div>
+    </#if>
+    <form id="form" role="form" action="${base}/auth/loginForm" method="post">
+
+        <div class="form-group label-floating">
+            <label class="control-label sr-only">${_res.get("login.name")}</label>
+            <input name="login_name" type="text" class="form-control" value="${login_name!}" required placeholder="请输入用户名">
+        </div>
+
+        <div class="form-group label-floating">
+            <label class="control-label sr-only">${_res.get("login.password")}</label>
+            <input name="password" type="password" class="form-control" required placeholder="请输入密码">
+        </div>
+
+        <#if isCaptchaEnabled>
+        <div class="form-group label-floating">
+            <label for="captcha" class="control-label sr-only">验证码</label>
+            <div class="row">
+                <div class="col-xs-6">
+                    <input name="captcha" type="text" class="form-control" required placeholder="请输入验证码">
+                </div>
+                <div class="col-xs-6">
+                    <img id="captcha" src="${base}/auth/captcha" height="30"
+                         onclick="this.src='${base}/auth/captcha?d='+new Date().getTime()" />
+                </div>
+            </div>
+        </div>
+        </#if>
+
+        <div class="form-group last-row">
+            <div class="row">
+                <div class="col-xs-12 text-right">
+                    <button id="loginBtn" type="submit" class="btn btn-block btn-primary submit-btn">${_res.get("login.btn.login")}</button>
+                </div>
+            </div>
+            <#if isAllowRegisterEnabled>
+            <div class="row">
+                <div class="col-xs-12" >
+                    <small>未有账户, 现在就 </small><a href="${base}/auth/reg">注册</a>
+                </div>
+            </div>
+        </#if>
+        </div>
+    </form>
+</@layout.layout>

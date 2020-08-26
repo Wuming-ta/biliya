@@ -1,0 +1,304 @@
+<#macro script>
+<script>
+    var json =${menuValue};
+
+    var buildMenuTree = function () {
+        var obj = eval(json);
+
+        for (var i = 0; i < obj.button.length; i++) {
+            var FirstMenuValue = $("#FirstMenuModel").html().replace(/#name#/g, obj.button[i].name).replace(/#id#/g, i);
+            $("#FirstMenu").append(FirstMenuValue);
+            if ("url" in obj.button[i]) {
+                var a = ["#0", "#1", "#2"];
+                $(".second-menu-add").attr("disabled", true);
+                $(a[i]).wrap("<a href=" + obj.button[i].url + "></a>");
+            }
+            else {
+                getSecondMenu = ["#SecondMenu_left", "#SecondMenu_midlle", "#SecondMenu_right"];
+                for (var j = 0; j < obj.button[i].sub_button.length; j++) {
+                    var MenuValue = $("#SecondMenuModel").html().replace(/#name#/g, obj.button[i].sub_button[j].name).replace(/#url#/g, obj.button[i].sub_button[j].url).replace(/#ids#/g, j).replace(/#myid#/g, i);
+                    $(getSecondMenu[i]).append(MenuValue);
+                }
+                if (j < 5) {
+                    var addSecondMenu = $("#ThirdMenuModel").html().replace(/#id#/g, i);
+                    $(getSecondMenu[i]).append(addSecondMenu);
+                }
+            }
+        }
+        if (i < 3) {
+            var addFirstMenu = $("#fourMenuModel").html();
+            $("#FirstMenu").append(addFirstMenu);
+        }
+
+        $(".del").click(function () {
+            var obj = eval(json);
+            DelId = $(this).attr("data-id");
+            DelId1 = $(this).attr("data-myid");
+            obj.button[DelId1].sub_button.splice(DelId, 1);
+            newjson = JSON.stringify(obj);
+            $("#FirstMenu").html("");
+            $("#SecondMenu_left").html("");
+            $("#SecondMenu_midlle").html("");
+            $("#SecondMenu_right").html("");
+            buildMenuTree(newjson);
+        });
+
+        $(".del1").click(function () {
+            var obj = eval(json);
+            FirstDelId = $(this).attr("data-id");
+            obj.button.splice(FirstDelId, 1);
+            newjson = JSON.stringify(obj);
+            $("#FirstMenu").html("");
+            $("#SecondMenu_left").html("");
+            $("#SecondMenu_midlle").html("");
+            $("#SecondMenu_right").html("");
+            buildMenuTree(newjson);
+        });
+
+        $("#save-btn").removeClass("disabled");
+    };
+
+
+    $(document).ready(function () {
+        buildMenuTree(json);
+        $("#save-btn").addClass("disabled");
+
+        $("#btn_menu").click(function () {
+            var obj = eval(json);
+            if (obj.button.length == 3) {
+                alert("最多三条记录！");
+            }
+            if ($("#menu_type").val() != "") {
+                var add = {
+                    "name": $("#menu_name").val(),
+                    "url": $("#menu_url").val(),
+                    "type": $("#menu_type").val(),
+                    "appid": $("#menu_appid").val(),
+                    "pagepath": $("#menu_pagepath").val(),
+                    "sub_button": []
+                }
+            }
+            else {
+                var add = {
+                    "name": $("#menu_name").val(),
+                    "sub_button": []
+                }
+            }
+            obj.button.push(add);
+            newjson = JSON.stringify(obj);
+            $("#FirstMenu").html("");
+            $("#SecondMenu_left").html("");
+            $("#SecondMenu_midlle").html("");
+            $("#SecondMenu_right").html("");
+            buildMenuTree(newjson);
+        });
+
+        $("#myModalAdd").on("show.bs.modal", function (event) {
+            var button = $(event.relatedTarget);
+            AddId = button.data("id");
+        });
+
+        $("#btn_add").click(function () {
+            var obj = eval(json);
+            if (obj.button[AddId].sub_button.length == 5) {
+                alert("最多五条记录!");
+            }
+            else {
+                var arr = {
+                    "name": $("#add_name").val(),
+                    "url": $("#add_url").val(),
+                    "type": $("#add_type").val(),
+                    "appid": $("#add_appid").val(),
+                    "pagepath": $("#add_pagepath").val()
+                };
+                obj.button[AddId].sub_button.push(arr);
+                newjson = JSON.stringify(obj);
+                $("#FirstMenu").html("");
+                $("#SecondMenu_left").html("");
+                $("#SecondMenu_midlle").html("");
+                $("#SecondMenu_right").html("");
+                buildMenuTree(newjson);
+            }
+        });
+
+        $("#myModalLabelEdit").on("show.bs.modal", function (event) {
+            var button = $(event.relatedTarget);
+            EditId = button.data("id");
+            var obj = eval(json);
+            $("#firstEdit_name").val(obj.button[EditId].name);
+            $("#firstEdit_url").val(obj.button[EditId].url);
+            $("#firstEdit_type").val(obj.button[EditId].type);
+            $("#firstEdit_appid").val(obj.button[EditId].appid);
+            $("#firstEdit_pagepath").val(obj.button[EditId].pagepath);
+        });
+
+        $("#btn_firstEdit").click(function () {
+            var obj = eval(json);
+            if ($("#firstEdit_url").val() != "") {
+                obj.button[EditId]["url"] = $("#firstEdit_url").val();
+            }
+            else {
+                delete obj.button[EditId].url;
+            }
+            obj.button[EditId].name = $("#firstEdit_name").val();
+            obj.button[EditId].type = $("#firstEdit_type").val();
+            obj.button[EditId].appid = $("#firstEdit_appid").val();
+            obj.button[EditId].pagepath = $("#firstEdit_pagepath").val();
+            newjson = JSON.stringify(obj);
+            $("#FirstMenu").html("");
+            $("#SecondMenu_left").html("");
+            $("#SecondMenu_midlle").html("");
+            $("#SecondMenu_right").html("");
+            buildMenuTree(newjson);
+        });
+
+        $("#myModalLabelEdit2").on("show.bs.modal", function (event) {
+            var button = $(event.relatedTarget);
+            FirstId = button.data("myid");
+            SecondId = button.data("id");
+            var obj = eval(json);
+            $("#secondEdit_name").val(obj.button[FirstId].sub_button[SecondId].name);
+            $("#secondEdit_url").val(obj.button[FirstId].sub_button[SecondId].url);
+            $("#secondEdit_type").val(obj.button[FirstId].sub_button[SecondId].type);
+            $("#secondEdit_appid").val(obj.button[FirstId].sub_button[SecondId].appid);
+            $("#secondEdit_pagepath").val(obj.button[FirstId].sub_button[SecondId].pagepath);
+        });
+        $("#btn_secondEdit").click(function () {
+            var obj = eval(json);
+            obj.button[FirstId].sub_button[SecondId].name = $("#secondEdit_name").val();
+            obj.button[FirstId].sub_button[SecondId].url = $("#secondEdit_url").val();
+            obj.button[FirstId].sub_button[SecondId].type = $("#secondEdit_type").val();
+            obj.button[FirstId].sub_button[SecondId].appid = $("#secondEdit_appid").val();
+            obj.button[FirstId].sub_button[SecondId].pagepath = $("#secondEdit_pagepath").val();
+            newjson = JSON.stringify(obj);
+            $("#FirstMenu").html("");
+            $("#SecondMenu_left").html("");
+            $("#SecondMenu_midlle").html("");
+            $("#SecondMenu_right").html("");
+            buildMenuTree(newjson);
+        });
+
+        $("#save-btn").click(function() {
+            var form = document.createElement("form");
+            document.body.appendChild(form);
+            form.method = "POST";
+            form.action = "${base}/wechat_menu/update";
+            var input = document.createElement("input");
+            input.setAttribute("name", "data");
+            input.value = newjson;
+            form.appendChild(input);
+            form.submit();
+        });
+
+        $("#view-json-btn").click(function() {
+            $("#view-json-content").html(JSON.stringify(json, null, 2));
+            $("#viewJson").modal("show");
+        });
+    });
+
+
+</script>
+
+<script type="text/html" id="FirstMenuModel">
+    <div class="col-md-4">
+        <div class="menu first-menu">
+            <div id="#id#">#name#</div>
+            <div class="text-right">
+                <button class="btn btn-default btn-sm" data-id="#id#" data-toggle="modal" data-target="#myModalLabelEdit">
+                    <span class="text-primary">编辑</span>
+                </button>
+                <button class="btn btn-default btn-sm del1" data-id="#id#">
+                    <span class="text-danger">删除</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="SecondMenuModel">
+    <div class="menu second-menu">
+        <div><a href="#url#">#name#</a></div>
+        <div class="text-right">
+            <button class="btn btn-default btn-sm" data-id="#ids#" data-myid="#myid#" data-toggle="modal" data-target="#myModalLabelEdit2">
+                <span class="text-primary">编辑</span>
+            </button>
+            <button class="btn btn-default btn-sm del" data-id="#ids#" data-myid="#myid#">
+                <span class="text-danger">删除</span>
+            </button>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="ThirdMenuModel">
+    <div class="menu second-menu second-menu-add" data-target="#myModalAdd" data-toggle="modal" data-id="#id#">+</div>
+</script>
+
+<script type="text/html" id="fourMenuModel">
+    <div class="col-md-4">
+        <div class="menu first-menu first-menu-add" data-toggle="modal" data-target="#myModalMenu">+</div>
+    </div>
+</script>
+
+
+</#macro>
+<#macro css>
+    <style>
+        .menu {
+            margin: 5px;
+            padding: 5px;
+            min-height: 60px;
+        }
+
+        .first-menu {
+            font-size: 16px;
+            border: 1px solid #10a500;
+        }
+
+        .second-menu {
+            font-size: 14px;
+            border: 1px solid #a7a7a7;
+        }
+
+        .first-menu-add {
+            text-align: center;
+            border: 1px dashed #10a500;
+            font-size: 30px;
+            font-weight: bold;
+            color: #10a500;
+        }
+
+        .second-menu-add {
+            text-align: center;
+            border: 1px dashed #a7a7a7;
+            font-size: 30px;
+            font-weight: bold;
+            color: #a7a7a7;
+        }
+    </style>
+</#macro>
+<#macro modal>
+    <#include "_modal.html"/>
+</#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.wechat_menu") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.wechat_menu")/>
+    <@msg message />
+
+    <div id="FirstMenu" class="row"></div>
+    <div class="row" id="SecondMenu">
+        <!--第二大模块-->
+        <div class="col-md-4" id="SecondMenu_left"></div>
+        <div class="col-md-4" id="SecondMenu_midlle"></div>
+        <div class="col-md-4" id="SecondMenu_right"></div>
+    </div>
+
+    <hr>
+    <div>
+        <a id="save-btn" class="btn btn-primary">保存</a>
+        <a id="view-json-btn" class="btn btn-default">查看JSON</a>
+    </div>
+
+</@layout.layout>

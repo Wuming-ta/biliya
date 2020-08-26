@@ -1,0 +1,261 @@
+
+
+<div class="form-group">
+    <label class="col-lg-2 col-md-2 control-label">${_res.get("member.coupon_strategy.name")}</label>
+    <div class="col-lg-4 col-md-6">
+        <input type="text" class="form-control required" name="couponStrategy.name" value="${couponStrategy.name!}">
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-lg-2 col-md-2 control-label">${_res.get("member.coupon_strategy.description")}</label>
+    <div class="col-lg-8 col-md-8">
+        <textarea cols="3" class="form-control required" name="couponStrategy.description">${couponStrategy.name!}</textarea>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-lg-2 col-md-2 control-label">${_res.get("member.coupon_strategy.type")}</label>
+    <div class="col-lg-4 col-md-6">
+        <select name="couponStrategy.type" class="form-control" id="strategyType">
+            <#list types as t>
+            <option value="${t}" <#if couponStrategy.type?? && t==couponStrategy.type>selected="selected"</#if> >${_res.get("member.coupon_strategy.type."+t?lower_case)}</option>
+        </#list>
+        </select>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-lg-2 col-md-2 control-label">${_res.get("member.coupon_strategy.random_number")}</label>
+    <div class="col-lg-2 col-md-2">
+        <input type="number" class="form-control required" name="couponStrategy.random_number" value="${couponStrategy.random_number!0}">
+    </div>
+    <div class="col-lg-8 col-md-8">
+        <p class="form-control-static text-muted">${_res.get("member.coupon_strategy.random_number.text")}</p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-lg-2 col-md-2 control-label">${_res.get("member.coupon_strategy.coupon_type")}</label>
+    <div class="col-lg-4 col-md-6">
+        <#list couponTypes as couponType>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="couponTypeId" value="${couponType.id}"
+                    <#if couponStrategy.couponTypes??>
+                        <#list couponStrategy.couponTypes as t>
+                            <#if t.id==couponType.id>checked</#if>
+                        </#list>
+                    </#if>
+                >
+                ${couponType.name!} - <span style="font-size: 12px; color: #666">${couponType.description!}</span>
+            </label>
+        </div>
+        </#list>
+    </div>
+</div>
+
+<div class="form-group" id="precisionMarketing">
+    <label class="col-lg-2 col-md-2 control-label">${_res.get("member.coupon_strategy.target")}</label>
+    <div class="col-lg-4 col-md-6">
+        <label class="radio-inline">
+            <input type="radio" name="couponStrategyTarget.type" value="all" <#if !couponStrategy.target_type?? || (couponStrategy.target_type?? && couponStrategy.target_type == 0)>checked</#if> > ${_res.get("member.coupon_strategy.target.all")}
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="couponStrategyTarget.type" value="some" <#if couponStrategy.target_type?? && couponStrategy.target_type == 1>checked</#if> > ${_res.get("member.coupon_strategy.target.some")}
+        </label>
+    </div>
+</div>
+
+<div class="form-group" id="precisionMarketingPeriod">
+    <label class="col-lg-2 col-md-2 control-label">${_res.get("member.coupon_strategy.period")}</label>
+    <div class="col-lg-6 col-md-6">
+        <input name="couponStrategy.start_time" class="form-control form-control-inline datepicker" data-date-format="yyyy-mm-dd" value="<#if couponStrategy.start_time??>${couponStrategy.start_time?string('yyyy-MM-dd')}</#if>">
+        至
+        <input name="couponStrategy.end_time" class="form-control form-control-inline datepicker" data-date-format="yyyy-mm-dd" value="<#if couponStrategy.end_time??>${couponStrategy.end_time?string('yyyy-MM-dd')}</#if>">
+    </div>
+</div>
+
+<div class="form-group <#if !couponStrategy.target_type?? || (couponStrategy.target_type?? && couponStrategy.target_type == 0)>hidden</#if>" id="couponStrategyTargetSome">
+    <label class="col-lg-2 col-md-2 control-label"></label>
+    <div class="col-lg-8 col-md-8">
+        <div class="order-header">基本信息</div>
+        <table class="table table-hover">
+            <tr>
+                <td style="width: 30%">顾客类别</td>
+                <td>
+                    <label class="radio-inline">
+                        <input type="radio" name="couponStrategyTarget.userType" value="0" <#if !targetCondition.userType?? || (targetCondition.userType?? && targetCondition.userType == 0)>checked</#if> > 全部
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="couponStrategyTarget.userType" value="1" <#if targetCondition.userType?? && targetCondition.userType == 1>checked</#if> > 会员
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="couponStrategyTarget.userType" value="2" <#if targetCondition.userType?? && targetCondition.userType == 2>checked</#if> > 顾客
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td>性别</td>
+                <td>
+                    <label class="radio-inline">
+                        <input type="radio" name="couponStrategyTarget.sex" value="0" <#if !targetCondition.sex?? || (targetCondition.sex?? && targetCondition.sex == 0)>checked</#if> > 全部
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="couponStrategyTarget.sex" value="1" <#if targetCondition.sex?? && targetCondition.sex == 1>checked</#if> > 男
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="couponStrategyTarget.sex" value="2" <#if targetCondition.sex?? && targetCondition.sex == 2>checked</#if> > 女
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td>生日</td>
+                <td>
+                    <input name="couponStrategyTarget.birthdayStartTime" class="form-control form-control-inline datepicker" data-date-format="mm-dd" value="${targetCondition.birthdayStartTime!}">
+                    至
+                    <input name="couponStrategyTarget.birthdayEndTime" class="form-control form-control-inline datepicker" data-date-format="mm-dd" value="${targetCondition.birthdayEndTime!}">
+                </td>
+            </tr>
+            <tr>
+                <td>年龄</td>
+                <td>
+                    <input type="number" name="couponStrategyTarget.ageStart" class="form-control form-control-inline" value="${targetCondition.ageStart!}">
+                    至
+                    <input type="number" name="couponStrategyTarget.ageEnd" class="form-control form-control-inline" value="${targetCondition.ageEnd!}">
+                </td>
+            </tr>
+            <tr>
+                <td>成为顾客时间</td>
+                <td>
+                    <input name="couponStrategyTarget.beCustomerStartTime" class="form-control form-control-inline datepicker" data-date-format="yyyy-mm-dd"  value="${targetCondition.beCustomerStartTime!}">
+                    至
+                    <input name="couponStrategyTarget.beCustomerEndTime" class="form-control form-control-inline datepicker" data-date-format="yyyy-mm-dd"  value="${targetCondition.beCustomerEndTime!}">
+                </td>
+            </tr>
+            <tr>
+                <td>成为会员时间</td>
+                <td>
+                    <input name="couponStrategyTarget.beMemberStartTime" class="form-control form-control-inline datepicker" data-date-format="yyyy-mm-dd"  value="${targetCondition.beMemberStartTime!}">
+                    至
+                    <input name="couponStrategyTarget.beMemberEndTime" class="form-control form-control-inline datepicker" data-date-format="yyyy-mm-dd" value="${targetCondition.beMemberEndTime!}">
+                </td>
+            </tr>
+        </table>
+
+        <div class="order-header">账户信息</div>
+        <table class="table table-hover">
+            <tr>
+                <td style="width: 30%">累计储值</td>
+                <td>
+                    <select name="couponStrategyTarget.walletAmountType" class="form-control form-control-inline">
+                        <option value="1" <#if !targetCondition.walletAmountType?? || (targetCondition.walletAmountType?? && targetCondition.walletAmountType == 1)>selected</#if> >大于</option>
+                        <option value="0" <#if targetCondition.walletAmountType?? && targetCondition.walletAmountType == 0>selected</#if> >等于</option>
+                        <option value="-1" <#if targetCondition.walletAmountType?? && targetCondition.walletAmountType == -1>selected</#if> >小于</option>
+                    </select>
+                    <input type="number" name="couponStrategyTarget.walletAmount" class="form-control form-control-inline"  value="${targetCondition.walletAmount!}"> 元
+                </td>
+            </tr>
+            <tr>
+                <td>累计积分</td>
+                <td>
+                    <select name="couponStrategyTarget.creditAmountType" class="form-control form-control-inline">
+                        <option value="1" <#if !targetCondition.creditAmountType?? || (targetCondition.creditAmountType?? && targetCondition.creditAmountType == 1)>selected</#if> >大于</option>
+                        <option value="0" <#if targetCondition.creditAmountType?? && targetCondition.creditAmountType == 0>selected</#if> >等于</option>
+                        <option value="-1" <#if targetCondition.creditAmountType?? && targetCondition.creditAmountType == -1>selected</#if> >小于</option>
+                    </select>
+                    <input type="number" name="couponStrategyTarget.creditAmount" class="form-control form-control-inline" value="${targetCondition.creditAmount!}">
+                </td>
+            </tr>
+            <tr>
+                <td>储值余额</td>
+                <td>
+                    <select name="couponStrategyTarget.walletBalanceType" class="form-control form-control-inline">
+                        <option value="1" <#if !targetCondition.walletBalanceType?? || (targetCondition.walletBalanceType?? && targetCondition.walletBalanceType == 1)>selected</#if> >大于</option>
+                        <option value="0" <#if targetCondition.walletBalanceType?? && targetCondition.walletBalanceType == 0>selected</#if> >等于</option>
+                        <option value="-1" <#if targetCondition.walletBalanceType?? && targetCondition.walletBalanceType == -1>selected</#if> >小于</option>
+                    </select>
+                    <input type="number" name="couponStrategyTarget.walletBalance" class="form-control form-control-inline" value="${targetCondition.walletBalance!}"> 元
+                </td>
+            </tr>
+            <tr>
+                <td>积分余额</td>
+                <td>
+                    <select name="couponStrategyTarget.creditBalanceType" class="form-control form-control-inline">
+                        <option value="1" <#if !targetCondition.creditBalanceType?? || (targetCondition.creditBalanceType?? && targetCondition.creditBalanceType == 1)>selected</#if> >大于</option>
+                        <option value="0" <#if targetCondition.creditBalanceType?? && targetCondition.creditBalanceType == 0>selected</#if> >等于</option>
+                        <option value="-1" <#if targetCondition.creditBalanceType?? && targetCondition.creditBalanceType == -1>selected</#if> >小于</option>
+                    </select>
+                    <input type="number" name="couponStrategyTarget.creditBalance" class="form-control form-control-inline" value="${targetCondition.creditBalance!}">
+                </td>
+            </tr>
+        </table>
+
+        <div class="order-header">消费信息</div>
+        <table class="table table-hover">
+            <tr>
+                <td style="width: 30%">累计消费</td>
+                <td>
+                    <select name="couponStrategyTarget.consumeAmountType" class="form-control form-control-inline">
+                        <option value="1" <#if !targetCondition.consumeAmountType?? || (targetCondition.consumeAmountType?? && targetCondition.consumeAmountType == 1)>selected</#if> >大于</option>
+                        <option value="0" <#if targetCondition.consumeAmountType?? && targetCondition.consumeAmountType == 0>selected</#if> >等于</option>
+                        <option value="-1" <#if targetCondition.consumeAmountType?? && targetCondition.consumeAmountType == -1>selected</#if> >小于</option>
+                    </select>
+                    <input type="number" name="couponStrategyTarget.consumeAmount" class="form-control form-control-inline" value="${targetCondition.consumeAmount!}"> 元
+                </td>
+            </tr>
+            <tr>
+                <td>累计消费次数</td>
+                <td>
+                    <select name="couponStrategyTarget.consumeCountType" class="form-control form-control-inline">
+                        <option value="1" <#if !targetCondition.consumeCountType?? || (targetCondition.consumeCountType?? && targetCondition.consumeCountType == 1)>selected</#if> >大于</option>
+                        <option value="0" <#if targetCondition.consumeCountType?? && targetCondition.consumeCountType == 0>selected</#if> >等于</option>
+                        <option value="-1" <#if targetCondition.consumeCountType?? && targetCondition.consumeCountType == -1>selected</#if> >小于</option>
+                    </select>
+                    <input type="number" name="couponStrategyTarget.consumeCount" class="form-control form-control-inline" value="${targetCondition.consumeCount!}"> 次
+                </td>
+            </tr>
+            <tr>
+                <td>次均消费</td>
+                <td>
+                    <select name="couponStrategyTarget.consumeAverageAmountType" class="form-control form-control-inline">
+                        <option value="1" <#if !targetCondition.consumeAverageAmountType?? || (targetCondition.consumeAverageAmountType?? && targetCondition.consumeAverageAmountType == 1)>selected</#if> >大于</option>
+                        <option value="0" <#if targetCondition.consumeAverageAmountType?? && targetCondition.consumeAverageAmountType == 0>selected</#if> >等于</option>
+                        <option value="-1" <#if targetCondition.consumeAverageAmountType?? && targetCondition.consumeAverageAmountType == -1>selected</#if> >小于</option>
+                    </select>
+                    <input type="number" name="couponStrategyTarget.consumeAverageAmount" class="form-control form-control-inline" value="${targetCondition.consumeAverageAmount!}"> 元
+                </td>
+            </tr>
+            <tr>
+                <td>累计储值消费</td>
+                <td>
+                    <select name="couponStrategyTarget.walletConsumeAmountType" class="form-control form-control-inline">
+                        <option value="1" <#if !targetCondition.walletConsumeAmountType?? || (targetCondition.walletConsumeAmountType?? && targetCondition.walletConsumeAmountType == 1)>selected</#if> >大于</option>
+                        <option value="0" <#if targetCondition.walletConsumeAmountType?? && targetCondition.walletConsumeAmountType == 0>selected</#if> >等于</option>
+                        <option value="-1" <#if targetCondition.walletConsumeAmountType?? && targetCondition.walletConsumeAmountType == -1>selected</#if> >小于</option>
+                    </select>
+                    <input type="number" name="couponStrategyTarget.walletConsumeAmount" class="form-control form-control-inline" value="${targetCondition.walletConsumeAmount!}"> 元
+                </td>
+            </tr>
+            <tr>
+                <td>累计非储值消费</td>
+                <td>
+                    <select name="couponStrategyTarget.creditConsumeAmountType" class="form-control form-control-inline">
+                        <option value="1" <#if !targetCondition.creditConsumeAmountType?? || (targetCondition.creditConsumeAmountType?? && targetCondition.creditConsumeAmountType == 1)>selected</#if> >大于</option>
+                        <option value="0" <#if targetCondition.creditConsumeAmountType?? && targetCondition.creditConsumeAmountType == 0>selected</#if> >等于</option>
+                        <option value="-1" <#if targetCondition.creditConsumeAmountType?? && targetCondition.creditConsumeAmountType == -1>selected</#if> >小于</option>
+                    </select>
+                    <input type="number" name="couponStrategyTarget.creditConsumeAmount" class="form-control form-control-inline" value="${targetCondition.creditConsumeAmount!}"> 元
+                </td>
+            </tr>
+            <tr>
+                <td>最后消费时间</td>
+                <td>
+                    <input name="couponStrategyTarget.lastConsumeStartTime" class="form-control form-control-inline datepicker" data-date-format="yyyy-mm-dd" value="${targetCondition.lastConsumeStartTime!}">
+                    至
+                    <input name="couponStrategyTarget.lastConsumeEndTime" class="form-control form-control-inline datepicker" data-date-format="yyyy-mm-dd" value="${targetCondition.lastConsumeEndTime!}">
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

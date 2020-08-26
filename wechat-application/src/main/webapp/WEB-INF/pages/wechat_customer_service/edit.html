@@ -1,0 +1,53 @@
+<#macro script>
+    <#include "../common/common.js"/>
+    <#include "../common/edit.js"/>
+    <script>
+        $(document).ready(function(){
+            $('#form').validate();
+        });
+    </script>
+</#macro>
+<#macro css>
+    <style>
+        <#include "../common/common.css"/>
+    </style>
+
+</#macro>
+<#macro modal></#macro>
+
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+
+<@layout.layout script css _res.get("breadcrumb.wechat_customer_service") modal>
+<#assign menus={"/": _res.get("breadcrumb.home"), "/wechat_customer_service": _res.get("breadcrumb.wechat_customer_service")}/>
+<@nav menus _res.get("breadcrumb.edit") />
+
+<form class="form-horizontal" role="form" id="form" enctype="multipart/form-data" action="${base}/wechat_customer_service/update" method="post">
+    <input type="hidden" name="kf_account" value="${wechatCustomerService.kf_account!}"/>
+    <div class="form-group">
+        <label class="col-md-2 control-label">${_res.get("wechat.wechat_customer_service.kf_account")}</label>
+        <div class="col-md-4">
+            ${wechatCustomerService.kf_account!}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label" for="nickname">${_res.get("wechat.wechat_customer_service.nickname")}</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control required" id="nickname" name="nickname" value="${wechatCustomerService.kf_nick!}" placeholder="最长6个汉字或12个英文字符"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">${_res.get("wechat.wechat_customer_service.kf_headimgurl")}</label>
+        <div class="col-md-4">
+            <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);" style="cursor:pointer;"></span>
+                <img style="height:100px" class="cover" src="${wechatCustomerService.kf_headimgurl!}" />
+            </div>
+            <input type="file" class="cover-form-control" placeholder="请上传jpg格式的图片" accept="image/jpeg" name="kf_headimgurl"  onchange="previewCover(this);">
+        </div>
+    </div>
+    <hr/>
+    <button type="submit" class="btn btn-primary">${_res.get("btn.submit")}</button>
+    <a class="btn btn-default" onclick="javascript:history.back()">${_res.get("btn.back")}</a>
+</form>
+</@layout.layout>

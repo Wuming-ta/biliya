@@ -1,0 +1,75 @@
+<#macro script>
+    <script>
+      $(document).ready(function(){
+        $('#form').validate();
+      });
+
+       function checkName(id) {
+        var name = $("#wholesale-category-name-"+id).val();
+        var $error = $("#wholesale-category-name-error-"+id);
+        if (name != null && name != "") {
+            $error.addClass("hidden");
+            return true;
+        }
+        else {
+            $error.removeClass("hidden");
+            return false;
+        }
+        }
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.wholesale_category") modal>
+<#assign menus = {"/": _res.get("breadcrumb.home"), "/wholesale": _res.get("breadcrumb.wholesale")} />
+<@nav menus _res.get("breadcrumb.wholesale_category")/>
+<@msg message />
+
+<div class="search-box">
+    <form id="form" class="form-inline" action="${base}/wholesale_category/save" method="post">
+        <input type="text" class="form-control required" name="wholesaleCategory.name" placeholder="${_res.get("marketing.wholesale.wholesale_category.name")}">
+        <button type="submit" class="btn btn-primary">${_res.get("marketing.wholesale.wholesale_category.btn.new")}</button>
+    </form>
+</div>
+
+<table class="table table-hover ">
+    <tr>
+        <th>${_res.get("id")}</th>
+        <th>${_res.get("marketing.wholesale.wholesale_category.name")}</th>
+        <th>${_res.get("marketing.wholesale.wholesale_category.sort_order")}</th>
+        <th>${_res.get("action")}</th>
+    </tr>
+    <#list wholesaleCategories as wholesaleCategory>
+    <form class="form" action="${base}/wholesale_category/update" onsubmit="return checkName(${wholesaleCategory.id});">
+        <input type="hidden" name="wholesaleCategory.id" value="${wholesaleCategory.id!}" />
+        <tr>
+            <td>${wholesaleCategory.id!}</td>
+            <td>
+                <input id="wholesale-category-name-${wholesaleCategory.id}" class="form-control required" type="text" name="wholesaleCategory.name" value="${wholesaleCategory.name!}" />
+                <label class="error hidden" id="wholesale-category-name-error-${wholesaleCategory.id}">必须填写</label>
+            </td>
+            <td>
+                <input type="number" name="wholesaleCategory.sort_order" class="form-control" value="${wholesaleCategory.sort_order!}"/>
+            </td>
+            <td>
+                <@shiro.hasPermission name="marketing.wholesale.edit">
+                    <button type="submit" class="btn btn-primary btn-sm">${_res.get("update")}</button>
+                </@shiro.hasPermission>
+                <@shiro.hasPermission name="marketing.wholesale.delete">
+                    <a class="btn btn-danger btn-sm" href="${base}/wholesale_category/delete/${wholesaleCategory.id}"
+                    onclick="javascript:if (confirm('${_res.get("marketing.wholesale.wholesale_category.delete_confirm")}')){return true;} return false;">删除</a>
+                </@shiro.hasPermission>
+            </td>
+        </tr>
+    </form>
+    </#list>
+    <#if (wholesaleCategories?size==0)>
+        <tr>
+            <td colspan="10">${_res.get("haven't.any.record")}</td>
+        </tr>
+    </#if>
+</table>
+</@layout.layout>

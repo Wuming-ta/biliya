@@ -1,0 +1,36 @@
+<#macro script>
+<script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+<script src="${base}/assets/js/echarts.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datepicker();
+        var myChart = echarts.init(document.getElementById('order-statistic-chart'));
+        option = ${option};
+        myChart.setOption(option);
+    });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.order_statistic") modal>
+    <#assign menus={"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.order_statistic")/>
+
+    <div class="search-box">
+    <form class="form-inline">
+        <div class="form-group">
+        <label for="startDate">${_res.get("order.statistic.start_date")}</label>
+        <input id="startDate" name="startDate" class="form-control datepicker" data-date-format="yyyy-mm-dd" value="${startDate!}">
+        <label for="endDate">${_res.get("order.statistic.end_date")}</label>
+        <input id="endDate" name="endDate" class="form-control datepicker" data-date-format="yyyy-mm-dd" value="${endDate!}">
+        </div>
+
+        <button type="submit" class="btn btn-primary">${_res.get("order.statistic.search")}</button>
+    </form>
+    </div>
+
+    <div id="order-statistic-chart" style="width: 100%;height:400px;"></div>
+
+</@layout.layout>

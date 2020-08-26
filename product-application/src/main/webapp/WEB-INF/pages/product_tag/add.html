@@ -1,0 +1,60 @@
+<#macro script>
+
+<script>
+    $(document).ready(function(){
+        $("#form").validate({
+            rules: {
+                "productTag.identifier": {
+                    required: true,
+                    remote: {
+                        url: "${base}/product_tag/identifierVerify",
+                        type: "POST",
+                        data: {
+                          "identifier": function() { return $("#identifier").val(); }
+                        }
+                    }
+                }
+            },
+            messages: {
+                "productTag.identifier": {
+                    remote: "${_res.get("product_tag.identifier.exist")}"
+                }
+            }
+        });
+    });
+</script>
+</#macro>
+<#macro css>
+</#macro>
+<#macro modal></#macro>
+
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+
+<@layout.layout script css _res.get("breadcrumb.product_tag") modal>
+    <#assign menus={"/": _res.get("breadcrumb.home"), "/product_tag": _res.get("breadcrumb.product_tag")} />
+    <@nav menus _res.get("breadcrumb.add") />
+    <form id="form" class="form-horizontal" role="form" method="post" action="${base}/product_tag/save">
+        <div class="form-group">
+            <label class="col-md-2 control-label">${_res.get("product_tag.identifier")}</label>
+            <div class="col-md-8">
+                <input type="text" id="identifier" name="productTag.identifier" class="form-control required" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label">${_res.get("product_tag.name")}</label>
+            <div class="col-md-8">
+                <input type="text" name="productTag.name" class="form-control required" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label">${_res.get("product_tag.sort_order")}</label>
+            <div class="col-md-8">
+                <input type="number" name="productTag.sort_order" class="form-control required" value="1"/>
+            </div>
+        </div>
+        <hr/>
+        <button type="submit" class="btn btn-primary">${_res.get("btn.submit")}</button>
+        <a class="btn btn-default" onclick="javascript:history.back();">${_res.get("btn.back")}</a>
+    </form>
+</@layout.layout>

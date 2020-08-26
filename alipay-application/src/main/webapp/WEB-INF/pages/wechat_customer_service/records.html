@@ -1,0 +1,57 @@
+<#macro script>
+    <#include "../common/invite-modal.js" />
+    <script>
+        $(document).ready(function(){
+
+        });
+    </script>
+</#macro>
+<#macro css><style></style></#macro>
+<#macro modal><#include "../common/invite-modal.html" /></#macro>
+
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+<#include "../template/message.ftl" />
+
+<@layout.layout script css _res.get("breadcrumb.wechat_customer_service") modal>
+<#assign menus={"/": _res.get("breadcrumb.home"), "/wechat_customer_service": _res.get("breadcrumb.wechat_customer_service")}/>
+<@nav menus _res.get("breadcrumb.records") />
+
+<table class="table table-bordered table-striped table-hover">
+    <tr>
+        <th style="width:20%">客服信息</th>
+        <th style="width:50%">绑定微信号</th>
+        <th style="width:30%">${_res.get("action")}</th>
+    </tr>
+    <#list customerServices as customerService>
+        <tr>
+            <td>
+                <img src="${customerService.kf_headimgurl!}" style="height:60px;" />
+                ${customerService.kf_account!}
+            </td>
+            <td>
+                <#if customerService.kf_wx??>
+                    <div>${customerService.kf_wx!}</div>
+                    <div>${customerService.kf_nick!}</div>
+                    <#else>未绑定
+                </#if>
+            </td>
+            <td>
+                <#if customerService.kf_wx??>
+                    <a class="btn btn-primary btn-sm">查看记录</a>
+                    <#else>
+                        <a class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal"
+                           data-action="${base}/customer_service/invite"
+                           data-kf_account="${customerService.kf_account!}">
+                            绑定
+                        </a>
+                </#if>
+
+                <a class="btn btn-primary btn-sm" href="${base}/customer_service/edit/${customerService.kf_id!}">${_res.get("edit")}</a>
+                <a class="btn btn-danger btn-sm" onclick="return confirm('确定要删除此客服吗？');" href="${base}/customer_service/delete/${customerService.kf_account!}">${_res.get("delete")}</a>
+            </td>
+        </tr>
+    </#list>
+</table>
+
+</@layout.layout>

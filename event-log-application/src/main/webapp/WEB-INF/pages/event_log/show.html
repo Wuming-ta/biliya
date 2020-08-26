@@ -1,0 +1,43 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css>
+    <style>
+    .col-name {
+        width: 150px;
+    }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+    <@layout.layout script css _res.get("breadcrumb.event_log") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/event_log": _res.get("breadcrumb.event_log")}>
+    <@nav menus _res.get("breadcrumb.view") />
+    
+    <table class="table table-hover table-bordered">
+      <tr><td class="col-name">${_res.get("event_log.id")}</td><td>${log.id}</td></tr>
+
+      <tr><td>${_res.get("event_log.name")}</td><td>${log.name!}</td></tr>
+
+      <tr><td>${_res.get("event_log.user")}</td><td>${log.user!}</td></tr>
+
+      <tr><td>${_res.get("event_log.event_type")}</td><td>${log.event_type!}</td></tr>
+
+      <tr><td>${_res.get("event_log.ip")}</td><td>${log.ip!}</td></tr>
+
+      <tr><td>${_res.get("event_log.user_agent")}</td><td>${log.user_agent!}</td></tr>
+
+      <tr><td>${_res.get("event_log.create_time")}</td><td>${log.create_time!}</td></tr>
+
+      <tr><td>${_res.get("event_log.data")}</td><td>${log.data!}</td></tr>
+
+    </table>
+
+    <a href="javascript:history.back()" class="btn btn-default">${_res.get("btn.back")}</a>
+    
+</@layout.layout>

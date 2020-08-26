@@ -1,0 +1,1 @@
+insert into t_widget (name, url, width, sort_order) values ('product.overview', '/product/widget', 4, 1);

@@ -1,0 +1,113 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+    $("#withdraw-form").validate();
+    $("#save-physical-seller-form").validate();
+  });
+</script>
+</#macro>
+<#macro css>
+<style>
+        .col-head {
+          width: 150px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.copartner") modal>
+<#assign menus = {"/": _res.get("breadcrumb.home"), "/copartner": _res.get("breadcrumb.copartner")}/>
+<@nav menus _res.get("breadcrumb.detail")/>
+<@msg message />
+
+<#assign seller = copartner.seller />
+<#assign user = seller.user />
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">${_res.get("partner.seller.summary")}</h3>
+    </div>
+    <table class="table table-hover table-bordered">
+        <tr>
+            <td class="col-head">${_res.get("partner.physical_seller.uid")}</td>
+            <td>${user.uid!}</td>
+        </tr>
+        <tr>
+            <td>${_res.get("partner.copartner.name")}</td>
+            <td>${user.name!}</td>
+        </tr>
+        <tr>
+            <td>${_res.get("partner.physical_seller.phone")}</td>
+            <td>${user.phone!'-'}</td>
+        </tr>
+        <tr>
+            <td>${_res.get("partner.copartner.create_time")}</td>
+            <td>${copartner.create_time!}</td>
+        </tr>
+        <tr>
+            <td>${_res.get("partner.copartner.status")}</td>
+            <td>${_res.get("partner.copartner.status." + copartner.status?lower_case)}</td>
+        </tr>
+    </table>
+</div>
+
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">${_res.get("partner.copartner.settlement")}</h3>
+    </div>
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th style="width: 20%">统计月份</th>
+            <th style="width: 20%">当月提成额</th>
+            <th style="width: 10%">当月提成比例</th>
+            <th style="width: 10%">已转积分？</th>
+            <th style="width: 20%">转积分额</th>
+        </tr>
+        <#list settlements as settlement>
+        <tr>
+            <td>${settlement.statistic_month}</td>
+            <td>${settlement.settled_amount}</td>
+            <td>${settlement.settlement_proportion}%</td>
+            <td><label class="label <#if settlement.transferred==1>label-primary<#else>label-default</#if>">${_res.get("summary.transferred." + settlement.transferred)}</label></td>
+            <td>${settlement.transferred_amount!}</td>
+        </tr>
+    </#list>
+    <#if (settlements?size==0)>
+    <td colspan="20">No Data</td>
+</#if>
+    </table>
+</div>
+
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">${_res.get("partner.copartner.children")}</h3>
+    </div>
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th style="width: 20%">${_res.get("partner.physical_seller.uid")}</th>
+            <th>${_res.get("partner.physical_seller.name")}</th>
+            <th>${_res.get("partner.physical_seller.real_name")}</th>
+            <th>${_res.get("partner.physical_seller.phone")}</th>
+            <th>加入时间</th>
+        </tr>
+        <#list copartner.children as p>
+        <tr>
+            <td>${p.uid!}</td>
+            <td><a href="${base}/seller/detail?sellerId=${p.seller_id}">${p.user_name!}</a></td>
+            <td>${p.real_name!'-'}</td>
+            <td>${p.phone!'-'}</td>
+            <td>${p.create_time!}</td>
+        </tr>
+    </#list>
+    <#if (copartner.children?size==0)>
+        <td colspan="20">No Data</td>
+    </#if>
+    </table>
+</div>
+
+</@layout.layout>

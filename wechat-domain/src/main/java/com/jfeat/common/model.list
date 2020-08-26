@@ -1,0 +1,15 @@
+# put the model here using full package.
+# it must be under model package.
+# such as there is a table t_abc_efg, then the model class should be AbcEfg
+#
+# example:
+#com.jfeat.test.model.AbcEfg
+
+com.jfeat.wechat.model.WechatMessageType
+com.jfeat.wechat.model.WechatMessageTypeProp
+com.jfeat.wechat.model.WechatTemplateMessage
+com.jfeat.wechat.model.WechatField
+com.jfeat.wechat.model.WechatSubscribeAutoreply
+com.jfeat.wechat.model.WechatMessageAutoreply
+com.jfeat.wechat.model.WechatKeywordAutoreply
+com.jfeat.wechat.model.WechatKeywordAutoreplyItem

@@ -1,0 +1,136 @@
+<#macro script>
+<script>
+  function updateUrl() {
+    $('a[name="batch-coupon"]').each(function() {
+      var theA = $(this);
+      var href = theA.prop("href");
+      var index = href.indexOf("&userId=");
+      if (index == -1) {
+        index = href.length;
+      }
+      href = href.substring(0, index);
+      var tempArray = [];
+      $('input[name=id]').each(function() {
+        if ($(this).is(":checked") == true) {
+          tempArray.push($(this).val());
+        }
+      });
+      href = href + "&userId=" + tempArray.join("-");
+      theA.prop("href", href);
+    });
+  }
+
+  $(document).ready(function() {
+
+    $("#select-all").click(function() {
+        $('input[name=id]').prop("checked", this.checked);
+        if (this.checked == true) {
+          $("#batch-give-coupon").removeClass("disabled");
+          updateUrl();
+        }
+        else {
+          $("#batch-give-coupon").addClass("disabled");
+        }
+    });
+
+    $('input[name=id]').click(function(){
+      var checked = false;
+      $('input[name=id]').each(function(){
+          if ($(this).is(":checked") == true) {
+              checked = true;
+          }
+      });
+      if (checked == false) {
+          $("#batch-give-coupon").addClass("disabled");
+          $("#select-all").prop("checked", false);
+      }
+      else {
+          $("#batch-give-coupon").removeClass("disabled");
+          updateUrl();
+      }
+    });
+
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "../template/pagination.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.member") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.member")/>
+    <@msg message />
+
+    <div class="search-box">
+        <form class="form-inline">
+            <label>${_res.get("member.name")}</label>
+            <input type="text" class="form-control" name="user" value="${user!}">
+            <div class="form-group">
+                <label>${_res.get("member.level")}</label>
+                <select name="levelId" class="form-control">
+                    <option value=""></option>
+                    <#list levels as level>
+                        <option value="${level.id}" <#if (levelId??&&levelId==level.id.toString())>selected="selected"</#if> >${level.name}</option>
+                    </#list>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">${_res.get("member.search")}</button>
+            <#if (couponTypes?size>0)>
+            <div class="btn-group">
+                <button type="button" id="batch-give-coupon" class="btn btn-info dropdown-toggle disabled" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    ${_res.get("member.give.coupon.batch")} <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <#list couponTypes as couponType>
+                        <li><a name="batch-coupon" href="${base}/coupon/give?couponTypeId=${couponType.id}&returnUrl=/member">${couponType.name!}</a></li>
+                    </#list>
+                </ul>
+            </div>
+            </#if>
+        </form>
+    </div>
+
+
+    <table class="table table-hover ">
+        <tr>
+            <th><input type="checkbox" id="select-all"></th>
+            <th>${_res.get("member.uid")}</th>
+            <th>${_res.get("member.name")}</th>
+            <th>${_res.get("member.level")}</th>
+            <th>${_res.get("member.point")}</th>
+            <th>${_res.get("member.coupon.count_activation")}</th>
+            <th>${_res.get("member.action")}</th>
+        </tr>
+        <#list members.list as member>
+            <tr>
+                <td><input type="checkbox" name="id" value="${member.id}"></td>
+                <td>${member.uid}</td>
+                <td><a href="${base}/member/detail/${member.id}">${member.name!}</a></td>
+                <td><#list levels as level><#if (level.id==member.level_id)>${level.name}</#if></#list></td>
+                <td>${member.point!}</td>
+                <td>${member.activation_coupon_count}</td>
+                <td>
+                    <a class="btn btn-primary btn-sm" href="${base}/member/detail/${member.id}">${_res.get("member.view")}</a>
+                    <#if (couponTypes?size>0)>
+                    <#assign returnUrl>/member%3fpageNumber=${pageNumber!}%26pageSize=${pageSize!}%26user=${user!}%26levelId=${levelId!}</#assign>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            ${_res.get("member.give.coupon")} <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <#list couponTypes as couponType>
+                            <li><a href="${base}/coupon/give?couponTypeId=${couponType.id}&userId=${member.id}&returnUrl=${returnUrl!}">${couponType.name!}</a></li>
+                            </#list>
+                        </ul>
+                    </div>
+                    </#if>
+                </td>
+            </tr>
+        </#list>
+    </table>
+    <@paginate currentPage=members.pageNumber totalPage=members.totalPage actionUrl="${base}/member?pageNumber=" urlParas="&user=${user!}&levelId=${levelId!}" />
+
+</@layout.layout>

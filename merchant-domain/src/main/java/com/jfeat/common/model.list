@@ -1,0 +1,16 @@
+# put the model here using full package.
+# it must be under model package.
+# such as there is a table t_abc_efg, then the model class should be AbcEfg
+#
+# example:
+#com.jfeat.test.model.AbcEfg
+
+com.jfeat.merchant.model.SettledTerm
+com.jfeat.merchant.model.SettledMerchantType
+com.jfeat.merchant.model.SettledMerchant
+com.jfeat.merchant.model.SettledMerchantIntroduction
+com.jfeat.merchant.model.SettledMerchantApproveLog
+com.jfeat.merchant.model.UserSettledMerchant
+com.jfeat.merchant.model.MerchantMessage
+com.jfeat.merchant.model.MerchantProductCategory
+com.jfeat.merchant.model.SettledMerchantSettlementProportion

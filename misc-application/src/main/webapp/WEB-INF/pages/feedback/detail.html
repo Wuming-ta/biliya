@@ -1,0 +1,78 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .col-key {
+            width: 20%;
+        }
+        .col-value {
+            width: 30%;
+        }
+        .thumbnail{
+            border: none;
+        }
+        .thumbnail > img{
+            margin-right: inherit;
+            margin-left: inherit;
+        }
+        .content {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.faq") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/faq": _res.get("breadcrumb.feedback")}>
+    <@nav menus _res.get("breadcrumb.view")/>
+
+    <#assign user = feedback.user />
+    <table class="table table-bordered">
+        <tr>
+            <td class="col-key">用户</td>
+            <td class="col-value"><a href="${base}/user/edit/${user.id}">${user.name}</a></td>
+            <td class="col-key">创建时间</td>
+            <td class="col-value">${feedback.created_date}</td>
+        </tr>
+        <tr>
+            <td class="col-key">手机</td>
+            <td class="col-value">${user.phone!'-'}</td>
+            <td class="col-key">真实姓名</td>
+            <td class="col-value">${user.real_name!'-'}</td>
+        </tr>
+        <tr>
+            <td class="col-key">
+                <a href="${base}/order?uid=${user.uid}">查看该用户订单</a>
+            </td>
+            <td class="col-value"></td>
+            <td class="col-key"></td>
+            <td class="col-value"></td>
+        </tr>
+        <tr>
+            <td class="col-key">内容</td>
+            <td colspan="3">
+                <div class="content">${feedback.content}</div>
+                <#list feedback.images as image>
+                    <div class="thumbnail">
+                        <img src="${image.url!}">
+                    </div>
+                </#list>
+            </td>
+        </tr>
+
+    </table>
+
+    <hr>
+    <a class="btn btn-default" href="javascript:history.back();">返回</a>
+    <a class="btn btn-danger" href="${base}/feedback/delete/${feedback.id}"
+       onclick="javascript:if (confirm('确定要删除吗？')){return true;} return false;">删除</a>
+
+</@layout.layout>

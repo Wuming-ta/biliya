@@ -1,0 +1,87 @@
+<style>
+    .apply-view-col-key {
+        width: 20%;
+    }
+    .apply-view-col-value {
+        width: 30%;
+    }
+</style>
+
+<#if props??>
+<div class="panel panel-default">
+    <div class="panel-heading">申请资料</div>
+    <table class="table table-hover table-bordered">
+        <#assign keys = props.keySet() />
+        <#list keys as k>
+        <tr>
+            <td class="apply-view-col-key">${k}</td>
+            <td class="apply-view-col-value">${props[k]}</td>
+        </tr>
+        </#list>
+    </table>
+</div>
+</#if>
+
+<#if seller??>
+<div class="panel panel-default">
+    <div class="panel-heading">申请人信息</div>
+    <#assign user = seller.user />
+    <table class="table table-hover table-bordered">
+        <tr>
+            <td class="apply-view-col-key">名字</td>
+            <td class="apply-view-col-value">${user.name!}</td>
+            <td class="apply-view-col-key">UID</td>
+            <td class="apply-view-col-value">${user.uid!}</td>
+        </tr>
+        <tr>
+            <td class="apply-view-col-key">真实姓名</td>
+            <td class="apply-view-col-value">${user.real_name!}</td>
+            <td class="apply-view-col-key">手机</td>
+            <td class="apply-view-col-value">${user.phone!}</td>
+        </tr>
+        <tr>
+            <td class="apply-view-col-key">身份</td>
+            <td colspan="3">
+                <span class="label <#if seller.seller_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.seller")}</span>
+                <span class="label <#if seller.partner_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.partner")}</span>
+                <span class="label <#if seller.crown_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.crown")}</span>
+            </td>
+        </tr>
+        <!--<tr>-->
+            <!--<td class="apply-view-col-key"></td>-->
+            <!--<td class="apply-view-col-value"></td>-->
+            <!--<td class="apply-view-col-key"></td>-->
+            <!--<td class="apply-view-col-value"></td>-->
+        <!--</tr>-->
+    </table>
+</div>
+</#if>
+
+<#if parent??>
+    <div class="panel panel-default">
+        <div class="panel-heading">邀请人信息</div>
+        <#assign parentUser = parent.user />
+        <table class="table table-hover table-bordered">
+            <tr>
+                <td class="apply-view-col-key">名字</td>
+                <td class="apply-view-col-value">${parentUser.name!}</td>
+                <td class="apply-view-col-key">UID</td>
+                <td class="apply-view-col-value">${parentUser.uid!}</td>
+            </tr>
+            <tr>
+                <td class="apply-view-col-key">真实姓名</td>
+                <td class="apply-view-col-value">${parentUser.real_name!}</td>
+                <td class="apply-view-col-key">手机</td>
+                <td class="apply-view-col-value">${parentUser.phone!}</td>
+            </tr>
+            <tr>
+                <td class="apply-view-col-key">身份</td>
+                <td colspan="3">
+                    <span class="label <#if parent.seller_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.seller")}</span>
+                    <span class="label <#if parent.partner_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.partner")}</span>
+                    <span class="label <#if parent.crown_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.crown")}</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+</#if>

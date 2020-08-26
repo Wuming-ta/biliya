@@ -1,0 +1,23 @@
+# put the model here using full package.
+# it must be under model package.
+# such as there is a table t_abc_efg, then the model class should be AbcEfg
+#
+# example:
+#com.jfeat.test.model.AbcEfg
+com.jfeat.product.model.Product
+com.jfeat.product.model.ProductBrand
+com.jfeat.product.model.ProductCategory
+com.jfeat.product.model.ProductImage
+com.jfeat.product.model.ProductFavorite
+com.jfeat.product.model.ProductProperty
+com.jfeat.product.model.ProductCategoryProperty
+com.jfeat.product.model.ProductHitWord
+com.jfeat.product.model.ProductSpecification
+com.jfeat.product.model.ProductDescription
+com.jfeat.product.model.CarryMode
+com.jfeat.product.model.InclPostageProviso
+com.jfeat.product.model.FareTemplate
+com.jfeat.product.model.ProductPurchaseStrategy
+com.jfeat.product.model.ProductPurchaseStrategyItem
+com.jfeat.product.model.ProductSettlementProportion
+com.jfeat.product.model.ProductTag

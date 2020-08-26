@@ -1,0 +1,94 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .col-key{
+        width: 15%;
+        }
+        .col-value{
+        width: 35%;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.coupon") modal>
+<#assign menus = {"/": _res.get("breadcrumb.home"), "/coupon": _res.get("breadcrumb.coupon")}>
+    <@nav menus _res.get("breadcrumb.view")/>
+    <@msg message />
+
+    <form class="form-horizontal">
+        <table class="table table-hover table-bordered">
+            <tr>
+                <td class="col-key"><label class="control-label">${_res.get("member.coupon.name")}</label></td>
+                <td class="col-value">${coupon.name!}</td>
+                <td class="col-key"><label class="control-label">${_res.get("member.coupon.display_name")}</label></td>
+                <td class="col-value">${coupon.display_name!}</td>
+            </tr>
+            <tr>
+                <td class="col-key"><label class="control-label">${_res.get("member.coupon.code")}</label></td>
+                <td class="col-value">${coupon.code!}</td>
+                <td class="col-key"><label class="control-label">${_res.get("member.coupon.valid_date")}</label></td>
+                <td class="col-value">${coupon.created_date!} -- ${coupon.valid_date!}</td>
+            </tr>
+            <tr>
+                <td class="col-key"><label class="control-label">${_res.get("member.coupon.user")}</label></td>
+                <td class="col-value"><a href="${base}/member/detail/${coupon.user_id}">${coupon.user.name!}</a></td>
+                <td class="col-key"><label class="control-label">${_res.get("member.coupon.status")}</label></td>
+                <td class="col-value">${_res.get("member.coupon.status." + coupon.status?lower_case)}</td>
+            </tr>
+            <#if (coupon.money>0)>
+            <tr>
+                <td class="col-key"><label class="control-label">${_res.get("member.coupon.money")}</label></td>
+                <td colspan="3">${coupon.money!}</td>
+            </tr>
+            </#if>
+            <#if (coupon.discount>0)>
+            <tr>
+                <td class="col-key"><label class="control-label">${_res.get("member.coupon.discount")}</label></td>
+                <td colspan="3">${coupon.discount!}</td>
+            </tr>
+            </#if>
+            <tr>
+                <td class="col-key"><label class="control-label">${_res.get("member.coupon.description")}</label></td>
+                <td colspan="3">${coupon.description!}</td>
+            </tr>
+            <#if coupon.attributeMap??>
+                <tr>
+                    <td class="col-key"><label class="control-label">${_res.get("member.coupon.attribute")}</label></td>
+                    <td colspan="3">
+                        <#assign map = coupon.attributeMap>
+                            <table class="table table-bordered">
+                                <#list map.keySet() as key>
+                                    <tr>
+                                        <td>${_res.get("member.coupon.attr."+key)}</td>
+                                        <td>${map.get(key)}</td>
+                                    </tr>
+                                </#list>
+                            </table>
+                    </td>
+                </tr>
+            </#if>
+            <tr>
+                <td class="col-key"><label class="control-label">${_res.get("member.coupon.condition")}</label></td>
+                <td colspan="3"><pre>${(coupon.cond!"")?html}</pre></td>
+            </tr>
+        </table>
+
+        <hr>
+        <@shiro.hasPermission name="coupon.edit">
+        <#if (coupon.status=='NON_ACTIVATION')>
+            <a class="btn btn-success btn-sm" href="${base}/coupon/activate/${coupon.id}">${_res.get("member.coupon.activate")}</a>
+        </#if>
+        </@shiro.hasPermission>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+    </form>
+
+</@layout.layout>

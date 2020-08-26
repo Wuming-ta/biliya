@@ -1,0 +1,15 @@
+# put the model here using full package.
+# it must be under model package.
+# such as there is a table t_abc_efg, then the model class should be AbcEfg
+#
+# example:
+#com.jfeat.test.model.AbcEfg
+com.jfeat.order.model.Order
+com.jfeat.order.model.OrderItem
+com.jfeat.order.model.OrderProcessLog
+com.jfeat.order.model.ShoppingCart
+com.jfeat.order.model.Express
+com.jfeat.order.model.OrderCustomerService
+com.jfeat.order.model.OrderStatistic
+com.jfeat.order.model.OrderCustomerServiceItem
+com.jfeat.order.model.OrderExpress

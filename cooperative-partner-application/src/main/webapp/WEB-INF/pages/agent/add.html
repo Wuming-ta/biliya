@@ -1,0 +1,148 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+    $("#agent_form").validate();
+
+    //search user
+    var PAGE_NUMBER = 1;
+    function loadSuppliers(pageNum, keyWord) {
+        $('#pageNumberSize').remove();
+        $.get(getUrl(pageNum, keyWord), function(data) {
+            $('#supplierModalBody').append(data);
+            PAGE_NUMBER = parseInt($('#pageNumber').attr("value"));
+            var totalPage = parseInt($('#totalPage').attr("value"));
+            if (PAGE_NUMBER < totalPage) {
+                $('#more').show();
+            }
+            else {
+                $('#more').hide();
+            }
+            if (totalPage == 0) {
+                $('#supplierModalBody').append("没有数据");
+            }
+        });
+    }
+
+    function getUrl(pageNum, keyWord) {
+        return "${base}/agent/nonAgentUser?pageNumber=" + pageNum + "&keyWord=" + keyWord;
+    }
+
+    $('#agent_uid').on('shown.bs.modal', function () {
+        //console.log("on show");
+        $('#loadSuppliers').show();
+        PAGE_NUMBER = 1;
+        var keyWord = $('#searchSupplierKeyWord').val();
+        $('#supplierModalBody').empty();
+        loadSuppliers(PAGE_NUMBER, keyWord);
+    });
+
+    $('#btnModalSave').click(function() {
+        var suppliers = $('input[name="supplierCheckbox"]:checked').val();
+        console.log(suppliers);
+        var res = suppliers.split("#");
+        $('#user_id').val(res[0]);
+        $('#user_name').html(res[1]);
+        $('#agent_uid').modal('hide');
+    });
+
+    //search btn
+    $('#searchSupplier').click(function() {
+        var keyWord = $('#searchSupplierKeyWord').val();
+        $('#supplierModalBody').empty();
+        loadSuppliers(1, keyWord);
+    });
+
+    $('#more').click(function() {
+        var keyWord = $('#searchSupplierKeyWord').val();
+        loadSuppliers(PAGE_NUMBER + 1, keyWord);
+    });
+
+  });
+
+  <#include "./agent.js"/>
+</script>
+<#include "agent.tpl.js"/>
+</#macro>
+
+<#macro css>
+    <style>
+        <#include "agent.css"/>
+    </style>
+</#macro>
+<#macro modal>
+    <!-- pcd Modal -->
+    <div class="modal fade" id="pcd" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title">请选择</h5>
+                </div>
+                <div id="pcdModalBody" class="modal-body">
+                    <input type="hidden" id="recipient">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <select id="p-select" class="form-control" name="provinces"></select>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="c-select" class="form-control" name="cities"></select>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="d-select" class="form-control" name="districts"></select>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top:6px;">
+                        <div class="col-md-3">
+                            <input id="agentPhysicalSettlementPercentage" placeholder="提成比例（%）" class="form-control"  name="agentPhysicalSettlementPercentage">
+                        </div>
+                        <div class="col-md-9">
+                            <div style="float:right;">
+                                <span class="label label-info">提示</span>
+                                若不设置提成比例，则使用"线下代理商区域提成比例"页面的设置
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button id="pcdSave" type="button" class="btn btn-primary">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div class="modal fade" id="agent_uid" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <input style="width:200px;float:left;" placeholder="用户名" id="searchSupplierKeyWord" type="text" class="form-control">
+                    <button style="margin-left:5px;" id="searchSupplier" type="button" class="btn btn-default">查找</button>
+                </div>
+                <div id="supplierModalBody" class="modal-body">
+                    <br>
+                </div>
+                <button id="more" type="button" class="btn btn-info btn-block">更多</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button id="btnModalSave" type="button" class="btn btn-primary">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "_form.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.agent") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/agent": _res.get("breadcrumb.agent")}/>
+    <@nav menus _res.get("breadcrumb.add")/>
+    <div style="float:right;">
+        <span class="label label-info">提示</span>
+        若不设置提成比例，则使用"线下代理商区域提成比例"页面的设置
+    </div>
+    <@form "save" />
+
+</@layout.layout>

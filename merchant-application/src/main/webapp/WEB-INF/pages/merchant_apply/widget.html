@@ -1,0 +1,78 @@
+<style>
+   .merchant-widget{
+      background-color: transparent;
+      border: 1px solid #f4f4f4;
+      min-height: 250px;
+   }
+   .merchant-widget-head{
+      border-left: 5px solid orange;
+      border-bottom: 1px solid #f4f4f4;
+      padding-left: 10px;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      font-size: 16px;
+      font-weight: bold;
+   }
+   .merchant-widget-row{
+      margin-left: 0px;
+      margin-right: 0px;
+      background-color: #fafafa;
+      min-height: 250px;
+   }
+   .merchant-widget-box{
+      background-color: #fafafa;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 80px;
+   }
+   .merchant-widget-count{
+      height: 60px;
+      padding-top: 15px;
+   }
+   .merchant-widget-title{
+      height: 30px;
+      padding-top: 10px;
+      font-size: 14px;
+   }
+   .merchant-widget-bar{
+      border-bottom: 8px solid green;
+      margin-bottom: 0px;
+   }
+   .merchant-widget-bar-deliver-pending{
+      border-color: yellow;
+   }
+   .merchant-widget-bar-delivering{
+      border-color: pink;
+   }
+   .merchant-widget-bar-return{
+      border-color: orange;
+   }
+   .merchant-widget-bar-reminder{
+      border-color: red;
+   }
+</style>
+
+<#if tips?? && allowApply??>
+<div class="merchant-widget">
+   <div class="merchant-widget-head">${merchantApplyWidgetDisplayName!}</div>
+   <div class="row merchant-widget-row">
+         <div class="merchant-widget-box">
+            <#if settledMerchant??>
+               <a href="${base}/merchant_apply/detail">
+                  <div class="merchant-widget-title">${tips!}</div>
+                  <div class="merchant-widget-count">查看已提交资料</div>
+
+
+               </a>
+            <#else>
+               <a href="${base}/merchant_apply">
+                  <div class="merchant-widget-title">${tips!}</div>
+                  <div class="merchant-widget-count">我要成为商家</div>
+               </a>
+            </#if>
+
+         </div>
+   </div>
+</div>
+</#if>

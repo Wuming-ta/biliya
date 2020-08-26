@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+    <title>分享红包</title>
+    <link href="${base}/assets/font-awesome.css" rel="stylesheet" />
+    <style>
+        body {
+            font: 14px/1.5 "Helvetica Neue",Helvetica,Arial,"Microsoft Yahei","Hiragino Sans GB","Heiti SC","WenQuanYi Micro Hei",sans-serif;
+            background-color: #efefef;
+            margin: 0px;
+        }
+        a, a:hover, a:link {
+            text-decoration: none;
+        }
+
+        #pay-info {
+            margin: 0px;
+            padding: 50px 0;
+            background-color: #fff;
+        }
+
+        #nav{
+            margin: 0px;
+            background-color: #fff;
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        #repay{
+            text-align: right;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        #footer{
+            text-align: center;
+            margin-top: 40px;
+            color: gray;
+        }
+
+        .success, .failure, .inprogress{
+            padding: 10px;
+            font-size: 18px;
+        }
+
+        .success{
+            color: green;
+        }
+        .failure{
+            background-color: #A95296;
+            color: white;
+        }
+
+
+        .price{
+            margin-bottom: 30px;
+            font-size: 30px;
+            color: #000000;
+            text-align: center;
+        }
+        .point{
+            font-size: 16px;
+        }
+        .table {
+            width: 100%;
+            color: gray;
+        }
+        .col-key{
+            width: 25%;
+            text-align: left;
+        }
+        .col-value{
+            width: 75%;
+            text-align: right;
+        }
+
+        .btn {
+            display: inline-block;
+            color: #333;
+            background-color: #fff;
+            padding: 10px 16px;
+            margin-bottom: 0;
+            font-size: 14px;
+            font-weight: normal;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            -ms-touch-action: manipulation;
+            touch-action: manipulation;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-image: none;
+            border: 1px solid #A95296;
+        }
+
+        .btn-repay{
+            background-color: #A95296;
+            color: white;
+        }
+
+
+
+        .pocket-btn {
+            position: absolute;
+            z-index: 99;
+            padding-top: 5%;
+            padding-bottom: 5%;
+            padding-left: 5%;
+            padding-right: 5%;
+        }
+        .pocket {
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          top: 0;
+          left: 0;
+          text-align: center;
+        }
+        .pocket-mask {
+          background-color: #000;
+          opacity: 0.5;
+        }
+        .pocket-img {
+          z-index: 2;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+        #pocket > .pocket-img {
+          background: url("${base}/assets/img/pocket.png") no-repeat center 0;
+          background-size: 100%;
+          width: 60%;
+          height: 60%;
+        }
+
+
+        #pocket > div > a.pocket-view-btn {
+            margin-top: 70%;
+            padding-top: 8%;
+            padding-bottom: 8%;
+            padding-left: 25%;
+            padding-right: 25%;
+            margin-left: -25%;
+        }
+        #pocket > div > a.pocket-close-btn {
+            margin-top: 0;
+            margin-left: 36%;
+            padding-top: 8%;
+            padding-bottom: 8%;
+            padding-left: 8%;
+            padding-right: 8%;
+        }
+        #pocket > div > a.pocket-info-btn {
+            margin-top: 60%;
+            padding-top: 1%;
+            padding-bottom: 1%;
+            padding-left: 1%;
+            padding-right: 1%;
+            margin-left: -25%;
+            color: #fff;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<div id="pocket" class="pocket">
+    <div class="pocket-img">
+        <a class="pocket-btn pocket-close-btn" href="#" onclick="hide('pocket');"></a>
+        <a class="pocket-btn pocket-view-btn" href="${base}/app#/coupon"></a>
+        <a class="pocket-btn pocket-info-btn">恭喜您获得${coupon_count!}张优惠券!</a>
+    </div>
+    <div class="pocket pocket-mask"></div>
+</div>
+
+<div id="success">
+    <div class="success"><i class="fa fa-check-circle" aria-hidden="true"></i> 兑换成功!</div>
+</div>
+<div id="pay-info">
+    <div class="price">${totalFee!}<span class="point">积分</span></div>
+    <hr>
+    <table class="table">
+        <tr>
+            <td class="col-key">商品</td>
+            <td class="col-value">${title!}</td>
+        </tr>
+        <tr>
+            <td class="col-key">交易时间</td>
+            <td class="col-value">${payDate!}</td>
+        </tr>
+        <tr>
+            <td class="col-key">订单号</td>
+            <td class="col-value">${orderNumber!}</td>
+        </tr>
+    </table>
+</div>
+
+<div id="nav">
+    <a href="${base}/app" class="btn">返回首页</a>
+    <a href="${base}/app#/order/all" class="btn">查看订单</a>
+</div>
+
+<div id="footer">
+    <i class="fa fa-check-circle" aria-hidden="true"></i> 积分兑换
+</div>
+
+</body>
+<script src="//res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+wx.config(${jsconfig});
+function hide(id){
+    document.getElementById(id).style.display="none";
+}
+function show(id){
+    document.getElementById(id).style.display="";
+}
+
+var weixin = function (title, link, imgurl, desc) {
+    wx.ready(function () {
+        wx.onMenuShareTimeline({
+            title: title,
+            link: link,
+            imgUrl: imgurl,
+            success: function() {
+
+            }
+        });
+        wx.onMenuShareAppMessage({
+            title: title,
+            desc: desc,
+            link: link,
+            imgUrl: imgurl,
+            success: function() {
+
+            }
+        });
+    });
+};
+
+weixin('${shareTitle!"快来领取十美优品专享红包"}', '${link}', '${host}/assets/img/pocket-480.png', '${shareDesc!"快来领取十美优品专享红包"}');
+
+</script>
+</html>

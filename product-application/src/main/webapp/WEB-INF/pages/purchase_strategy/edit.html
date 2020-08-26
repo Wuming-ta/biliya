@@ -1,0 +1,95 @@
+<#macro script>
+<script>
+<#include "form.js"/>
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .purchase {
+            margin-top: 10px;
+        }
+        .purchase-style {
+            margin-bottom: 10px;
+            width: 350px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "../template/pagination.ftl"/>
+<@layout.layout script css _res.get("menu.purchase_strategy") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/purchase_strategy": _res.get("breadcrumb.purchase_strategy")}/>
+    <@nav menus _res.get("breadcrumb.edit")/>
+    <@msg message />
+
+    <form action="${base}/purchase_strategy/update" class="form-horizontal" role="form" method="post">
+        <input type="hidden" name="productPurchaseStrategy.id" value="${strategy.id}">
+        <div class="form-group">
+            <label for="name" class="col-md-2 control-label">${_res.get("purchase_strategy.name")}<span class="required-field">*</span></label>
+            <div class="col-md-8">
+                <input type="text" class="form-control required" id="name" name="productPurchaseStrategy.name" value="${strategy.name}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-2 control-label">${_res.get("purchase_strategy.description")}<span class="required-field">*</span></label>
+            <div class="col-md-8">
+                <textarea rows="3" class="form-control required" id="description" name="productPurchaseStrategy.description" >${strategy.description!}</textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="name" class="col-md-2 control-label">${_res.get("purchase_strategy.strategy")}<span class="required-field">*</span></label>
+            <div class="col-md-8">
+                <#list strategy.newItems as item>
+                    <div class="purchase ${item.name?replace('.','-')}">
+                        <div class="<#if item_index==0>hidden</#if>">
+                            <label class="radio-inline">
+                                <input type="radio" name="productPurchaseStrategyItem[${item.id}].operator" value="AND" <#if item.operator=='AND'>checked</#if> > 并且满足以下策略
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="productPurchaseStrategyItem[${item.id}].operator" value="OR" <#if item.operator=='OR'>checked</#if>> 或者满足以下策略
+                            </label>
+                        </div>
+                        <div style="border: 1px solid #ddd; padding: 10px;">
+                            <input type="hidden" name="productPurchaseStrategyItem[${item.id}].name" value="${item.name}">
+                            <p class="form-control-static">${_res.get("purchase_strategy.name")}: ${item.displayName!}</p>
+                            <div class="row">
+                                <#list item.definitions as definition>
+                                    <div class="col-xs-3 text-right">
+                                        <span class="form-control-static">${definition.displayName}:</span>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <input type="<#if definition.type=='INTEGER'>number<#else>text</#if>"
+                                               class="required" name="parameterDefinition[${item.id}${definition_index}].value" value="${definition.value!}">
+                                        <input type="hidden" name="parameterDefinition[${item.id}${definition_index}].item_id" value="${item.id}">
+                                        <input type="hidden" name="parameterDefinition[${item.id}${definition_index}].name" value="${definition.name}">
+                                        <input type="hidden" name="parameterDefinition[${item.id}${definition_index}].type" value="${definition.type}">
+                                    </div>
+                                </#list>
+                            </div>
+                        </div>
+                    </div>
+                </#list>
+
+                <p id="purchase-strategy-container" class="form-control-static">
+                <div class="btn-group">
+                    <a type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">添加策略 <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <#list purchaseStrategies as purchaseStrategy>
+                            <li><a href="#" onclick="addPurchaseStrategy(this, '${purchaseStrategy.name}');">${purchaseStrategy.displayName}</a></li>
+                        </#list>
+                    </ul>
+                </div>
+                <a id="reset-purchase-strategy" class="btn btn-danger">重置</a>
+                </p>
+            </div>
+        </div>
+
+        <hr>
+        <button id="submitBtn" type="submit" class="btn btn-primary">${_res.get("btn.update")}</button>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+    </form>
+
+</@layout.layout>

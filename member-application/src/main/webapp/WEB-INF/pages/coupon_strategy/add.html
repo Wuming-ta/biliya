@@ -1,0 +1,34 @@
+
+<#macro script>
+<script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+<#include "form.js"/>
+<script>
+    $(document).ready(function(){
+        trigger($('#strategyType option:first'), $('#strategyType'));
+    });
+</script>
+</#macro>
+
+<#macro css>
+<#include "form.css"/>
+</#macro>
+
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.coupon_strategy") modal>
+<#assign menus = {"/": _res.get("breadcrumb.home"), "/coupon_strategy": _res.get("breadcrumb.coupon_strategy")}>
+    <@nav menus _res.get("breadcrumb.add")/>
+    <@msg message />
+    <form id="form" class="form-horizontal" role="form" action="${base}/coupon_strategy/save" method="post">
+
+        <#include "_form.html"/>
+
+        <hr>
+        <@shiro.hasPermission name="coupon.edit">
+        <button type="submit" class="btn btn-primary">${_res.get("btn.save")}</button>
+        </@shiro.hasPermission>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+    </form>
+</@layout.layout>

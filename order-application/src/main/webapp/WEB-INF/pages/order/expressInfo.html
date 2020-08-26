@@ -1,0 +1,34 @@
+<#macro script>
+</#macro>
+<#macro css>
+<style>
+    .info-key-col {
+        font-weight: bold;
+        width: 30%;
+    }
+    .info-value-col {
+        width: 70%;
+    }
+</style>
+</#macro>
+<#import "../template/blankLayout.ftl" as layout>
+
+<@layout.layout script css _res.get("breadcrumb.order")>
+
+<#if (expressInfo??&&expressInfo.status=="1")>
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th class="info-key-col">时间</th>
+            <th>事件</th>
+        </tr>
+        <#list expressInfo.data as d>
+        <tr>
+            <td>${d.time!}</td>
+            <td>${d.context!}</td>
+        </tr>
+        </#list>
+    </table>
+<#else>
+    <h3>暂无物流信息。</h3>
+</#if>
+</@layout.layout>

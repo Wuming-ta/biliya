@@ -1,0 +1,39 @@
+<#macro script>
+    <script>
+    $(document).ready(function(){
+
+    });
+    </script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+<@layout.layout script css _res.get("breadcrumb.settled_merchant_type") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/merchant_config": _res.get("breadcrumb.merchant_config")} />
+    <@nav menus _res.get("breadcrumb.settled_merchant_type.add") />
+
+    <form class="form-horizontal" method="post" action="${base}/merchant_config/saveSettledMerchantType">
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label" for="name">${_res.get("merchant.settled_merchant_type.name")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="text"  class="form-control" id="name" name="settledMerchantType.name" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label" for="product_count">${_res.get("merchant.settled_merchant_type.product_count")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="number" class="form-control" id="product_count" name="settledMerchantType.product_count"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label" for="deposit">${_res.get("merchant.settled_merchant_type.deposit")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="number"  class="form-control" id="deposit" name="settledMerchantType.deposit" />
+            </div>
+        </div>
+        <hr>
+        <button type="submit" class="btn btn-primary">${_res.get("submit")}</button>
+        <button type="button" class="btn btn-default" onclick="history.back();">${_res.get("back")}</button>
+    </form>
+</@layout.layout>

@@ -1,0 +1,223 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+    $("#product_category_form").validate();
+
+    var id = 1;
+    $("#create-property-btn").click(function() {
+        var html = $("#property-template").html().replace(/#ID#/g, id++);
+        $("#create-property-tr").before(html);
+    });
+
+  });
+
+function removeProperty(element) {
+    $(element).parents("tr").remove();
+}
+
+function previewCover(element){
+    // Get a reference to the fileList
+    var files = !!element.files ? element.files : [];
+
+    // If no files were selected, or no FileReader support, return
+    if (!files.length || !window.FileReader) return false;
+
+    // Only proceed if the selected file is an image
+    if (/^image/.test( files[0].type)){
+        // Create a new instance of the FileReader
+        var reader = new FileReader();
+
+        // Read the local file as a DataURL
+        reader.readAsDataURL(files[0]);
+
+        // When loaded, set image data as background of div
+        reader.onloadend = function(){
+            var $img = $(element).siblings("img");
+            $img.attr("src", this.result);
+        }
+
+        return true;
+    }
+    return false;
+}
+
+</script>
+<script type="text/html" id="property-template">
+    <tr>
+        <td class="col-width-md"><input type="text" class="form-control required" name="productCategoryProperty[#ID#].display_name"></td>
+        <td class="col-width-md">
+            <select class="form-control" name="productCategoryProperty[#ID#].value_type">
+                <#list valueTypes as valueType>
+                    <option value="${valueType}">${_res.get("product_category.properties.value_type."+valueType?lower_case)}</option>
+                </#list>
+            </select>
+        </td>
+        <td class="col-width-md">
+            <select class="form-control" name="productCategoryProperty[#ID#].input_type">
+                <#list inputTypes as inputType>
+                    <option value="${inputType}">${_res.get("product_category.properties.input_type."+inputType?lower_case)}</option>
+                </#list>
+            </select>
+        </td>
+        <td><textarea rows="3" class="form-control" name="productCategoryProperty[#ID#].candidate_values"></textarea></td>
+        <td class="col-width-md"><input type="text" class="form-control" name="productCategoryProperty[#ID#].default_value"></td>
+        <td class="col-width-lg">
+            <label class="radio-inline">
+                <input type="radio" name="productCategoryProperty[#ID#].is_required" value="1" >${_res.get("product_category.properties.is_required.1")}
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="productCategoryProperty[#ID#].is_required" value="0" checked>${_res.get("product_category.properties.is_required.0")}
+            </label>
+        </td>
+        <td class="col-width-sm"><input type="text" class="form-control" name="productCategoryProperty[#ID#].sort_order" value="100"></td>
+        <td class="col-width-md">
+            <a class="btn btn-danger btn-sm" onclick="removeProperty(this);">删除</a>
+        </td>
+    </tr>
+</script>
+
+</#macro>
+<#macro css>
+    <style>
+        .col-width-lg{
+            width: 12%;
+        }
+        .col-width-md{
+            width: 10%;
+        }
+        .col-width-sm{
+            width: 8%;
+        }
+          .tips{
+            font-size: 12px;
+            color: #428bca;
+            padding-top: 10px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "product_category_select_option.ftl"/>
+<@layout.layout script css _res.get("menu.product_category") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/product_category": _res.get("breadcrumb.product_category")}/>
+    <@nav menus _res.get("breadcrumb.add")/>
+    <@msg message />
+    <form id="product_category_form" class="form-horizontal" role="form"
+          enctype="multipart/form-data"
+          action="${base}/product_category/save/" method="post">
+        <div class="form-group">
+            <label for="name" class="col-md-2 control-label">${_res.get("product_category.name")}</label>
+            <div class="col-md-6">
+                <input type="text" class="form-control required" id="name" name="productCategory.name">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label">${_res.get("product_category.parent")}</label>
+            <div class="col-md-6">
+                <select class="form-control" name="productCategory.parent_id">
+                    <option value=""></option>
+                    <#if !(parent_id??)>
+                        <#assign parent_id = 0>
+                    </#if>
+                    <@select productCategories parent_id?eval />
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label">${_res.get("product_category.promoted")}</label>
+            <div class="col-md-6">
+                <label class="radio-inline">
+                    <input type="radio" name="productCategory.promoted" value="1" checked>${_res.get("product_category.promoted.1")}
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="productCategory.promoted" value="0" >${_res.get("product_category.promoted.0")}
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label" name="productCategory.wholesale">${_res.get("product_category.wholesale")}</label>
+            <div class="col-md-6">
+                <label class="radio-inline">
+                    <input type="radio" name="productCategory.wholesale" value="1" >${_res.get("product_category.wholesale.1")}
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="productCategory.wholesale" value="0" checked>${_res.get("product_category.wholesale.0")}
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="productCategory.wholesale" value="2" >${_res.get("product_category.wholesale.2")}
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label" name="productCategory.is_show_products">${_res.get("product_category.is_show_products")}</label>
+            <div class="col-md-3">
+                <label class="radio-inline">
+                    <input type="radio" name="productCategory.is_show_products" value="1" checked >
+                ${_res.get("product_category.is_show_products.1")}
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="productCategory.is_show_products" value="0">
+                ${_res.get("product_category.is_show_products.0")}
+                </label>
+            </div>
+            <div class="col-md-3 tips">
+                提示：若设置为“否”，则不显示该类别下的产品
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="promoted_product_count" class="col-md-2 control-label">${_res.get("product_category.promoted_product_count")}</label>
+            <div class="col-md-2">
+                <input type="number" class="form-control required" id="promoted_product_count" name="productCategory.promoted_product_count" value="3">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-2 control-label">${_res.get("product.sort_order")}</label>
+            <div class="col-md-2">
+                <input type="number" class="form-control required" id="sort_order" name="productCategory.sort_order" value="100">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="cover" class="col-md-2 control-label">${_res.get("product_category.cover")}</label>
+            <div class="col-md-6">
+                <img width="100%">
+                <input type="file" class="form-control" accept="image/*" id="cover" name="cover" onchange="previewCover(this);">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="description" class="col-md-2 control-label">${_res.get("product_category.description")}</label>
+            <div class="col-md-6">
+                <textarea rows="3" class="form-control" id="description" name="productCategory.description"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2 control-label">${_res.get("product_category.properties")}</label>
+            <div class="col-md-10">
+                <table class="table table-bordered table-hover">
+                    <tr>
+                        <th>${_res.get("product_category.properties.display_name")}</th>
+                        <th>${_res.get("product_category.properties.value_type")}</th>
+                        <th>${_res.get("product_category.properties.input_type")}</th>
+                        <th>${_res.get("product_category.properties.candidate_values")}</th>
+                        <th>${_res.get("product_category.properties.default_value")}</th>
+                        <th>${_res.get("product_category.properties.is_required")}</th>
+                        <th>${_res.get("product_category.properties.sort_order")}</th>
+                        <th>${_res.get("product_category.properties.action")}</th>
+                    </tr>
+
+                    <tr id="create-property-tr">
+                        <td colspan="10">
+                            <a id="create-property-btn" class="btn btn-info">新建属性</a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <hr>
+        <button id="submitBtn" type="submit" class="btn btn-primary">${_res.get("btn.submit")}</button>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+    </form>
+</@layout.layout>

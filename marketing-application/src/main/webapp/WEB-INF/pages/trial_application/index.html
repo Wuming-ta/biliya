@@ -1,0 +1,221 @@
+<#macro script>
+    <script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+
+    <script>
+         $(document).ready(function() {
+            $('.datepicker').datepicker();
+
+            $("#rejectForm").validate({ });
+
+            $('#rejectModal').on('show.bs.modal', function (event) {
+              var button = $(event.relatedTarget);
+              var applicationId = button.data('application-id');
+              var modal = $(this);
+              modal.find('#rejectForm').attr('action','${base}/trial_application/reject/' + applicationId + '?returnUrl=${returnUrl!}');
+            });
+
+            $("#deliverForm").validate({ });
+
+            $('#deliverModal').on('show.bs.modal', function (event) {
+              var button = $(event.relatedTarget);
+              var applicationId = button.data('application-id');
+              var modal = $(this);
+              modal.find('#deliverForm').attr('action','${base}/trial_application/expressInfo/' + applicationId + '?returnUrl=${returnUrl!}');
+            });
+        });
+
+    </script>
+</#macro>
+<#macro css>
+    <style><#include "common.css"/></style>
+</#macro>
+<#macro modal>
+
+<div class="modal fade" id="deliverModal" tabindex="-1" role="dialog" aria-labelledby="deliverModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">发货</h4>
+            </div>
+            <div class="modal-body">
+                <form id="deliverForm" method="post">
+                    <div class="form-group">
+                        <label>快递公司</label>
+                        <select class="form-control" name="expressId">
+                        <#list expresses as express>
+                            <option value="${express.id}">${express.name}</option>
+                        </#list>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>${_res.get("order.express_number")}</label>
+                        <input class="form-control" type="text" name="expressNumber" placeholder="${_res.get("order.express_number")}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">${_res.get("close")}</button>
+                        <button type="submit"  class="btn btn-primary">${_res.get("submit")}</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">拒绝试用申请</h4>
+            </div>
+            <div class="modal-body">
+                <form id="rejectForm" method="post">
+                    <div class="form-group">
+                        <label for="note" class="control-label">拒绝原因<span class="star-required">*</span></label>
+                        <textarea class="form-control required" name="trialApplication.note" id="note" rows="5"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">${_res.get("close")}</button>
+                        <button type="submit"  class="btn btn-primary">${_res.get("submit")}</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+</#macro>
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+<#include "../template/message.ftl" />
+<#include "../template/pagination.ftl" />
+<#include "./_trial_application_label.ftl" />
+<#include "../trial/_trial_label.ftl" />
+<@layout.layout script css  _res.get("breadcrumb.trial_application") modal >
+<#assign menus = {"/": _res.get("breadcrumb.home"), "/trial": _res.get("breadcrumb.trial")}>
+<@nav menus _res.get("breadcrumb.trial_application")/>
+<@msg message/>
+<#assign returnUrl>/trial_application%3fpageNumber=${pageNumber!}%26pageSize=${pageSize!}%26trial_id=${trial_id!}%26status=${status!}%26start_time=${start_time!}%26end_time=${end_time!}%26version=${version!}</#assign>
+
+
+<#if trial??>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <span class="template-title">基本信息</span>
+    </div>
+    <table class="table table-bordered">
+        <tr>
+            <th style="width:5%;">${_res.get("id")}</th>
+            <th style="width:5%;">${_res.get("marketing.trial.trial.cover")}</th>
+            <th style="width:18%;">${_res.get("marketing.trial.trial.name")}</th>
+            <th style="width:20%">${_res.get("marketing.trial.trial.product_name")}</th>
+            <th style="width:8%">${_res.get("marketing.trial.trial.enabled")}</th>
+            <th style="width:24%;">${_res.get("marketing.trial.trial.valid_period")}</th>
+            <th style="width:10%;">${_res.get("marketing.trial.trial.index")}</th>
+        </tr>
+        <tr>
+            <td>${trial.id!}</td>
+            <td>
+                <#if trial.cover??>
+                    <div class="cover-image" style="background-image: url(${trial.cover!});"></div>
+                </#if>
+            </td>
+            <td>
+                <a href="${base}/trial/edit/${trial.id}">${trial.name!}</a>
+            </td>
+            <td>
+                <a href="${base}/product/edit/${trial.product_id}">${trial.product.name!}</a>
+            </td>
+            <td>
+                 <span class="label <@trialEnabled trial.enabled />">${_res.get("marketing.trial.trial.enabled." +  "${trial.enabled!}")}</span>
+            </td>
+            <td>${trial.valid_period!}</td>
+            <td>${trial.index!}</td>
+        </tr>
+    </table>
+</div>
+</#if>
+
+<div class="search-box">
+    <form role="form" class="form-inline">
+        <input type="hidden" name="trial_id" value="${trial_id!}" />
+        <div class="form-group">
+            <label>${_res.get("status")}</label>
+            <select name="status" class="form-control">
+                <option value=""></option>
+                <#list statuses as st>
+                    <option value="${st!}" <#if status?? && status==st>selected="selected"</#if>>
+                        ${_res.get('marketing.trial.trial_application.status.' + st)}
+                    </option>
+                </#list>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>${_res.get("start_time")}</label>
+            <input class="form-control datepicker" name="start_time" data-date-format="yyyy-mm-dd" value="${start_time!}" />
+        </div>
+        <div class="form-group">
+            <label>${_res.get("end_time")}</label>
+            <input class="form-control datepicker" name="end_time" data-date-format="yyyy-mm-dd" value="${end_time!}" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">${_res.get("search")}</button>
+    </form>
+</div>
+<table class="table table-hover">
+    <tr>
+        <th style="=width:5%"></th>
+        <th style="width:15%;">${_res.get("marketing.trial.trial_application.trial_name")}</th>
+        <th style="width:15%;">${_res.get("marketing.trial.trial_application.order_number")}</th>
+        <th style="width:10%;">${_res.get("marketing.trial.trial_application.status")}</th>
+        <th style="width:15%">${_res.get("marketing.trial.trial_application.created_time")}</th>
+        <th style="width:15%">用户信息</th>
+        <th style="width:25%;">${_res.get("action")}</th>
+    </tr>
+    <#list trialApplications.list as trialApplication>
+        <tr>
+            <td><div class="cover-image" style="background-image: url(${trialApplication.cover!});"></div></td>
+            <td>${trialApplication.name!}</td>
+            <td><a href="${base}/order/detail?order_number=${trialApplication.order_number!}">${trialApplication.order_number!}</a></td>
+            <td>
+                <span class="label <@trialApplicationStatus trialApplication.status />">
+                    ${_res.get("marketing.trial.trial_application.status." +  "${trialApplication.status!}")}
+                </span>
+            </td>
+            <td>${trialApplication.created_time!}</td>
+            <td>
+                <div>${trialApplication.user_name!}</div>
+                <div>${trialApplication.phone!}</div>
+            </td>
+            <td>
+                <a class="btn btn-primary btn-sm" href="${base}/trial_application/detail/${trialApplication.id!}">${_res.get("view")}</a>
+                <@shiro.hasPermission name="marketing.trial_application.delete">
+                    <a class="btn btn-danger btn-sm" href="${base}/trial_application/delete/${trialApplication.id}?returnUrl=${returnUrl!}"
+                        onclick="javascript:if (confirm('${_res.get("delete_confirm")}')){return true;} return false;">${_res.get("delete")}</a>
+                </@shiro.hasPermission>
+                <@shiro.hasPermission name="marketing.trial_application.edit">
+                    <#if (trialApplication.status)?? && (trialApplication.status == "AUDITING")>
+                        <a class="btn btn-primary btn-sm"
+                           href="${base}/trial_application/agree/${trialApplication.id}?returnUrl=${returnUrl}"
+                           onclick="javascript:if (confirm('${_res.get("marketing.trial.trial_application.agree_confirm")}')){return true;} return false;"
+                        > ${_res.get("agree")}</a>
+                        <a class="btn btn-primary btn-sm" data-toggle="modal" data-target="#rejectModal" data-application-id="${trialApplication.id}">${_res.get("reject")}</a>
+                    </#if>
+
+                    <#if (trialApplication.status)?? && (trialApplication.status == "DELIVERING")>
+                    <a class="btn btn-info btn-sm" data-toggle="modal" data-target="#deliverModal" data-application-id="${trialApplication.id}">发货</a>
+                    </#if>
+
+                </@shiro.hasPermission>
+            </td>
+        </tr>
+    </#list>
+    <#if trialApplications.list?size == 0>
+        <td colspan="15">${_res.get("haven't.any.record")}</td>
+    </#if>
+</table>
+<@paginate currentPage=trialApplications.pageNumber totalPage=trialApplications.totalPage actionUrl="${base}/trial_application?pageNumber=" urlParas="&pageSize=${pageSize!}&trial_id=${trial_id!}&status=${status!}&start_time=${start_time!}&end_time=${end_time!}&version=${version!}" />
+
+</@layout.layout>

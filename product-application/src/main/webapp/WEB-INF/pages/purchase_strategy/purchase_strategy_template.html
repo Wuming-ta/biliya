@@ -1,0 +1,29 @@
+
+<div class="purchase ${purchaseStrategy.name?replace('.','-')}">
+    <div class="VISIBLE">
+        <label class="radio-inline">
+            <input type="radio" name="productPurchaseStrategyItem[ID].operator" value="AND" checked> 并且满足以下策略
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="productPurchaseStrategyItem[ID].operator" value="OR"> 或者满足以下策略
+        </label>
+    </div>
+    <div style="border: 1px solid #ddd; padding: 10px;">
+        <input type="hidden" name="productPurchaseStrategyItem[ID].name" value="${purchaseStrategy.name}">
+        <p class="form-control-static">${_res.get("purchase_strategy.name")}: ${purchaseStrategy.displayName}</p>
+        <div class="row">
+            <#list purchaseStrategy.parameterDefinition as definition>
+                <div class="col-xs-3 text-right">
+                    <span class="form-control-static">${definition.displayName}:</span>
+                </div>
+                <div class="col-xs-3">
+                    <input type="<#if definition.type=='INTEGER'>number<#else>text</#if>"
+                           class="form-control required" name="parameterDefinition[ID${definition_index}].value">
+                    <input type="hidden" name="parameterDefinition[ID${definition_index}].item_id" value="ID">
+                    <input type="hidden" name="parameterDefinition[ID${definition_index}].name" value="${definition.name}">
+                    <input type="hidden" name="parameterDefinition[ID${definition_index}].type" value="${definition.type}">
+                </div>
+            </#list>
+        </div>
+    </div>
+</div>

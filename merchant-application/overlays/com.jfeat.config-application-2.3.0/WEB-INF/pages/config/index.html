@@ -1,0 +1,122 @@
+<#macro script>
+    <#include "./pwd-validate-modal.js" />
+    <script src="${base}/assets/js/bootstrap-switch.min.js"></script>
+    <script>
+  $(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+    $("form").validate();
+    $("input:checkbox").bootstrapSwitch();
+  });
+</script>
+</#macro>
+
+<#macro css>
+    <link href="${base}/assets/css/bootstrap-switch.min.css" rel="stylesheet" />
+    <style>
+    .bootstrap-switch .bootstrap-switch-handle-off,
+    .bootstrap-switch .bootstrap-switch-handle-on,
+    .bootstrap-switch .bootstrap-switch-label {
+        font-size: 12px;
+    }
+    </style>
+</#macro>
+<#macro modal>
+    <#include "./pwd-validate-modal.html" />
+</#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.config") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.config")/>
+    <@msg message />
+
+    <#if groups??>
+        <div class="row">
+        <#list groups as group>
+
+            <#assign groupVisible = false/>
+            <#list group.configs as config>
+                <#assign groupVisible = groupVisible || config.visible == 1 />
+            </#list>
+
+            <#if groupVisible>
+            <div class="col-md-6">
+                <form id="form"  action="${base}/config/save" method="post">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">${group.name}</div>
+                        <table class="table">
+                            <#list group.configs as config>
+                                <#if config.visible==1>
+                                <tr>
+                                    <input type="hidden" name="config[${config_index}].id" value="${config.id}">
+                                    <input type="hidden" name="config[${config_index}].value_type" value="${config.value_type}">
+                                    <input type="hidden" name="config[${config_index}].key_name" value="${config.key_name}">
+
+                                    <td>${config.name}</td>
+                                    <#if (config.value_type! == "String")>
+                                        <td>
+                                            <input data-toggle="tooltip" data-placement="bottom" title="${config.description!}"
+                                                   type="text" class="form-control" name="config[${config_index}].value"
+                                                   value="${config.value!}" <#if config.readonly==1>readonly</#if> >
+                                        </td>
+                                    <#elseif (config.value_type! == "password")>
+                                        <td>
+                                            <input type="password" data-toggle="tooltip" data-placement="bottom" title="${config.description!}"
+                                                   type="text" class="form-control" name="config[${config_index}].value"
+                                                   value="${config.value!}" <#if config.readonly==1>readonly</#if> >
+                                        </td>
+                                    <#elseif (config.value_type! == "int" || config.value_type! == "float")>
+                                        <td>
+                                            <input data-toggle="tooltip" data-placement="bottom" title="${config.description!}"
+                                                   type="number" class="form-control" name="config[${config_index}].value"
+                                                   value="${config.value!}" <#if config.readonly==1>readonly</#if>>
+                                        </td>
+                                    <#elseif (config.value_type! == "boolean")>
+                                        <td>
+                                            <label>
+                                                <input type="checkbox" name="config[${config_index}].value" <#if (config.value! == "true")>checked="checked"</#if> <#if config.readonly==1>readonly</#if>>
+                                            </label>
+                                        </td>
+                                    <#elseif (config.value_type! == "text")>
+                                        <td>
+                                            <textarea class="form-control" rows="3" data-toggle="tooltip" data-placement="bottom" title="${config.description!}"
+                                                      name="config[${config_index}].value">${config.value!}</textarea>
+                                        </td>
+
+                                    <#else>
+                                        <td>
+                                            <input data-toggle="tooltip" data-placement="bottom" title="${config.description!}"
+                                                   type="text" class="form-control" name="config[${config_index}].value"
+                                                   value="${config.value!}" <#if config.readonly==1>readonly</#if>>
+                                        </td>
+                                    </#if>
+                                </tr>
+                                </#if>
+                            </#list>
+                            <tr>
+                                <td colspan="2">
+                                    <#if group.protected>
+                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"
+                                           data-title="该组配置受密码保护！"
+                                           data-return-url="/config">
+                                            保存
+                                        </button>
+                                    <#else>
+                                        <button type="submit" class="btn btn-primary">保存</button>
+                                    </#if>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            </#if>
+
+        </#list>
+        </div>
+    </#if>
+
+
+</@layout.layout>

@@ -1,0 +1,136 @@
+<#macro script>
+    <script>
+  $(document).ready(function(){
+    $("#withdraw-form").validate();
+    $("#save-physical-seller-form").validate();
+  });
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .col-head {
+          width: 150px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.physicalSeller") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/physical_seller": _res.get("breadcrumb.physicalSeller")}/>
+    <@nav menus _res.get("breadcrumb.detail")/>
+    <@msg message />
+
+    <#assign seller = physicalSeller.seller />
+    <#assign user = seller.user />
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">${_res.get("partner.seller.summary")}</h3>
+        </div>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <td class="col-head">${_res.get("partner.physical_seller.uid")}</td>
+                <td>${user.uid!}</td>
+            </tr>
+            <tr>
+                <td>${_res.get("partner.physical_seller.name")}</td>
+                <td>${user.name!}</td>
+            </tr>
+            <tr>
+                <td>${_res.get("partner.physical_seller.real_name")}</td>
+                <td>${user.real_name!'-'}</td>
+            </tr>
+            <tr>
+                <td>${_res.get("partner.physical_seller.phone")}</td>
+                <td>${user.phone!'-'}</td>
+            </tr>
+            <tr>
+                <td>${_res.get("partner.physical_seller.created_date")}</td>
+                <td>${physicalSeller.created_date!}</td>
+            </tr>
+            <tr>
+                <td>${_res.get("partner.physical_seller.parent.name")}</td>
+                <td>
+                    <#if physicalSeller.verboseParent??>
+                        <#assign parentPhysicalSeller = physicalSeller.verboseParent/>
+                        <a href="${base}/physical_seller/detail?id=${parentPhysicalSeller.id}">${parentPhysicalSeller.user_name!}</a>
+                    <#else>
+                        -
+                    </#if>
+                </td>
+            </tr>
+            <tr>
+                <td>${_res.get("partner.seller.partnership")}</td>
+                <td>
+                    ${_res.get("partner.seller.partnership."+seller.partner_ship)}
+                    <#if (seller.partner_ship==1)>
+                        - ${_res.get("partner.seller.partnership.time")} - ${seller.partner_ship_time!}
+                    </#if>
+                </td>
+            </tr>
+            <tr>
+                <td>${_res.get("partner.seller.crownship")}</td>
+                <td>
+                    ${_res.get("partner.seller.crownship."+seller.crown_ship)}
+                    <#if (seller.crown_ship_temp==1)>
+                        <span class="label label-info">临时</span>
+                    </#if>
+                    <#if (seller.crown_ship==1)>
+                        - ${_res.get("partner.seller.crownship.time")} - ${seller.crown_ship_time!}
+                    </#if>
+                    - ${_res.get("partner.seller.crown_apply_failure_times")} - ${seller.crown_apply_failure_times!}次
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">${_res.get("partner.physical_seller.children")}</h3>
+        </div>
+        <div class="panel-body">
+            <form class="form-inline"
+                  id="save-physical-seller-form"
+                  action="${base}/physical_seller/save" method="post">
+                <input type="text"
+                       class="form-control required"
+                       name="uid"
+                       placeholder="要添加的线下成员的UID">
+                <input type="hidden" name="sellerId" value="${seller.id}">
+                <input type="hidden" name="returnUrl" value="${base}/physical_seller/detail?id=${physicalSeller.id}">
+                <button type="submit" class="btn btn-primary">为该经销商添加线下成员</button>
+            </form>
+        </div>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th style="width: 20%">${_res.get("partner.physical_seller.uid")}</th>
+                <th>${_res.get("partner.physical_seller.name")}</th>
+                <th>${_res.get("partner.physical_seller.real_name")}</th>
+                <th>${_res.get("partner.physical_seller.phone")}</th>
+                <th></th>
+                <th>${_res.get("partner.physical_seller.created_date")}</th>
+            </tr>
+            <#list physicalSeller.verboseChildren as p>
+                <tr>
+                    <#assign s = p.seller />
+                    <td>${p.uid!}</td>
+                    <td><a href="${base}/physical_seller/detail?id=${p.id}">${p.user_name!}</a></td>
+                    <td>${p.real_name!'-'}</td>
+                    <td>${p.phone!'-'}</td>
+                    <td>
+                        <span class="label <#if s.partner_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.partner")}</span>
+                        <span class="label <#if s.crown_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.crown")}</span>
+                    </td>
+                    <td>${p.created_date!}</td>
+                </tr>
+            </#list>
+            <#if (physicalSeller.children?size==0)>
+                <td colspan="20">No Data</td>
+            </#if>
+        </table>
+    </div>
+
+</@layout.layout>

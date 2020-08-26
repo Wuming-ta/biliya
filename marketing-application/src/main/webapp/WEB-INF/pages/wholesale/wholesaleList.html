@@ -1,0 +1,138 @@
+<#macro script>
+    <script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.datepicker').datepicker();
+        });
+    </script>
+</#macro>
+<#macro css>
+    <style>
+        .show-off{
+        color:red;
+        font-size:18px
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+<#include "./_wholesale_label.ftl" />
+<#include "../template/pagination.ftl" />
+<@layout.layout script css _res.get("breadcrumb.wholesale_list") modal>
+<#assign menus = {"/": _res.get("breadcrumb.home"), "/wholesale": _res.get("breadcrumb.wholesale")} />
+<@nav menus _res.get("breadcrumb.wholesale_list") />
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <span class="template-title">基本信息</span>
+    </div>
+    <table class="table table-bordered">
+        <tr>
+            <th style="width:5%;">${_res.get("id")}</th>
+            <th style="width:5%;">${_res.get("marketing.wholesale.wholesale.cover")}</th>
+            <th style="width:20%;">${_res.get("marketing.wholesale.wholesale.marketing_name")}</th>
+            <th style="width:20%;">${_res.get("marketing.wholesale.wholesale.product_name")}</th>
+            <th style="width:8%;">${_res.get("marketing.wholesale.wholesale.status")}</th>
+            <th style="width:8%;">${_res.get("marketing.wholesale.wholesale.sale")}</th>
+        </tr>
+        <tr>
+            <td>${wholesale.id!}</td>
+            <td>
+                <#if wholesale.cover??>
+                    <img height="50" src="${wholesale.cover!}" />
+                </#if>
+            </td>
+            <td>
+                <a href="${base}/wholesale/edit/${wholesale.id}">
+                    ${wholesale.marketing_name!}
+                </a>
+            </td>
+            <td>
+                <a href="${base}/product/edit/${wholesale.product_id}">
+                    ${wholesale.product.name!}
+                </a>
+            </td>
+            <td>
+                <span class="label <@wholesaleStatus wholesale.status />">${_res.get("marketing.wholesale.wholesale.status." + wholesale.status?lower_case)}</span>
+            </td>
+            <td>${wholesale.sale!}</td>
+        </tr>
+    </table>
+</div>
+
+<div class="search-box">
+    <form role="form" class="form-inline">
+        <div class="form-group">
+            <label>${_res.get("status")}</label>
+            <select name="status"  class="form-control">
+                <option value=""></option>
+                <#list statuses as s>
+                    <option value="${s!}" <#if status?? && status == s>selected="selected"</#if>>
+                    ${_res.get("marketing.wholesale.wholesale_member.status."+ s?lower_case)}</option>
+                </#list>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>${_res.get("start_time")}</label>
+            <input class="form-control datepicker" name="startTime" data-date-format="yyyy-mm-dd" value="${startTime!}" />
+        </div>
+        <div class="form-group">
+            <label>${_res.get("end_time")}</label>
+            <input class="form-control datepicker" name="endTime" data-date-format="yyyy-mm-dd" value="${endTime!}" />
+        </div>
+        <button type="submit" class="btn btn-primary">${_res.get("btn.search")}</button>
+    </form>
+</div>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <span class="template-title">购买信息</span>
+    </div>
+    <table class="table table-bordered table-hover">
+        <tr>
+            <th style="width:8%">${_res.get("id")}</th>
+            <th style="width:8%">${_res.get("avatar")}</th>
+            <th style="width:13%">uid</th>
+            <th style="width:13%">${_res.get("marketing.wholesale.wholesale_member.user_name")}</th>
+            <th style="width:8%">${_res.get("status")}</th>
+            <th style="width:16%">${_res.get("marketing.wholesale.wholesale_member.order_number")}</th>
+            <th style="width:10%">${_res.get("marketing.wholesale.wholesale_member.total_price")}</th>
+            <th style="width:14%">${_res.get("marketing.wholesale.wholesale_member.created_time")}</th>
+        </tr>
+        <#list wholesaleMembers.list as wholesaleMember>
+            <tr>
+                <td>${(wholesaleMember.id)!}</td>
+                <td>
+                    <#if (wholesaleMember.user.avatar)??>
+                        <img src="${wholesaleMember.user.avatar!}" height="40"><#else><img src="${base}/assets/img/find_user.png" height="60">
+                    </#if>
+                </td>
+                <td>${(wholesaleMember.user.uid)!}</td>
+                <td>
+                    <div>${(wholesaleMember.user.name)!}</div>
+                    <div><span class="small text-muted">${_res.get("marketing.wholesale.wholesale_member.user_real_name")}: </span>${wholesaleMember.user.real_name!'-'}</div>
+                    <div><span class="small text-muted">${_res.get("marketing.wholesale.wholesale_member.phone")}: </span>${wholesaleMember.user.phone!'-'}</div>
+                </td>
+                <td>
+                    <span class="label <@wholesaleMemberStatus wholesaleMember.status />">
+                        ${_res.get("marketing.wholesale.wholesale_member.status." + wholesaleMember.status?lower_case)}
+                    </span>
+                </td>
+                <td>
+                    <a href="${base}/order/detail?order_number=${wholesaleMember.order_number!}">
+                        ${wholesaleMember.order_number!}
+                    </a>
+                </td>
+                <td>${wholesaleMember.total_price!}</td>
+                <td>${(wholesaleMember.created_time)!}</td>
+            </tr>
+        </#list>
+        <#if wholesaleMembers.list?size == 0>
+            <tr><td colspan="10">暂无购买者</td></tr>
+        </#if>
+    </table>
+</div>
+<@paginate currentPage=wholesaleMembers.pageNumber totalPage=wholesaleMembers.totalPage actionUrl="${base}/wholesale/wholesaleList/${wholesale.id!}?pageNumber=" urlParas="&pageSize=${pageSize!}&status=${status!}&startTime=${startTime!}&endTime=${endTime!}" />
+
+
+
+</@layout.layout>

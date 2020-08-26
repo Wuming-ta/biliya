@@ -1,0 +1,57 @@
+<#macro script>
+    <#include "listSkus.js" />
+</#macro>
+<div style="margin-top: 10px;">
+    <form class="form-inline">
+        <div class="form-group">
+            <label>编号: </label>
+            <input type="text" class="form-control" id="sku-code" value="${skuCode!}">
+        </div>
+        <div class="form-group">
+            <label>条形码: </label>
+            <input type="text" class="form-control" id="bar-code" value="${barCode!}">
+        </div>
+        <div class="form-group">
+            <label>名称: </label>
+            <input type="text" class="form-control" id="sku-name" value="${skuName!}">
+        </div>
+        <div class="form-group">
+            <a class="btn btn-info" id="search-sku" onclick="searchSkus('#SPEC_VIRTUAL_ID#');">搜索</a>
+        </div>
+    </form>
+</div>
+<div id="sku">
+    <div style="margin-top: 10px">
+        <table class="table">
+            <tr>
+                <th>编号</th>
+                <th>条形码</th>
+                <th>名称</th>
+                <th>成本价</th>
+            </tr>
+            <#list skus as sku>
+            <tr>
+                <td>${sku.skuCode!}</td>
+                <td>${sku.barCode!}</td>
+                <td><a href="#" onclick="selectLink('${sku.id!}', '${sku.skuCode!}','${sku.skuName!}', '${sku.barCode!}', '#SPEC_VIRTUAL_ID#')">${sku.skuName!}</a></td>
+                <td>${sku.skuPrice!}</td>
+            </tr>
+        </#list>
+        </table>
+
+    </div>
+
+    <nav>
+        <ul class="pager">
+            <#if (skusPageNumber != 1) >
+                <li><a href="#" onclick="getSkus(${skusPageNumber - 1}, '${skuCode!}', '${skuName!}', '${barCode!}');">上一页</a></li>
+            </#if>
+            <#if (skusTotalPage > skusPageNumber) >
+                <li><a href="#" onclick="getSkus(${skusPageNumber + 1}, '${skuCode!}', '${skuName!}', '${barCode!}');">下一页</a></li>
+            </#if>
+        </ul>
+    </nav>
+</div>
+
+
+

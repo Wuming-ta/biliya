@@ -1,0 +1,28 @@
+
+
+<!-- Modal -->
+    <div class="modal fade bs-example-modal-sm" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <form class="form-horizontal" id="pwd-form">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">确定吗？</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="col-xs-9 col-md-10">
+                                <input type="hidden" id="return-url" name="returnUrl" />
+                                <input type="password" id="pwd" name="pwd" class="form-control" placeholder="请输入密码" required/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">${_res.get("btn.cancel")}</button>
+                        <button type="button" class="btn btn-primary" id="ok-btn">
+                        ${_res.get("btn.ok")}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>

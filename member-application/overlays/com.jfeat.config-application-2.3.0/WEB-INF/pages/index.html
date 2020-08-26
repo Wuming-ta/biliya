@@ -1,0 +1,49 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+      var nodes = {};
+      <#list widgets as w>
+      nodes["${w.id}"] = "${w.url}";
+      </#list>
+      $.map(nodes, function(value, index){
+          console.log(index + ", " + value);
+          $.get(value, function(result) {
+              var dom = "#widget-" + index;
+              $(dom).html(result);
+          });
+      });
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "./template/layout.ftl" as layout>
+<@layout.layout script css productName modal>
+    <#assign width=0, start=true>
+    <#list widgets as w>
+        <#if (w_index == 0) || start>
+            <div class="row">
+                <#assign start=false>
+        </#if>
+
+        <#assign width=width+w.width>
+        <#if (width==12)>
+            <#assign width=0, start=true>
+            <div id="widget-${w.id}" class="col-md-${w.width} col-sm-12 col-xs-12"></div>
+            </div>
+            <#elseif (width>12)>
+                </div>
+                <div class="row">
+                    <div id="widget-${w.id}" class="col-md-${w.width} col-sm-12 col-xs-12">}</div>
+                    <#assign width=w.width>
+            <#else>
+                <div id="widget-${w.id}" class="col-md-${w.width} col-sm-12 col-xs-12"></div>
+                <#if !(w_has_next)>
+                </div>
+            </#if>
+        </#if>
+
+    </#list>
+
+</@layout.layout>
+

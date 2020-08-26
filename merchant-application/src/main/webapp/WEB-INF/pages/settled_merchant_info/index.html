@@ -1,0 +1,127 @@
+<#macro script>
+    <script src="${base}/assets/js/jquery.qrcode.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            jQuery("#merchant-qrcode").qrcode("${wxHost!}/app?mid=${settledMerchant.id}&invite_code=${settledMerchant.invite_code!}");
+        });
+    </script>
+</#macro>
+<#macro css>
+    <style>
+        <#include "../settled_merchant/common.css" />
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+<#include "../template/message.ftl" />
+<#include "../settled_merchant/settled_merchant_status_label.ftl" />
+<@layout.layout script css _res.get("breadcrumb.settled_merchant_info") modal>
+    <#assign menus={"/": _res.get("breadcrumb.home")} />
+    <@nav menus _res.get("breadcrumb.settled_merchant_info") />
+    <@msg message />
+
+    <#if settledMerchant??>
+        <div class="header">基本信息</div>
+        <table class="table table-bordered table-hover">
+            <tr>
+                <td class="col-key">${_res.get("merchant.settled_merchant.name")}</td>
+                <td class="col-value">
+                    ${settledMerchant.name!}
+                </td>
+                <td class="col-key">${_res.get("merchant.settled_merchant_type.name")}</td>
+                <td class="col-value">
+                    ${(settledMerchant.settledMerchantType.name)!}
+                </td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("merchant.settled_merchant.status")}</td>
+                <td>
+                    <#if settledMerchant.status??>
+                                <span class="label <@statusLabel settledMerchant.status/>">
+                                    ${_res.get("merchant.settled_merchant." + settledMerchant.status?lower_case)}
+                                </span>
+                    </#if>
+                </td>
+                <td class="col-key">${_res.get("merchant.settled_merchant.phone")}</td>
+                <td class="col-value">${settledMerchant.phone!}</td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("merchant.settled_merchant.contact_user")}</td>
+                <td class="col-value">${settledMerchant.contact_user!}</td>
+                <td class="col-key">${_res.get("merchant.settled_merchant.contact_phone")}</td>
+                <td class="col-value">${settledMerchant.contact_phone!}</td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("merchant.settled_merchant.contact_email")}</td>
+                <td class="col-value">${settledMerchant.contact_email!}</td>
+                <td class="col-key">${_res.get("merchant.settled_merchant.id_number")}</td>
+                <td class="col-value">${settledMerchant.id_number!}</td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("merchant.settled_merchant.business_license_number")}</td>
+                <td class="col-value">${settledMerchant.business_license_number!}</td>
+                <td class="col-key">${_res.get("merchant.settled_merchant.address")}</td>
+                <td class="col-value">${settledMerchant.address!}</td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("merchant.settled_merchant.url")}</td>
+                <td class="col-value" colspan="3">${wxHost!}/app?mid=${settledMerchant.id}</td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("merchant.settled_merchant.qrcode")}</td>
+                <td class="col-value" colspan="3"><div id="merchant-qrcode"></div></td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("merchant.settled_merchant.description")}</td>
+                <td class="col-value" colspan="3">${settledMerchant.description!}</td>
+            </tr>
+        </table>
+
+        <div class="header">其他信息</div>
+        <table class="table table-bordered table-hover">
+            <tr>
+                <td class="col-key">${_res.get("merchant.settled_merchant.quality_ranking")}</td>
+                <td class="col-value">${settledMerchant.quality_ranking!}</td>
+                <td class="col-key">${_res.get("merchant.settled_merchant.attitude_ranking")}</td>
+                <td class="col-value">${settledMerchant.attitude_ranking!}</td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("merchant.settled_merchant.express_ranking")}</td>
+                <td class="col-value">${settledMerchant.express_ranking!}</td>
+            </tr>
+        </table>
+
+        <div class="header">图片信息</div>
+        <table class="table table-bordered table-hover">
+            <tr>
+                <td class="col-key">${_res.get("merchant.settled_merchant.logo")}</td>
+                <td class="col-value">
+                    <div  class="cover-box">
+                        <img width="85" src="${settledMerchant.logo!}">
+                    </div>
+                </td>
+                <td class="col-key">${_res.get("merchant.settled_merchant.business_license_image")}</td>
+                <td class="col-value">
+                    <div  class="cover-box">
+                        <img width="85" src="${settledMerchant.business_license_image!}">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("merchant.settled_merchant.id_front")}</td>
+                <td class="col-value">
+                    <div  class="cover-box">
+                        <img width="85" src="${settledMerchant.id_front!}">
+                    </div>
+                </td>
+                <td class="col-key">${_res.get("merchant.settled_merchant.id_back")}</td>
+                <td class="col-value">
+                    <div  class="cover-box">
+                        <img width="85" src="${settledMerchant.id_back!}" >
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </#if>
+</@layout.layout>

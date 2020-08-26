@@ -1,0 +1,78 @@
+<#macro script>
+<script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+<script>
+  $(document).ready(function(){
+    $('.datepicker').datepicker();
+  });
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .col-head {
+          width: 150px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.physicalSeller") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/physical_seller": _res.get("breadcrumb.physicalSeller")}/>
+    <@nav menus _res.get("breadcrumb.physicalPurchaseJournal")/>
+    <@msg message />
+
+    <div class="search-box">
+        <form class="form-inline">
+            <div class="form-group">
+                <label>${_res.get("partner.seller.uid")}</label>
+                <input type="text" name="uid" class="form-control" value="${uid!}">
+            </div>
+            <div class="form-group">
+                <label>${_res.get("partner.physical_seller.purchase_journal.start_date")}</label>
+                <input id="startDate" name="startDate" class="form-control datepicker" data-date-format="yyyy-mm-dd" value="${startDate!}">
+            </div>
+            <div class="form-group">
+                <label>${_res.get("partner.physical_seller.purchase_journal.end_date")}</label>
+                <input id="endDate" name="endDate" class="form-control datepicker" data-date-format="yyyy-mm-dd" value="${endDate!}">
+            </div>
+
+            <button type="submit" class="btn btn-primary">${_res.get("partner.seller.search")}</button>
+        </form>
+    </div>
+
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th style="width: 15%">${_res.get("partner.physical_seller.purchase_journal.created_date")}</th>
+            <th style="width: 10%">${_res.get("partner.physical_seller.purchase_journal.amount")}</th>
+            <th style="width: 10%">${_res.get("partner.physical_seller.purchase_journal.product_settlement_proportion")}</th>
+            <th style="width: 10%">${_res.get("partner.physical_seller.purchase_journal.expected_reward")}</th>
+            <th style="width: 20%">${_res.get("partner.seller.uid")}</th>
+            <th style="width: 20%">${_res.get("partner.seller.name")}</th>
+            <th style="width: 25%">${_res.get("partner.physical_seller.purchase_journal.note")}</th>
+        </tr>
+        <#list historicalPurchaseJournal.list as journal>
+            <tr>
+                <td>${journal.created_date!}</td>
+                <td>${journal.amount!}</td>
+                <td>${journal.product_settlement_proportion!}</td>
+                <td>${journal.expected_reward!}</td>
+                <td>${journal.uid!}</td>
+                <td>
+                    <div>${journal.user_name!}</div>
+                    <div>${_res.get("partner.physical_seller.real_name")}:${journal.real_name!}</div>
+                    <div>${_res.get("partner.physical_seller.phone")}:${journal.phone!}</div>
+                </td>
+                <td>${journal.note!}</td>
+            </tr>
+        </#list>
+        <#if historicalPurchaseJournal.list?size == 0>
+            <tr>
+                <td colspan="10">No Data</td>
+            </tr>
+        </#if>
+    </table>
+    <@paginate currentPage=historicalPurchaseJournal.pageNumber totalPage=historicalPurchaseJournal.totalPage actionUrl="${base}/physical_seller/purchaseJournalList?pageNumber=" urlParas="&uid=${uid!}"/>
+
+</@layout.layout>

@@ -1,0 +1,379 @@
+<#macro script>
+    <script>
+      $(document).ready(function(){
+        $("#seller-form").validate();
+        $("#agent-form").validate();
+        $("#physical-agent-form").validate();
+        $("#partner-level-form").validate();
+        $("#partner-form").validate();
+        $("#platform-form").validate();
+        $("#crown-form").validate();
+        $("#physical-form").validate();
+      });
+
+      function removeProportion(element) {
+        $(element).parents("tr").remove();
+      }
+      var id = 0;
+      function addProportion(element) {
+        var html = $("#physical-proportion-template").html().replace(/#ID#/g, id--);
+        $(element).parents("tr").before(html);
+      }
+    </script>
+    <script type="text/html" id="physical-proportion-template">
+        <tr>
+            <td>
+                <input type="number" name="physicalSettlementProportion[#ID#].min_amount" min="0" class="form-control required">
+                至
+                <input type="number" name="physicalSettlementProportion[#ID#].max_amount" class="form-control required" placeholder="-1表示无穷大">
+            </td>
+            <td>
+                <input type="number" name="physicalSettlementProportion[#ID#].percentage"  min="0" max="100" class="form-control required">
+            </td>
+            <td>
+                <a class="btn btn-danger btn-sm" onclick="removeProportion(this);">删除</a>
+            </td>
+        </tr>
+    </script>
+</#macro>
+
+<#macro css>
+    <style>
+        .padding{
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .line {
+            margin-bottom: 10px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.settings") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.settings")/>
+    <@msg message />
+
+    <#if sellerSettlementProportionsVisible>
+    <section id="seller">
+        <div class="panel panel-primary">
+            <div class="panel-heading">${_res.get("partner.settings.seller")}</div>
+            <form id="seller-form" class="form-inline" action="${base}/settings/sellerSave" method="post">
+            <div class="panel-body">
+                <div class="form-group padding">
+                    <label>设置最大分销层级</label>
+                    <input type="hidden" name="merchantOptions.id" class="form-control" value=1>
+                    <input type="text" name="merchantOptions.max_level" class="form-control required" value="${merchantOptions.max_level!}">
+                </div>
+                <div class="form-group padding">
+                    <label>分成计算基数</label>
+                    <label class="radio-inline">
+                        <input type="radio" name="sellerSettlementType" value="PROFIT" <#if sellerSettlementType == 'PROFIT'>checked</#if> > ${_res.get("partner.settings.settlement_types.profit")}
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="sellerSettlementType" value="SALES_AMOUNT" <#if sellerSettlementType == 'SALES_AMOUNT'>checked</#if>> ${_res.get("partner.settings.settlement_types.sales_amount")}
+                    </label>
+                </div>
+            </div>
+                <table class="table table-hover table-bordered">
+                    <tr>
+                        <th>级别</th>
+                        <th>分销级别名称</th>
+                        <th>分成比例（%）</th>
+                        <!--<th>每月最低销售额</th>-->
+                    </tr>
+                    <#list sellerSettlementProportions as settlementProportion>
+                        <#assign proportionObject = settlementProportion.proportionObject />
+                        <tr>
+                            <input type="hidden" name="settlementProportion[${settlementProportion_index}].id" value="${settlementProportion.id!}">
+                            <input type="hidden" name="proportion[${settlementProportion.id!}].percentage" value="${proportionObject.percentage?c}">
+                            <input type="hidden" name="proportion[${settlementProportion.id!}].settlementProportionId" value="${settlementProportion.id!}">
+                            <td>${settlementProportion.level!}</td>
+                            <td><input type="text" name="settlementProportion[${settlementProportion_index}].name" class="form-control required"  value="${settlementProportion.name!}"></td>
+                            <td><input type="number" name="proportion[${settlementProportion.id!}].value" class="form-control required" value="${proportionObject.value!}"></td>
+                            <!--<td><input type="number" name="settlementProportion[${settlementProportion_index}].turnover_quota" class="form-control required" value="${settlementProportion.turnover_quota!}"></td>-->
+                        </tr>
+                    </#list>
+                    <tr>
+                        <td colspan="10">
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </section>
+    </#if>
+
+    <#if agentSettlementProportionsVisible>
+    <section id="agent">
+        <div class="panel panel-primary">
+            <div class="panel-heading">${_res.get("partner.settings.agent")}</div>
+            <form id="agent-form" class="form-inline" action="${base}/settings/agentSave" method="post">
+                <table class="table table-hover table-bordered">
+                    <tr>
+                        <th>代理级别</th>
+                        <th>分成比例（%）</th>
+                        <th>每月最低销售额</th>
+                    </tr>
+                    <#list agentSettlementProportions as settlementProportion>
+                        <#assign proportionObject = settlementProportion.proportionObject />
+                        <tr>
+                            <input type="hidden" name="settlementProportion[${settlementProportion_index}].id" value="${settlementProportion.id!}">
+                            <input type="hidden" name="proportion[${settlementProportion.id!}].percentage" value="${proportionObject.percentage?c}">
+                            <input type="hidden" name="proportion[${settlementProportion.id!}].settlementProportionId" value="${settlementProportion.id!}">
+                            <td>${settlementProportion.name!}</td>
+                            <td><input type="number" name="proportion[${settlementProportion.id!}].value" class="form-control required" value="${proportionObject.value!}"></td>
+                            <td><input type="number" name="settlementProportion[${settlementProportion_index}].turnover_quota" class="form-control required" value="${settlementProportion.turnover_quota!}"></td>
+                        </tr>
+                    </#list>
+                    <tr>
+                        <td colspan="10">
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </section>
+    </#if>
+
+    <#if physicalAgentSettlementProportionsVisible>
+    <section id="physical_agent">
+        <div class="panel panel-primary">
+            <div class="panel-heading">${_res.get("partner.settings.physical_agent")}</div>
+            <form id="physical-agent-form" class="form-inline" action="${base}/settings/physicalAgentSave" method="post">
+                <table class="table table-hover table-bordered">
+                    <tr>
+                        <th>代理级别</th>
+                        <th>分成比例（%）</th>
+                        <th>每月最低销售额</th>
+                    </tr>
+                    <#list physicalAgentSettlementProportions as settlementProportion>
+                        <#assign proportionObject = settlementProportion.proportionObject />
+                        <tr>
+                            <input type="hidden" name="settlementProportion[${settlementProportion_index}].id" value="${settlementProportion.id!}">
+                            <input type="hidden" name="proportion[${settlementProportion.id!}].percentage" value="${proportionObject.percentage?c}">
+                            <input type="hidden" name="proportion[${settlementProportion.id!}].settlementProportionId" value="${settlementProportion.id!}">
+                            <td>${settlementProportion.name!}</td>
+                            <td><input type="number" name="proportion[${settlementProportion.id!}].value" class="form-control required" value="${proportionObject.value!}"></td>
+                            <td><input type="number" name="settlementProportion[${settlementProportion_index}].turnover_quota" class="form-control required" value="${settlementProportion.turnover_quota!}"></td>
+                        </tr>
+                    </#list>
+                    <tr>
+                        <td colspan="10">
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </section>
+    </#if>
+
+    <#if partnerSettlementProportionsVisible>
+    <section id="partner">
+        <div class="panel panel-primary">
+            <div class="panel-heading">${_res.get("partner.settings.partner")}</div>
+            <form id="partner-level-form" class="form-inline" action="${base}/settings/partnerLevelSave" method="post">
+                <table class="table table-hover table-bordered">
+                    <tr>
+                        <th>级别</th>
+                        <th>名称</th>
+                        <th>人数</th>
+                    </tr>
+                    <#list partnerLevels as level>
+                        <input type="hidden" name="partnerLevel[${level.id}].id" value="${level.id}">
+                        <tr>
+                            <td>${level.level}</td>
+                            <td><input type="text" class="form-control required" name="partnerLevel[${level.id}].name" value="${level.name}"></td>
+                            <td><input type="number" class="form-control <#if level.level lt 6>required</#if>" name="partnerLevel[${level.id}].headcount_quota" value="${level.headcount_quota!}"></td>
+                        </tr>
+                    </#list>
+                    <tr>
+                        <td colspan="10">
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+
+            <hr>
+
+            <form id="partner-form" class="form-inline padding" action="${base}/settings/partnerSave" method="post">
+                <table class="table table-hover table-bordered">
+                    <tr>
+                        <th>级别</th>
+                        <th>名称</th>
+                        <th>零元区分成</th>
+                        <th>精品区分成</th>
+                        <th>特价区分成</th>
+                    </tr>
+                    <#list partnerSettlementProportions as settlementProportion>
+                        <#assign proportionObject = settlementProportion.proportionObject, zeroZone = proportionObject.getValue(1), superiorZone = proportionObject.getValue(2), specialZone = proportionObject.getValue(3) />
+                        <tr>
+                            <input type="hidden" name="settlementProportion[${settlementProportion_index}].id" value="${settlementProportion.id!}">
+                            <input type="hidden" name="proportion[${settlementProportion.id!}].fixedvalue" value="${proportionObject.fixedvalue?c}">
+                            <td>${settlementProportion.level!}</td>
+                            <td><input type="text" name="settlementProportion[${settlementProportion_index}].name" class="form-control required" value="${settlementProportion.name!}"></td>
+                            <td><input type="number" name="proportion[${settlementProportion.id!}].1" class="form-control required" value="${zeroZone!}"></td>
+                            <td><input type="number" name="proportion[${settlementProportion.id!}].2" class="form-control required" value="${superiorZone!}"></td>
+                            <td><input type="number" name="proportion[${settlementProportion.id!}].3" class="form-control required" value="${specialZone!}"></td>
+                        </tr>
+                    </#list>
+                    <tr>
+                        <td colspan="10">
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </section>
+    </#if>
+
+    <#if crownSettlementProportionsVisible>
+    <section id="crown">
+        <div class="panel panel-primary">
+            <div class="panel-heading">${_res.get("partner.settings.crown")}</div>
+            <form id="crown-form" class="form-inline padding" action="${base}/settings/crownSave" method="post">
+                <table class="table table-hover table-bordered">
+                    <tr>
+                        <th>名称</th>
+                        <#list partnerLevelZones as z>
+                            <th>${z.name}分成</th>
+                        </#list>
+                    </tr>
+                    <#assign proportionObject = crownSettlementProportions.proportionObject />
+                    <tr>
+                        <input type="hidden" name="settlementProportion.id" value="${crownSettlementProportions.id!}">
+                        <input type="hidden" name="proportion.fixedvalue" value="${proportionObject.fixedvalue?c}">
+                        <td><input type="text" name="settlementProportion.name" class="form-control required" value="${crownSettlementProportions.name!}"></td>
+                        <#list partnerLevelZones as z>
+                            <td><input type="number" name="proportion.${z.key}" class="form-control required" value="${proportionObject.getValue(z.key?number)!}"></td>
+                        </#list>
+                    </tr>
+                    <tr>
+                        <td colspan="10">
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </section>
+    </#if>
+
+    <#if platformSettlementProportionsVisible>
+    <section id="platform">
+        <div class="panel panel-primary">
+            <div class="panel-heading">${_res.get("partner.settings.platform")}</div>
+            <div class="panel-body">
+                <form id="platform-form" class="form-inline" action="${base}/settings/platformSave" method="post">
+                    <#assign proportionObject = platformSettlementProportions.proportionObject />
+                    <div class="form-group">
+                        <label>分成比例</label>
+                        <input type="hidden" name="settlementProportion.id" value="${platformSettlementProportions.id!}">
+                        <input type="hidden" name="proportion.percentage" value="${proportionObject.percentage?c}">
+                        <input type="number" name="proportion.value" class="form-control required" value="${proportionObject.value!}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </form>
+            </div>
+        </div>
+    </section>
+    </#if>
+
+    <#if physicalCrownSettlementProportionsVisible>
+    <section id="physical">
+        <div class="panel panel-primary">
+            <div class="panel-heading">${_res.get("partner.settings.physical")}</div>
+            <form id="physical-form" class="form-inline padding" action="${base}/settings/physicalSave" method="post">
+                <div class="panel-body">
+                    <table class="table table-hover table-bordered">
+                        <tr>
+                            <th>线下皇冠商最大提成总额</th>
+                            <th>${physicalCrownSettlementProportions[0].name}</th>
+                            <th>${physicalCrownSettlementProportions[1].name}</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="hidden" name="physicalSettlementDefinition.id" class="form-control" value=1>
+                                <input type="number" name="physicalSettlementDefinition.amount" class="form-control required" value="${physicalSettlementDefinition.amount!}" placeholder="-1表示没有限制">
+                            </td>
+                            <td>
+                                <input type="hidden" name="settlementProportion[0].id" value="${physicalCrownSettlementProportions[0].id}" />
+                                <input type="hidden" name="proportion[${physicalCrownSettlementProportions[0].id}].fixedvalue" value="${(physicalCrownSettlementProportions[0].proportionObject.fixedvalue?c)!}" />
+                                <input type="number" class="form-control required" name="proportion[${physicalCrownSettlementProportions[0].id}].value" value="${(physicalCrownSettlementProportions[0].proportionObject.value)!}" />
+                            </td>
+                            <td>
+                                <input type="hidden" name="settlementProportion[1].id" value="${physicalCrownSettlementProportions[1].id}" />
+                                <input type="hidden" name="proportion[${physicalCrownSettlementProportions[1].id}].fixedvalue" value="${(physicalCrownSettlementProportions[1].proportionObject.fixedvalue?c)!}" />
+                                <input type="number" class="form-control required" name="proportion[${physicalCrownSettlementProportions[1].id}].value" value="${(physicalCrownSettlementProportions[1].proportionObject.value)!}" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <table class="table table-hover table-bordered">
+                    <tr>
+                        <th>销售额(元)</th>
+                        <th>提成比例(%)</th>
+                        <th>操作</th>
+                    </tr>
+                    <#list physicalSettlementProportions as proportion>
+                    <tr>
+                        <input type="hidden" name="physicalSettlementProportion[${proportion.id}].id" value="${proportion.id}">
+                        <td>
+                            <input type="number" name="physicalSettlementProportion[${proportion.id}].min_amount" class="form-control required" min="0" value="${proportion.min_amount}">
+                            至
+                            <input type="number" name="physicalSettlementProportion[${proportion.id}].max_amount" class="form-control required" value="${proportion.max_amount}" placeholder="-1表示无穷大">
+                        </td>
+                        <td>
+                            <input type="number" name="physicalSettlementProportion[${proportion.id}].percentage" class="form-control required" min="0" max="100" value="${proportion.percentage}">
+                        </td>
+                        <td>
+                            <a class="btn btn-danger btn-sm" onclick="removeProportion(this);">删除</a>
+                        </td>
+                    </tr>
+                    </#list>
+                    <tr>
+                        <td colspan="10">
+                            <a class="btn btn-default btn-sm" onclick="addProportion(this);">添加</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="10">
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </section>
+    </#if>
+
+    <#if copartnerSettlementProportionsVisible>
+    <section id="copartner">
+        <div class="panel panel-primary">
+            <div class="panel-heading">${_res.get("partner.settings.copartner")}</div>
+            <form id="copartner-form" class="form-inline padding" action="${base}/settings/copartnerSave" method="post">
+                <#assign proportionObject = copartnerSettlementProportions.proportionObject />
+                <div class="form-group">
+                    <label>分成比例</label>
+                    <input type="hidden" name="settlementProportion.id" value="${copartnerSettlementProportions.id!}">
+                    <input type="hidden" name="proportion.percentage" value="${proportionObject.percentage?c}">
+                    <input type="number" name="proportion.value" class="form-control required" value="${proportionObject.value!}">
+                </div>
+                <button type="submit" class="btn btn-primary">保存</button>
+            </form>
+        </div>
+    </section>
+    </#if>
+
+</@layout.layout>

@@ -1,0 +1,128 @@
+<#macro script>
+<script>
+    <#include 'editPcdQualify.js' />
+</script>
+    <#include 'qualify.tpl.js' />
+</#macro>
+
+<#macro css>
+    <style>
+        .save-btn-div {
+            padding:10px 0px;
+        }
+
+        .district-col {
+            width: 45%;
+        }
+
+        .proportion-col {
+            width: 35%;
+        }
+
+        .action-col {
+            width: 20%;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl" />
+<@layout.layout script css _res.get("breadcrumb.pcd_qualify") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/agent": _res.get("breadcrumb.agent")}/>
+    <@nav menus _res.get("breadcrumb.pcd_qualify")/>
+    <@msg message />
+    <div style="float:right;">
+        <span class="label label-info" >提示</span>
+        若某地区不设置提成比例，则使用默认提成比例
+    </div>
+    <form class="form-inline" action="${base}/agent/updatePcdQualify" method="post">
+        <div class="save-btn-div">
+
+            <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+        <div class="row">
+            <div class="col-md-4" id="provinceQualify">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">省级代理提成比例（%）</h3>
+                    </div>
+                    <div class="panel-body">
+                        省级默认提成比例
+                        <input type="hidden" name="settlementProportion[${provinceSettlementProportion.id}].id" value="${provinceSettlementProportion.id!}">
+                        <input type="hidden" name="proportion[${provinceSettlementProportion.id}].percentage" value="${provinceSettlementProportion.proportionObject.percentage?c}">
+                        <input type="hidden" name="proportion[${provinceSettlementProportion.id}].settlementProportionId" value="${provinceSettlementProportion.id}">
+                        <input type="number" class="form-control" name="proportion[${provinceSettlementProportion.id}].value"  value="${(provinceSettlementProportion.proportionObject.value)!}">
+                    </div>
+
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th class="district-col">省</th>
+                            <th class="proportion-col">提成比例（%）</th>
+                            <th class="action-col"></th>
+                        </tr>
+                        </thead>
+                        <tbody id="province-qualify-tbody">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-4" id="cityQualify">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">市级代理提成比例（%）</h3>
+                    </div>
+                    <div class="panel-body">
+                        默认提成比例
+                        <input type="hidden" name="settlementProportion[${citySettlementProportion.id}].id" value="${citySettlementProportion.id!}">
+                        <input type="hidden" name="proportion[${citySettlementProportion.id}].percentage" value="${citySettlementProportion.proportionObject.percentage?c}">
+                        <input type="hidden" name="proportion[${citySettlementProportion.id}].settlementProportionId" value="${citySettlementProportion.id}">
+                        <input type="number" class="form-control" name="proportion[${citySettlementProportion.id}].value"  value="${(citySettlementProportion.proportionObject.value)!}">
+                    </div>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th class="district-col">市</th>
+                            <th class="proportion-col">提成比例（%）</th>
+                            <th class="action-col"></th>
+                        </tr>
+                        </thead>
+                        <tbody id="city-qualify-tbody">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-4" id="districtQualify">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            县级代理提成比例（%）
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        默认提成比例
+                        <input type="hidden" name="settlementProportion[${districtSettlementProportion.id}].id" value="${districtSettlementProportion.id!}">
+                        <input type="hidden" name="proportion[${districtSettlementProportion.id}].percentage" value="${districtSettlementProportion.proportionObject.percentage?c}">
+                        <input type="hidden" name="proportion[${districtSettlementProportion.id}].settlementProportionId" value="${districtSettlementProportion.id}">
+                        <input type="number" class="form-control" name="proportion[${districtSettlementProportion.id}].value"  value="${(districtSettlementProportion.proportionObject.value)!}">
+                    </div>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th class="district-col">区</th>
+                            <th class="proportion-col">提成比例（%）</th>
+                        </tr>
+                        </thead>
+                        <tbody id="district-qualify-tbody">
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </form>
+</@layout.layout>

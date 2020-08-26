@@ -1,0 +1,47 @@
+<#macro script>
+<script>
+        $(document).ready(function(){
+
+        });
+    </script>
+</#macro>
+<#macro css>
+<style></style>
+</#macro>
+<#macro modal></#macro>
+
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+
+<@layout.layout script css _res.get("breadcrumb.product_tag") modal>
+<#assign menus={"/": _res.get("breadcrumb.home")} />
+<@nav menus _res.get("breadcrumb.product_tag") />
+
+<div class="search-box">
+    <a class="btn btn-primary" href="${base}/product_tag/add">${_res.get("product_tag.btn.new")}</a>
+</div>
+<table class="table table-hover">
+    <tr>
+        <th style="width:25%;">${_res.get("product_tag.identifier")}</th>
+        <th style="width:25%;">${_res.get("product_tag.name")}</th>
+        <th style="width:15%;">${_res.get("product_tag.sort_order")}</th>
+        <th style="width:35%;">${_res.get("action")}</th>
+    </tr>
+    <#list tags as tag>
+    <tr>
+        <td>${tag.identifier!}</td>
+        <td>${tag.name!}</td>
+        <td>${tag.sort_order!}</td>
+        <td>
+            <a href="${base}/product_tag/edit/${tag.id!}" class="btn btn-primary btn-sm">${_res.get("btn.edit")}</a>
+            <a href="${base}/product_tag/delete/${tag.id!}" class="btn btn-danger btn-sm"
+               onclick="return confirm('${_res.get('product_tag.delete_confirm')}');">${_res.get("btn.delete")}
+            </a>
+        </td>
+    </tr>
+</#list>
+<#if tags?size == 0>
+<tr><td colspan="10">没有任何标签</td></tr>
+</#if>
+</table>
+</@layout.layout>

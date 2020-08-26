@@ -1,0 +1,125 @@
+<#macro script>
+    <script>
+        $(document).ready(function(){
+
+        });
+    </script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+<#include "../template/message.ftl" />
+<#include "../template/pagination.ftl" />
+<#include "_wholesale_label.ftl" />
+<@layout.layout script css  _res.get("breadcrumb.wholesale") modal >
+    <#assign menus={"/": _res.get("breadcrumb.home")} />
+    <@nav menus _res.get("breadcrumb.wholesale") />
+    <@msg message/>
+    <#assign returnUrl>/wholesale%3fpageNumber=${pageNumber!}%26pageSize=${pageSize!}%26marketingName=${marketingName!}%26status=${status!}</#assign>
+    <div class="search-box">
+        <form role="form" class="form-inline">
+            <div class="form-group">
+                <label>${_res.get("marketing.wholesale.wholesale.wholesale_category_name")}</label>
+                <select class="form-control" name="categoryId">
+                    <option value=""></option>
+                    <#list wholesaleCategories as wholesaleCategory>
+                        <option value="${wholesaleCategory.id!}" <#if categoryId?? && categoryId!="" && categoryId?number==wholesaleCategory.id>selected="selected"</#if>>${wholesaleCategory.name!}</option>
+                    </#list>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>${_res.get("marketing.wholesale.wholesale.marketing_name")}</label>
+                <input class="form-control" name="marketingName" value="${marketingName!}" />
+            </div>
+            <div class="form-group">
+                <label>${_res.get("marketing.wholesale.wholesale.status")}</label>
+                <select name="status" class="form-control">
+                    <option value=""></option>
+                    <#list statuses as s>
+                        <option value="${s!}" <#if (status?? && status == s)>selected="selected"</#if>>
+                        ${_res.get("marketing.wholesale.wholesale.status." + s?lower_case)}
+                        </option>
+                    </#list>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">${_res.get("btn.search")}</button>
+            <@shiro.hasPermission name="marketing.wholesale.edit">
+                <span class="vertical-separator"></span>
+                <a class="btn btn-primary" href="${base}/wholesale/add">${_res.get("marketing.wholesale.wholesale.btn.new")}</a>
+                <span class="vertical-separator"></span>
+                <a class="btn btn-primary" href="${base}/wholesale_category">批发类别</a>
+                <#if (marketingConfig.enabled)?? && (marketingConfig.enabled == 0) || (marketingConfig.enabled == 1)>
+                    <span class="vertical-separator"></span>
+                    <a class="btn btn-primary <#if marketingConfig.enabled = 0>btn-warning<#else>btn-success</#if>"
+                        href="${base}/wholesale/switchEnabled/${marketingConfig.enabled!}"
+                        <#if marketingConfig.enabled==1>onclick="return confirm('禁用批发活动后，批发功能将失效，确定禁用吗？');"</#if>
+                    >
+                        ${_res.get("marketing.marketing_config.enabled.wholesale."+ marketingConfig.enabled)}
+                    </a>
+                </#if>
+            </@shiro.hasPermission>
+        </form>
+    </div>
+    <table class="table table-hover table-bordered table-striped">
+        <tr>
+            <th style="width:5%;">${_res.get("id")}</th>
+            <th style="width:5%;">${_res.get("marketing.wholesale.wholesale.cover")}</th>
+            <th style="width:13%;">${_res.get("marketing.wholesale.wholesale.marketing_name")}</th>
+            <th style="width:8%;">${_res.get("marketing.wholesale.wholesale.wholesale_category_name")}</th>
+            <th style="width:13%;">${_res.get("marketing.wholesale.wholesale.product_name")}</th>
+            <th style="width:8%;">${_res.get("marketing.wholesale.wholesale.status")}</th>
+            <th style="width:8%;">${_res.get("marketing.wholesale.wholesale.sale")}</th>
+            <th style="width:8%;">${_res.get("marketing.wholesale.wholesale.sort_order")}</th>
+            <th style="width:8%;">${_res.get("marketing.wholesale.wholesale.unit")}</th>
+            <th style="width:16%;">${_res.get("action")}</th>
+        </tr>
+        <#list wholesales.list as wholesale>
+        <tr>
+            <td>${wholesale.id!}</td>
+            <td>
+                <#if wholesale.cover??>
+                    <img height="50" src="${wholesale.cover!}" />
+                </#if>
+            </td>
+            <td>
+                <a href="${base}/wholesale/wholesaleList/${wholesale.id!}">
+                    ${wholesale.marketing_name!}
+                </a>
+            </td>
+            <td>${(wholesale.category.name)!}</td>
+            <td>
+                <a href="${base}/product/edit/${wholesale.product_id}">
+                    ${wholesale.product.name!}
+                </a>
+            </td>
+            <td>
+                <span class="label <@wholesaleStatus wholesale.status />">${_res.get("marketing.wholesale.wholesale.status." + wholesale.status?lower_case)}</span>
+            </td>
+            <td>${wholesale.sale!}</td>
+            <td>${wholesale.sort_order!}</td>
+            <td>${wholesale.unit!}</td>
+            <td>
+                <@shiro.hasPermission name="marketing.wholesale.delete">
+                <a class="btn btn-danger btn-sm" href="${base}/wholesale/delete/${wholesale.id}?returnUrl=${returnUrl!}"
+                   onclick="javascript:if (confirm('${_res.get("marketing.wholesale.wholesale.delete_confirm")}')){return true;} return false;">${_res.get("btn.delete")}</a>
+                </@shiro.hasPermission>
+                <@shiro.hasPermission name="marketing.wholesale.edit">
+                <a class="btn btn-primary btn-sm" href="${base}/wholesale/edit/${wholesale.id}?returnUrl=${returnUrl}">${_res.get("btn.edit")}</a>
+                <#if (wholesale.status)?? && (wholesale.status == 'INIT' || wholesale.status == 'OFFSELL')>
+                    <a class="btn btn-primary btn-sm" href="${base}/wholesale/onsell/${wholesale.id}?returnUrl=${returnUrl}">发布</a>
+                </#if>
+                <#if (wholesale.status)?? && (wholesale.status == 'ONSELL')>
+                    <a class="btn btn-primary btn-sm" href="${base}/wholesale/offsell/${wholesale.id}?returnUrl=${returnUrl}">停止</a>
+                </#if>
+                </@shiro.hasPermission>
+            </td>
+        </tr>
+        </#list>
+        <#if wholesales.list?size == 0>
+            <td colspan="10">${_res.get("haven't.any.record")}</td>
+        </#if>
+    </table>
+    <@paginate currentPage=wholesales.pageNumber totalPage=wholesales.totalPage actionUrl="${base}/wholesale?pageNumber=" urlParas="&pageSize=${pageSize!}&marketingName=${marketingName!}&status=${status!}" />
+
+</@layout.layout>

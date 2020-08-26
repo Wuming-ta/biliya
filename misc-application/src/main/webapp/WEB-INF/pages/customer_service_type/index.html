@@ -1,0 +1,69 @@
+<#macro script>
+    <script>
+    $(document).ready(function(){
+        $("#form").validate();
+    });
+
+    function checkName(id) {
+    var name = $("#name-"+id).val();
+    var $error = $("#name-error-"+id);
+    if (name != null && name != "") {
+        $error.addClass("hidden");
+        return true;
+    }
+    else {
+        $error.removeClass("hidden");
+        return false;
+    }
+}
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.customer_service_type") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.customer_service_type") />
+    <@msg message />
+
+    <div class="search-box">
+        <form id="form" class="form-inline" action="${base}/customer_service_type/save" method="post">
+            <input type="text" class="form-control required" name="customerServiceType.name">
+            <button type="submit" class="btn btn-primary">${_res.get("btn.customer.service.type.new")}</button>
+        </form>
+    </div>
+    <table class="table table-hover">
+        <tr>
+            <th>${_res.get("customer.service.type.id")}</th>
+            <th>${_res.get("customer.service.type.name")}</th>
+            <th>${_res.get("customer.service.type.action")}</th>
+        </tr>
+        <#list types as type>
+            <form action="${base}/customer_service_type/update/${type.id}" method="post" onsubmit="return checkName(${type.id});">
+                <input type="hidden" name="customerServiceType.id" value="${type.id}">
+                <tr>
+                    <td>${type.id}</td>
+                    <td>
+                        <input id="name-${type.id}" class="form-control required" type="text" name="customerServiceType.name" value="${type.name!}">
+                        <label class="error hidden" id="name-error-${type.id}">必须填写</label>
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-primary btn-sm">${_res.get("btn.update")}</button>
+                        <a class="btn btn-danger btn-sm" href="${base}/customer_service_type/delete/${type.id}"
+                           onclick="javascript:if (confirm('${_res.get("customer.service.type.delete.confirm")}')){return true;} return false;">${_res.get("btn.delete")}</a>
+                    </td>
+                </tr>
+            </form>
+        </#list>
+        <#if types?size == 0>
+            <tr>
+                <td colspan="10">No Data</td>
+            </tr>
+        </#if>
+
+    </table>
+
+</@layout.layout>

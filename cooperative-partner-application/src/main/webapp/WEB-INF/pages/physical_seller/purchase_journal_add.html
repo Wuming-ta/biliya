@@ -1,0 +1,97 @@
+<#macro script>
+<script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+<script>
+  $(document).ready(function(){
+    $('.datepicker').datepicker();
+    $("#save-purchase-journal-form").validate();
+  });
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .col-key {
+            width: 20%;
+        }
+        .col-value {
+            width: 30%;
+        }
+        .journal-header {
+          border-left: 4px solid orange;
+          font-size: 14px;
+          font-weight: bold;
+          margin: 5px 0px;
+          margin-top: 40px;
+          padding-left: 10px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.physicalSeller") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/physical_seller/purchaseJournalList": _res.get("breadcrumb.physicalPurchaseJournal")}/>
+    <@nav menus _res.get("breadcrumb.add")/>
+    <@msg message />
+
+    <form id="save-purchase-journal-form" class="form" action="${base}/physical_seller/savePurchaseJournal" method="post">
+        <input type="hidden" name="physicalPurchaseJournal.seller_id" value="${seller.id}">
+        <input type="hidden" name="returnUrl" value="${base}/physical_seller/addPurchaseJournal/${seller.id}">
+        <table class="table table-hover table-bordered">
+            <tr>
+                <td class="col-key">${_res.get("partner.seller.uid")}</td>
+                <td class="col-value">${user.uid}</td>
+                <td class="col-key">${_res.get("partner.seller.name")}</td>
+                <td class="col-value">${user.name}</td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("partner.physical_seller.phone")}</td>
+                <td class="col-value">${user.phone!}</td>
+                <td class="col-key">${_res.get("partner.physical_seller.real_name")}</td>
+                <td class="col-value">${user.real_name!}</td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("partner.physical_seller.purchase_journal.amount")}</td>
+                <td class="col-value">
+                    <input class="form-control required" type="number" name="physicalPurchaseJournal.amount">
+                </td>
+                <td class="col-key">${_res.get("partner.physical_seller.purchase_journal.created_date")}</td>
+                <td class="col-value">
+                    <input id="created_date" name="physicalPurchaseJournal.created_date" class="form-control datepicker" data-date-format="yyyy-mm-dd" placeholder="如不填写则为当前日期">
+                </td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("partner.physical_seller.purchase_journal.note")}</td>
+                <td colspan="3">
+                    <textarea class="form-control" rows="3" name="physicalPurchaseJournal.note"></textarea>
+                </td>
+            </tr>
+        </table>
+
+        <button type="submit" class="btn btn-primary">${_res.get("btn.submit")}</button>
+    </form>
+
+    <div class="journal-header">最近入货记录</div>
+    <table class="table table-hover">
+        <tr>
+            <th style="width: 20%">${_res.get("partner.physical_seller.purchase_journal.created_date")}</th>
+            <th style="width: 10%">${_res.get("partner.physical_seller.purchase_journal.amount")}</th>
+            <th style="width: 70%">${_res.get("partner.physical_seller.purchase_journal.note")}</th>
+        </tr>
+        <#list historicalPurchaseJournal as journal>
+            <tr>
+                <td>${journal.created_date!}</td>
+                <td>${journal.amount!}</td>
+                <td>${journal.note!}</td>
+            </tr>
+        </#list>
+        <#if historicalPurchaseJournal?size == 0>
+            <tr>
+                <td colspan="10">No Data</td>
+            </tr>
+        </#if>
+    </table>
+
+
+</@layout.layout>

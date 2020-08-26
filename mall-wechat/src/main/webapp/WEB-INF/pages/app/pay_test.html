@@ -1,0 +1,19 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+
+    <title>PayTest</title>
+</head>
+<body>
+
+<form action="${base}/app/pay_test_save">
+    订单号: <input type="text" name="orderNumber">
+    <input type="hidden" name="paytoken" value="${paytoken}">
+    <button type="submit">支付</button>
+</form>
+
+<a href="/app">返回商城</a>
+
+</body>
+</html>

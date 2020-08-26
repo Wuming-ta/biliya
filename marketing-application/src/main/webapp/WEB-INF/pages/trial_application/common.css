@@ -1,0 +1,17 @@
+.col-key{
+    text-align: center;
+    width:15%;
+}
+.col-value{
+    width: 20%;
+}
+.star-required{
+    color: red;
+}
+
+.cover-image {
+  height: 60px;
+  width: 60px;
+  background-size: cover;
+  background-position: center;
+}

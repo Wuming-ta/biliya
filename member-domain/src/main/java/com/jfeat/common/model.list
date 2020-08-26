@@ -1,0 +1,24 @@
+# put the model here using full package.
+# it must be under model package.
+# such as there is a table t_abc_efg, then the model class should be AbcEfg
+#
+# example:
+#com.jfeat.test.model.AbcEfg
+
+com.jfeat.member.model.MemberLevel
+com.jfeat.member.model.MemberExt
+com.jfeat.member.model.MemberPointHistory
+com.jfeat.member.model.CouponType
+com.jfeat.member.model.Coupon
+com.jfeat.member.model.CouponStrategy
+com.jfeat.member.model.CouponStrategyTakenRecord
+com.jfeat.member.model.Contact
+com.jfeat.member.model.CouponTemplate
+com.jfeat.member.model.CouponShare
+com.jfeat.member.model.CouponTakenRecord
+com.jfeat.member.model.UserCouponNotify
+com.jfeat.member.model.CouponOverdue
+com.jfeat.member.model.CouponStatistic
+com.jfeat.member.model.Wallet
+com.jfeat.member.model.WalletCharge
+com.jfeat.member.model.WalletHistory

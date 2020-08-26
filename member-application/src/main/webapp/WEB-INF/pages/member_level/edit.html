@@ -1,0 +1,36 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+    $("#form").validate();
+
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.member_level") modal>
+<#assign menus = {"/": _res.get("breadcrumb.home"), "/member_level": _res.get("breadcrumb.member_level")}>
+    <@nav menus _res.get("breadcrumb.edit")/>
+    <form id="form" class="form-horizontal" role="form" action="${base}/member_level/update" method="post">
+        <input type="hidden" name="memberLevel.id" value="${level.id}">
+        <div class="form-group">
+            <label for="name" class="col-lg-2 col-md-2 control-label">${_res.get("member.level.name")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="text" class="form-control required" id="name" name="memberLevel.name" value="${level.name}" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="point" class="col-lg-2 col-md-2 control-label">${_res.get("member.level.point")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="number" class="form-control required" id="point" name="memberLevel.point" value="${level.point}" required>
+            </div>
+        </div>
+
+        <hr>
+        <button id="submitBtn" type="submit" class="btn btn-primary">${_res.get("btn.update")}</button>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+
+    </form>
+</@layout.layout>

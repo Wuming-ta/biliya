@@ -1,0 +1,50 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+    $("#form").validate();
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.express") modal>
+<#assign menus = {"/": _res.get("breadcrumb.home"), "/express": _res.get("breadcrumb.express")}>
+    <@nav menus _res.get("breadcrumb.edit")/>
+    <@msg message />
+
+    <form id="form" class="form-horizontal" action="${base}/express/update" method="post">
+        <div class="form-group">
+            <input type="hidden" name="express.id" value="${express.id}">
+            <label for="name" class="col-lg-2 col-md-2 control-label">${_res.get("express.name")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="text" class="form-control required" id="name" name="express.name" value="${express.name}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="code" class="col-lg-2 col-md-2 control-label">${_res.get("express.code")}</label>
+            <div class="col-lg-4 col-md-6">
+                <input type="text" class="form-control required" id="code" name="express.code" value="${express.code}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 col-md-2 control-label">${_res.get("express.is_default")}</label>
+            <div class="col-lg-4 col-md-6">
+                <label class="radio-inline"> 
+                    <input type="radio" name="express.is_default" value="1" <#if express.is_default==1>checked</#if> >${_res.get("express.is_default.1")} 
+                </label>
+                 <label class="radio-inline"> 
+                <input type="radio" name="express.is_default" value="0" <#if express.is_default==0>checked</#if> > ${_res.get("express.is_default.0")}
+            </label>
+            </div>
+        </div>
+
+        <hr>
+        <button id="submitBtn" type="submit" class="btn btn-primary">${_res.get("btn.update")}</button>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+
+    </form>
+
+</@layout.layout>

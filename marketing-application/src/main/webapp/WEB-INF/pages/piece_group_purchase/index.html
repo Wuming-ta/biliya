@@ -1,0 +1,124 @@
+<#macro script>
+    <script>
+        $(document).ready(function() {
+
+        });
+    </script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+<#include "../template/pagination.ftl" />
+<#include "../template/message.ftl"/>
+<#include "./_piece_group_purchase_label.ftl" />
+<@layout.layout script css _res.get("menu.piece_group_purchase") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")} />
+    <@nav menus _res.get("breadcrumb.piece_group_purchase") />
+    <@msg message />
+    <#assign returnUrl>/piece_group_purchase%3fpageNumber=${pageNumber!}%26pageSize=${pageSize!}%26marketingName=${marketingName!}%26status=${status!}</#assign>
+    <div class="search-box">
+        <form role="form" class="form-inline">
+            <div class="form-group">
+                <label>${_res.get("marketing.piece.piece_group_purchase.marketing_name")}</label>
+                <input class="form-control" name="marketingName" value="${marketingName!}" />
+            </div>
+            <div class="form-group">
+                <label>${_res.get("marketing.piece.piece_group_purchase.status")}</label>
+                <select name="status" class="form-control">
+                    <option value=""></option>
+                    <#list statuses as s>
+                        <option value="${s!}" <#if (status?? && status == s)>selected="selected"</#if>>
+                            ${_res.get("marketing.piece.piece_group_purchase.status." + s?lower_case)}
+                        </option>
+                    </#list>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">${_res.get("btn.search")}</button>
+            <@shiro.hasPermission name="marketing.piece.edit">
+                <span class="vertical-separator"></span>
+                <a class="btn btn-primary" href="${base}/piece_group_purchase/add">${_res.get("marketing.piece.piece_group_purchase.btn.new")}</a>
+                <#if (marketingConfig.enabled)?? && (marketingConfig.enabled == 0) || (marketingConfig.enabled == 1)>
+                    <span class="vertical-separator"></span>
+                    <a class="btn btn-primary <#if marketingConfig.enabled = 0>btn-warning<#else>btn-success</#if>"
+                        href="${base}/piece_group_purchase/switchEnabled/${marketingConfig.enabled!}"
+                        <#if marketingConfig.enabled==1>onclick="return confirm('禁用拼团活动后，拼团功能将失效，确定禁用吗？');"</#if>
+                        >
+                        ${_res.get("marketing.marketing_config.enabled.piecegroup."+ marketingConfig.enabled)}
+                    </a>
+                </#if>
+            </@shiro.hasPermission>
+        </form>
+    </div>
+
+    <table class="table table-hover ">
+        <tr>
+            <th style="width: 5%;">${_res.get("id")}</th>
+            <th style="width: 5%;">${_res.get("marketing.piece.piece_group_purchase.cover")}</th>
+            <th style="width: 10%;">${_res.get("marketing.piece.piece_group_purchase.marketing_name")}</th>
+            <th style="width: 10%;">产品</th>
+            <th style="width: 8%;">${_res.get("marketing.piece.piece_group_purchase.status")}</th>
+            <th style="width: 8%;">${_res.get("marketing.piece.piece_group_purchase.payment_type")}</th>
+            <th style="width: 8%;">${_res.get("marketing.piece.piece_group_purchase.price")}</th>
+            <th style="width: 8%;">${_res.get("marketing.piece.piece_group_purchase.sale")}</th>
+            <th style="width: 8%;">${_res.get("marketing.piece.piece_group_purchase.duration")}</th>
+            <th style="width:8%;">${_res.get("marketing.piece.piece_group_purchase.sort_order")}</th>
+            <th style="width: 17%;">${_res.get("action")}</th>
+        </tr>
+        <#list pieceGroupPurchases.list as pieceGroupPurchase>
+        <tr>
+            <td>${pieceGroupPurchase.id!}</td>
+            <td>
+                <#if pieceGroupPurchase.cover??>
+                    <img height="50" src="${pieceGroupPurchase.cover!}" />
+                </#if>
+            </td>
+            <td>
+                <a href="${base}/piece_group_purchase/pieceGroupPurchaseList/${pieceGroupPurchase.id!}">${pieceGroupPurchase.marketing_name!}</a>
+            </td>
+            <td>
+                <a href="${base}/product/edit/${pieceGroupPurchase.product_id}">${pieceGroupPurchase.product.name!}</a>
+            </td>
+            <td>
+                <span class="label <@pieceGroupPurchaseStatus pieceGroupPurchase.status />">${_res.get("marketing.piece.piece_group_purchase.status." + pieceGroupPurchase.status?lower_case)}</span>
+            </td>
+            <td>
+                <#if pieceGroupPurchase.payment_type??>
+                    <#list pieceGroupPurchase.payment_type?split('|') as pt>
+                        <div style="margin-bottom: 2px">
+                            <span class="label label-success">${_res.get("marketing.piece.piece_group_purchase.payment_type." + pt?lower_case)}</span>
+                        </div>
+                    </#list>
+                </#if>
+            </td>
+            <td>${pieceGroupPurchase.price!}</td>
+            <td>${pieceGroupPurchase.sale!}</td>
+            <td><#if pieceGroupPurchase.duration??>${pieceGroupPurchase.duration/3600}</#if></td>
+            <td>${pieceGroupPurchase.sort_order!}</td>
+            <td>
+                <@shiro.hasPermission name="marketing.piece.delete">
+                    <a class="btn btn-danger btn-sm" href="${base}/piece_group_purchase/delete/${pieceGroupPurchase.id}?returnUrl=${returnUrl}"
+                        onclick="javascript:if (confirm('${_res.get("marketing.piece.piece_group_purchase.delete_confirm")}')){return true;} return false;">${_res.get("btn.delete")}</a>
+                </@shiro.hasPermission>
+                <@shiro.hasPermission name="marketing.piece.edit">
+                    <a class="btn btn-primary btn-sm" href="${base}/piece_group_purchase/edit/${pieceGroupPurchase.id}?returnUrl=${returnUrl}">${_res.get("btn.edit")}</a>
+                    <#if (pieceGroupPurchase.status)?? && (pieceGroupPurchase.status == 'INIT' || pieceGroupPurchase.status == 'OFFSELL' || pieceGroupPurchase.status == 'LOCK')>
+                    <a class="btn btn-primary btn-sm" href="${base}/piece_group_purchase/onsell/${pieceGroupPurchase.id}?returnUrl=${returnUrl}">发布</a>
+                    </#if>
+                    <#if (pieceGroupPurchase.status)?? && (pieceGroupPurchase.status == 'ONSELL' || pieceGroupPurchase.status == 'LOCK')>
+                    <a class="btn btn-primary btn-sm" href="${base}/piece_group_purchase/offsell/${pieceGroupPurchase.id}?returnUrl=${returnUrl}">停止</a>
+                    </#if>
+                    <#if (pieceGroupPurchase.status)?? && (pieceGroupPurchase.status == 'ONSELL')>
+                    <a class="btn btn-primary btn-sm" href="${base}/piece_group_purchase/lock/${pieceGroupPurchase.id}?returnUrl=${returnUrl}">锁定</a>
+                    </#if>
+                </@shiro.hasPermission>
+            </td>
+        </tr>
+        </#list>
+        <#if pieceGroupPurchases.list?size == 0>
+            <tr><td colspan="10">${_res.get("haven't.any.record")}</td></tr>
+        </#if>
+    </table>
+    <@paginate currentPage=pieceGroupPurchases.pageNumber totalPage=pieceGroupPurchases.totalPage actionUrl="${base}/piece_group_purchase?pageNumber=" urlParas="&pageSize=${pageSize!}&marketingName=${marketingName!}&status=${status!}" />
+</@layout.layout>
+

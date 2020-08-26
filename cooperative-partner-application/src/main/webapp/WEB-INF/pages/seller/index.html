@@ -1,0 +1,100 @@
+<#macro script>
+    <script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .col-summary-sm {
+          width: 110px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.seller") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.seller")/>
+    <@msg message />
+
+    <div class="search-box">
+        <form class="form-inline">
+            <div class="form-group">
+                <label>${_res.get("partner.seller.Id")}</label>
+                <input type="text" name="sellerId" class="form-control" value="${sellerId!}">
+            </div>
+            <div class="form-group">
+                <label>${_res.get("partner.seller.uid")}</label>
+                <input type="text" name="uid" class="form-control" value="${uid!}">
+            </div>
+            <button type="submit" class="btn btn-primary">${_res.get("partner.seller.search")}</button>
+        </form>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">${_res.get("partner.seller.common")}</h3>
+        </div>
+        <table class="table table-bordered">
+            <tr>
+                <td class="col-summary-sm">${_res.get("partner.seller.total_levels")}</td>
+                <td class="col-summary-sm">${totalLevel}</td>
+                <td class="col-summary-sm">${_res.get("partner.seller.total_all")}</td>
+                <td class="col-summary-sm">${totalCustomerCount + totalSellerCount}</td>
+                <td class="col-summary-sm">${_res.get("partner.seller.total_customers")}</td>
+                <td class="col-summary-sm">${totalCustomerCount}</td>
+                <td class="col-summary-sm">${_res.get("partner.seller.total_sellers")}</td>
+                <td class="col-summary-sm">${totalSellerCount}</td>
+                <td class="col-summary-sm">${_res.get("partner.partner.total_partners")}</td>
+                <td>${totalPartnerCount}</td>
+            </tr>
+        </table>
+    </div>
+
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th style="width: 5%">${_res.get("partner.seller.Id")}</th>
+            <th style="width: 14%">${_res.get("partner.seller.name")}</th>
+            <th style="width: 14%">${_res.get("partner.seller.parent_name")}</th>
+            <th style="width: 14%">${_res.get("partner.seller.partner_name")}</th>
+            <th style="width: 14%">${_res.get("partner.seller.crown_name")}</th>
+            <th style="width: 14%"></th>
+            <th style="width: 25%">${_res.get("partner.seller.action")}</th>
+        </tr>
+        <#list sellers.list as seller>
+            <tr>
+                <td>${seller.id}</td>
+                <td><a href="${base}/seller/detail?sellerId=${seller.id}">${seller.name!'-'}</a></td>
+                <td><a href="${base}/seller/detail?sellerId=${seller.parent_id!}">${seller.parent_name!}</a></td>
+                <td><a href="${base}/seller/detail?sellerId=${seller.partner_id!}">${seller.partner_name!}</a></td>
+                <td><a href="${base}/seller/detail?sellerId=${seller.crown_id!}">${seller.crown_name!}</a></td>
+                <td>
+                    <span class="label <#if seller.seller_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.seller")}</span>
+                    <span class="label <#if seller.partner_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.partner")}</span>
+                    <span class="label <#if seller.crown_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.crown")}</span>
+                </td>
+                <td>
+                    <a class="btn btn-primary btn-sm" href="${base}/seller/detail?sellerId=${seller.id}">${_res.get("partner.seller.detail")}</a>
+                    <#if (seller.seller_ship == 0)>
+                        <a class="btn btn-info btn-sm" href="${base}/seller/assign?sellerId=${seller.id}">${_res.get("partner.set.seller")}</a>
+                    </#if>
+                    <#if (seller.partner_ship == 0)>
+                        <a class="btn btn-info btn-sm" href="${base}/partner/assign?sellerId=${seller.id}&returnUrl=/seller">${_res.get("partner.set.partner")}</a>
+                    </#if>
+                    <#if (seller.crown_ship == 0)>
+                        <a class="btn btn-info btn-sm" href="${base}/crown/assign?sellerId=${seller.id}&returnUrl=/seller">${_res.get("partner.set.crown")}</a>
+                    </#if>
+                </td>
+            </tr>
+        </#list>
+        <#if (sellers.list?size==0)>
+            <td colspan="20">No Data</td>
+        </#if>
+    </table>
+    <@paginate currentPage=sellers.pageNumber totalPage=sellers.totalPage actionUrl="${base}/seller?pageNumber=" urlParas="&sellerId=${sellerId!}&uid=${uid!}"/>
+</@layout.layout>

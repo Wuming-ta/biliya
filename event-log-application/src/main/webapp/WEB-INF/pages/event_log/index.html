@@ -1,0 +1,65 @@
+<#macro script>
+<script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+<script>
+  $('.datepicker').datepicker();
+  $(document).ready(function(){
+
+  });
+</script>  
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/pagination.ftl"/>
+<#include "../template/breadcrumb.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.event_log") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.event_log") />
+
+    <div class="search-box">
+        <form class="form-inline" role="form">
+          <div class="form-group">
+            <label for="eventType">${_res.get("event_log.search.type")}</label>
+            <input type="text" class="form-control" name="eventType" id="eventType" value="${eventType!}">
+          </div>
+            <div class="form-group">
+                <label for="eventType">用户</label>
+                <input type="text" class="form-control" name="user" id="user" value="${user!}">
+            </div>
+          <div class="form-group">
+            <label for="startTime">${_res.get("event_log.search.start_time")}</label>
+            <input id="startTime" class="form-control datepicker" data-date-format="yyyy/mm/dd" name="startTime" value="${startTime!}">
+          </div>
+          <div class="form-group">
+            <label for="endTime">${_res.get("event_log.search.end_time")}</label>
+            <input id="endTime" class="form-control datepicker" data-date-format="yyyy/mm/dd" name="endTime" value="${endTime!}">
+          </div>
+          <button type="submit" class="btn btn-primary">${_res.get("event_log.search.btn.go")}</button>
+        </form>
+    </div>
+
+
+    <table class="table table-bordered">
+        <tr>
+            <th>${_res.get("event_log.event_type")}</th>
+            <th>${_res.get("event_log.name")}</th>
+            <th>${_res.get("event_log.user")}</th>
+            <th>${_res.get("event_log.ip")}</th>
+            <th style="width: 30%">${_res.get("event_log.user_agent")}</th>
+            <th>${_res.get("event_log.create_time")}</th>
+        </tr>
+        <#list logs.list as log>
+        <tr>
+            <td><a href="${base}/event_log?eventType=${log.event_type!}">${log.event_type!}</a></td>
+            <td><a href="${base}/event_log/show/${log.id}">${log.name!}</a></td>
+            <td>${log.user!}</td>
+            <td>${log.ip!}</td>
+            <td>${log.user_agent!}</td>
+            <td>${log.create_time!}</td>
+        </tr>
+        </#list>
+    </table>
+
+    <@paginate currentPage=logs.pageNumber totalPage=logs.totalPage actionUrl="${base}/event_log?pageNumber=" urlParas="&eventType=${eventType}&startTime=${startTime}&endTime=${endTime}"/>
+
+</@layout.layout>

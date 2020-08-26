@@ -1,0 +1,64 @@
+<#macro script>
+    <script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.faq") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.faq")/>
+    <@msg message />
+
+    <div class="search-box">
+        <a class="btn btn-primary" href="${base}/faq/add">添加常见问题</a>
+        <a class="btn btn-primary" href="${base}/faq/type">类型管理</a>
+    </div>
+
+    <table class="table table-hover ">
+        <tr>
+            <th>编号</th>
+            <th>
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">类型<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="${base}/faq">所有</a></li>
+                        <#list types as type>
+                            <li><a href="${base}/faq?typeId=${type.id}">${type.name}</a></li>
+                        </#list>
+                    </ul>
+                </div>
+            </th>
+            <th>标题</th>
+            <th>创建时间</th>
+            <th>最后修改时间</th>
+            <th>操作</th>
+        </tr>
+        <#list faqs.list as faq>
+            <tr>
+                <td>${faq.id!}</td>
+                <td>${faq.type_name!}</td>
+                <td>${faq.title!}</td>
+                <td>${faq.created_date!}</td>
+                <td>${faq.last_modified_date!}</td>
+                <td>
+                    <a class="btn btn-primary btn-sm" href="${base}/faq/edit/${faq.id}">编辑</a>
+                    <a class="btn btn-danger btn-sm" href="${base}/faq/delete/${faq.id}"
+                       onclick="javascript:if (confirm('确定要删除吗？')){return true;} return false;">删除</a>
+                </td>
+            </tr>
+        </#list>
+        <#if (faqs.list?size==0)>
+            <tr>
+                <td colspan="10">No Data</td>
+            </tr>
+        </#if>
+    </table>
+    <@paginate currentPage=faqs.pageNumber totalPage=faqs.totalPage actionUrl="${base}/faq?pageNumber=" urlParas=""/>
+</@layout.layout>

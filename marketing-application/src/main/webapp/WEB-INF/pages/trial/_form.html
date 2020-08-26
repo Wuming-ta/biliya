@@ -1,0 +1,121 @@
+<table class="table table-bordered">
+    <tr>
+        <td class="col-key">${_res.get("marketing.trial.trial.name")}<span class="star-required">*</span></td>
+        <td colspan="3"><input type="text" class="form-control required"  name="trial.name" value="${(trial.name)!}"></td>
+    </tr>
+
+    <tr>
+        <td class="col-key">${_res.get("marketing.trial.trial.short_note")}<span class="star-required">*</span></td>
+        <td class="col-value"><input type="text" class="form-control required"  name="trial.short_note" value="${(trial.short_note)!}"></td>
+    </tr>
+    <tr>
+        <td class="col-key">${_res.get("marketing.trial.trial.start_time")}</td>
+        <td class="col-value"><input class="form-control datepicker" name="trial.start_time" data-date-format="yyyy-mm-dd" value="${(trial.start_time)!}" />
+        <td class="col-key">${_res.get("marketing.trial.trial.end_time")}</td>
+        <td class="col-value"><input class="form-control datepicker" name="trial.end_time" data-date-format="yyyy-mm-dd" value="${(trial.end_time)!}" />
+    </tr>
+    <tr>
+        <td class="col-key">
+            Tips
+        </td>
+        <td colspan="3">
+            <span class="tips">开始时间和结束时间必须同时设置才生效，如果不设置，则该活动有效期为永久</span>
+        </td>
+    </tr>
+    <tr>
+        <td class="col-key">${_res.get("marketing.trial.trial.product_name")}<span class="star-required">*</span></td>
+        <td colspan="3">
+            <input id="product_id" type="hidden" name="trial.product_id" value="${(trial.product_id)!}"/>
+            <div>
+                <a href="#" class="btn btn-info" data-toggle="modal" data-target="#myModal">选择产品</a>
+            </div>
+            <div style="margin-top:3px;">
+                <span id="product-select-result"></span>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="col-key">${_res.get("marketing.trial.trial.index")}</td>
+        <td class="col-value">
+            <input type="number" name="trial.index" class="form-control" value="${(trial.index)!100}" />
+        </td>
+        <td class="col-key">${_res.get("marketing.trial.trial.enabled")}<span class="star-required">*</span></td>
+        <td class="col-value">
+            <label class="radio-inline">
+                <input type="radio" class="required" name="trial.enabled" value="1"
+                <#if !(trial?? && trial.enabled??) || trial.enabled==1>checked="checked"</#if> />
+                是
+            </label>
+            <label class="radio-inline">
+                <input type="radio" class="required" name="trial.enabled" value="0"
+                <#if (trial?? && trial.enabled??)  && trial.enabled==0>checked="checked"</#if> />
+                否
+            </label>
+        </td>
+    </tr>
+    <!--<tr>-->
+        <!--<td class="col-key">${_res.get("marketing.trial.trial.shipping_type")}<span class="star-required">*</span></td>-->
+        <!--<td class="col-value">-->
+            <!--<label class="radio-inline">-->
+                <!--<input type="radio" class="required" name="trial.shipping_type" value="0"-->
+                <!--<#if !(trial?? && trial.shipping_type??) || trial.shipping_type==0>checked="checked"</#if> />-->
+                <!--${_res.get("marketing.trial.trial.shipping_type.0")}-->
+            <!--</label>-->
+            <!--<label class="radio-inline">-->
+                <!--<input type="radio" class="required" name="trial.shipping_type" value="1"-->
+                <!--<#if (trial?? && trial.shipping_type??)  && trial.shipping_type==1>checked="checked"</#if> />-->
+                <!--${_res.get("marketing.trial.trial.shipping_type.1")}-->
+            <!--</label>-->
+        <!--</td>-->
+        <!--<td class="col-key">${_res.get("marketing.trial.trial.payment_type")}</td>-->
+        <!--<td class="col-value">-->
+            <!--<select class="form-control" name="trial.payment_type">-->
+                <!--<option value=""></option>-->
+                <!--<#list paymentTypes as paymentType>-->
+                    <!--<option value="${paymentType!}" <#if trial?? && trial.payment_type?? && trial.payment_type==paymentType>selected="selected"</#if>>-->
+                        <!--${_res.get('marketing.trial.trial.payment_type.' + paymentType)}-->
+                    <!--</option>-->
+                <!--</#list>-->
+            <!--</select>-->
+        <!--</td>-->
+    <!--</tr>-->
+    <tr>
+        <td class="col-key">${_res.get("marketing.trial.trial.cover")}<span class="star-required">*</span></td>
+        <td colspan="3">
+            <div class="row">
+                <#assign covers = trial.covers>
+                <#list covers as cover>
+                <div class="col-md-2 col-sm-4">
+                    <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                        <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                        <input type="hidden" name="cover-id" value="${cover.id}">
+                        <img style="width:100%;height:100%;" src="${cover.url!}">
+                    </div>
+                    <input type="file" class="cover-form-control" accept="image/*" name="cover-${cover_index}" onchange="previewCover(this);">
+                </div>
+                </#list>
+                <#if covers?size lt 6>
+                <#list covers?size..5 as cover>
+                <div class="col-md-2 col-sm-4">
+                    <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                        <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                        <img style="width:100%;height:100%;">
+                    </div>
+                    <input type="file" class="cover-form-control" accept="image/*" name="cover-${cover}" onchange="previewCover(this);">
+                </div>
+                </#list>
+                </#if>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="col-key">${_res.get("marketing.trial.trial.note")}</td>
+        <td colspan="3">
+            <script type="text/plain" id="myEditor" name="trial.note" style="width: 100%; min-height: 400px">${(trial.note)!}</script>
+        </td>
+    </tr>
+
+</table>
+<hr>
+<button id="submitBtn" type="submit" class="btn btn-primary" onclick="return doSubmit();">${_res.get("btn.save")}</button>
+<a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>

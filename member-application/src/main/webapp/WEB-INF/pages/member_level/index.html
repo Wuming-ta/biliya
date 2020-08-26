@@ -1,0 +1,46 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "../template/pagination.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.member_level") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.member_level")/>
+    <@msg message />
+
+    <div class="search-box">
+        <a class="btn btn-primary" href="${base}/member_level/add">${_res.get("member.level.btn.new")}</a>
+    </div>
+
+    <table class="table table-hover ">
+        <tr>
+            <th>${_res.get("member.level.id")}</th>
+            <th>${_res.get("member.level.name")}</th>
+            <th>${_res.get("member.level.point")}</th>
+            <th>${_res.get("member.level.action")}</th>
+        </tr>
+        <#list levels as level>
+            <tr>
+                <td>${level.id}</td>
+                <td>${level.name}</td>
+                <td>${level.point}</td>
+                <td>
+                    <@shiro.hasPermission name="member.edit">
+                    <a class="btn btn-danger btn-sm" href="${base}/member_level/delete/${level.id}"
+                       onclick="javascript:if (confirm('${_res.get("member.level.delete_confirm")}')){return true;} return false;">${_res.get("member.level.btn.delete")}</a>
+                    <a class="btn btn-primary btn-sm" href="${base}/member_level/edit/${level.id}">${_res.get("member.level.btn.edit")}</a>
+                </@shiro.hasPermission>
+                </td>
+            </tr>
+        </#list>
+    </table>
+
+</@layout.layout>

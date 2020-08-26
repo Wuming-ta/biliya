@@ -1,0 +1,162 @@
+<#macro script>
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.config.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.all.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/lang/zh-cn/zh-cn.js"></script>
+
+    <#include "common.js" />
+    <#include "add.js" />
+    <#include "../product_select/listProducts.js" />
+</#macro>
+<#macro css>
+    <link href="${base}/assets/ueditor-1.4.3.3/themes/default/css/ueditor.css" type="text/css" rel="stylesheet">
+    <style><#include "common.css"/></style>
+</#macro>
+<#macro modal><#include "../product_select/_modal.html" /></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<@layout.layout script css _res.get("menu.piece_group_purchase") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/piece_group_purchase": _res.get("breadcrumb.piece_group_purchase")}>
+    <@nav menus _res.get("breadcrumb.add")/>
+
+        <#assign returnUrl><#if returnUrl??>${returnUrl}<#else>/piece_group_purchase</#if></#assign>
+        <form id="form" role="form" enctype="multipart/form-data" action="${base}/piece_group_purchase/save?returnUrl=${returnUrl?replace('&', '%26')}" method="post">
+            <table class="table table-bordered">
+                <tr>
+                    <td class="col-key">${_res.get("marketing.piece.piece_group_purchase.marketing_name")}<span class="star-required">*</span></td>
+                    <td colspan="3"><input type="text" class="form-control required"  name="pieceGroupPurchase.marketing_name"></td>
+                </tr>
+                <tr>
+                    <td class="col-key">${_res.get("marketing.piece.piece_group_purchase.marketing_short_name")}</td>
+                    <td class="col-value"><input type="text" class="form-control"  name="pieceGroupPurchase.marketing_short_name"></td>
+                    <td class="col-key">${_res.get("marketing.piece.piece_group_purchase.sort_order")}</td>
+                    <td class="col-value"><input type="number" class="form-control digits"  name="pieceGroupPurchase.sort_order" value="100"></td>
+                </tr>
+                <tr>
+                    <td class="col-key">${_res.get("marketing.piece.piece_group_purchase.product_name")}<span class="star-required">*</span></td>
+                    <td colspan="3">
+                        <input id="product_id" type="hidden" name="pieceGroupPurchase.product_id" />
+                        <div>
+                            <a href="#" class="btn btn-info" data-toggle="modal" data-target="#myModal">选择产品</a>
+                        </div>
+                        <div style="margin-top:3px;">
+                            <span id="product-select-result"></span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-key">${_res.get("marketing.piece.piece_group_purchase.suggested_price")}<span class="star-required">*</span></td>
+                    <td class="col-value">
+                        <input type="number" min="0" class="form-control required"  name="pieceGroupPurchase.suggested_price">
+                    </td>
+                    <td class="col-key">${_res.get("marketing.piece.piece_group_purchase.price")}<span class="star-required">*</span></td>
+                    <td class="col-value">
+                        <input type="number" min="0" class="form-control required"  name="pieceGroupPurchase.price">
+                    </td>
+                <tr>
+                    <td class="col-key">${_res.get("marketing.piece.piece_group_purchase.min_participator_count")}<span class="star-required">*</span></td>
+                    <td class="col-value"><input type="number" min="2" class="form-control required" name="pieceGroupPurchase.min_participator_count" value="2" ></td>
+                    <td class="col-key">${_res.get("marketing.piece.piece_group_purchase.duration")}<span class="star-required">*</span></td>
+                    <td class="col-value">
+                        <input type="number" min="0" class="form-control digits required"  name="pieceGroupPurchase.duration">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-key">${_res.get("marketing.piece.piece_group_purchase.master_free")}</td>
+                    <td>
+                        <label class="radio-inline">
+                            <input type="radio" name="pieceGroupPurchase.master_free" value="1" checked="checked">是
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="pieceGroupPurchase.master_free" value="0" >否
+                        </label>
+                    </td>
+                    <td class="col-key">${_res.get("marketing.piece.piece_group_purchase.free_shipping")}</td>
+                    <td class="col-value">
+                        <label class="radio-inline">
+                            <input type="radio" name="pieceGroupPurchase.free_shipping" value="1" checked="checked" >是
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="pieceGroupPurchase.free_shipping" value="0" >否
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-key">${_res.get("marketing.piece.piece_group_purchase.coupon_usage")}<span class="star-required">*</span></td>
+                    <td>
+                        <select class="form-control required" name="pieceGroupPurchase.coupon_usage">
+                            <option value="0" selected="selected">
+                                ${_res.get("marketing.piece.piece_group_purchase.coupon_usage.0")}
+                            </option>
+                            <option value="1">
+                                ${_res.get("marketing.piece.piece_group_purchase.coupon_usage.1")}
+                            </option>
+                            <option value="2">
+                                ${_res.get("marketing.piece.piece_group_purchase.coupon_usage.2")}
+                            </option>
+                        </select>
+                    </td>
+                    <td class="col-key">${_res.get("marketing.piece.piece_group_purchase.payment_type")}<span class="star-required">*</span></td>
+                    <td>
+                        <#list paymentTypes as paymentType>
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="payment_type"  value="${paymentType!}">
+                                ${_res.get("marketing.piece.piece_group_purchase.payment_type." + paymentType?lower_case)}
+                            </label>
+                        </#list>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-key">${_res.get("marketing.piece.piece_group_purchase.coupon_strategy_service_name")}</td>
+                    <td colspan="3">
+                        <label class="radio-inline">
+                            <input type="radio" name="pieceGroupPurchase.coupon_strategy_service_name" value="" checked="checked">不赠送
+                        </label>
+                        <#list strategies as strategy>
+                            <label class="radio-inline">
+                                <input type="radio" name="pieceGroupPurchase.coupon_strategy_service_name" value="${strategy!}" />
+                                ${_res.get("marketing.piece.piece_group_purchase.coupon_strategy_service_name." + strategy?lower_case)}
+                            </label>
+                        </#list>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-key">价格阶梯</td>
+                    <td colspan="3">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width:40%;">满多少人数</th>
+                                <th style="width:40%;">价格</th>
+                                <th style="width:20%;">${_res.get("action")}</th>
+                            </tr>
+                            <tr>
+                                <td colspan="10"><a id="pricing-create-btn" class="btn btn-default btn-pricing">+</a></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-key">${_res.get("marketing.piece.piece_group_purchase.cover")}<span class="star-required">*</span></td>
+                    <td colspan="3">
+                        <div class="row">
+                            <div class="col-md-2 col-sm-4">
+                                <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                                    <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                                    <img width="100%">
+                                </div>
+                                <input type="file" class="cover-form-control" accept="image/*" name="cover-1" onchange="previewCover(this);">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-key">${_res.get("marketing.piece.piece_group_purchase.description")}</td>
+                    <td colspan="3">
+                        <script type="text/plain" id="myEditor" name="pieceGroupPurchase.description" style="width: 100%; min-height: 400px"></script>
+                    </td>
+                </tr>
+            </table>
+            <hr>
+            <button id="submitBtn" type="submit" class="btn btn-primary" onclick="return doSubmit();">${_res.get("btn.save")}</button>
+            <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+        </form>
+</@layout.layout>

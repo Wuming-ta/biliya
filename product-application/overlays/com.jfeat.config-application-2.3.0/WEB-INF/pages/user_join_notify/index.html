@@ -1,0 +1,52 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+</script>  
+</#macro>
+<#macro css>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "./list.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.user_join_notify") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.user_join_notify")/>
+    <@msg message />
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="<#if isRead?? && isRead == '0'>active</#if>"><a href="${base}/user_join_notify?isRead=0#unread" >未读</a></li>
+    <li role="presentation" class="<#if !isRead??>active</#if>"><a href="${base}/user_join_notify#all">所有</a></li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane <#if isRead?? && isRead == '0'>active</#if>" id="unread">
+        <#if notifies.list?size gt 0>
+        <div class="search-box" style="margin-top: 15px;">
+            <form class="form-inline" method="post" action="${base}/user_join_notify/markRead">
+                <#list notifies.list as n>
+                <input type="hidden" name="id" value="${n.id}">
+                </#list>
+                <button class="btn btn-link" type="submit">${_res.get("identity.user_join_notify.mark_page_as_read")}</button>
+                <span class="vertical-separator"></span>
+                <a class="btn btn-link" href="${base}/user_join_notify/markAllRead">${_res.get("identity.user_join_notify.mark_all_as_read")}</a>
+            </form>
+        </div>
+        </#if>
+        <@list notifies />
+        <@paginate currentPage=notifies.pageNumber totalPage=notifies.totalPage actionUrl="${base}/user_join_notify?pageNumber=" urlParas="&isRead=0&pageSize=${pageSize!}" />
+    </div>
+
+    <div role="tabpanel" class="tab-pane <#if !isRead??>active</#if>" id="all">
+        <@list notifies />
+        <@paginate currentPage=notifies.pageNumber totalPage=notifies.totalPage actionUrl="${base}/user_join_notify?pageNumber=" urlParas="&pageSize=${pageSize!}" />
+    </div>
+</div>
+
+</@layout.layout>

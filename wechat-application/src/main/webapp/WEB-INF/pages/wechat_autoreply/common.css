@@ -1,0 +1,37 @@
+<style>
+        .tab-pane-cus {
+            margin-top:10px;
+        }
+
+        .box {
+            border:1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 10px;
+            padding: 10px 10px 0px 10px;
+            height: 165px;
+            overflow: hidden;
+        }
+
+        .box-title {
+            height:40px;
+            padding-top:10px;
+            font-size:20px;
+            color: black;
+        }
+
+        .box-digest {
+            height: 65px;
+        }
+
+        .box-btn {
+            height: 30px;
+        }
+
+        .filter {
+            opacity:0.3;
+        }
+
+        .green-border {
+            border:solid green 1px;
+        }
+    </style>

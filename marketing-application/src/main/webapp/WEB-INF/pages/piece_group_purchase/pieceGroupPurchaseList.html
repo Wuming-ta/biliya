@@ -1,0 +1,172 @@
+<#macro script>
+    <script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.datepicker').datepicker();
+        });
+    </script>
+</#macro>
+<#macro css>
+    <style>
+
+
+        .show-off{
+            color:red;
+            font-size:18px
+        }
+
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+<#include "./_piece_group_purchase_label.ftl" />
+<#include "../template/pagination.ftl" />
+<@layout.layout script css _res.get("breadcrumb.piece_group_purchase_list") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/piece_group_purchase": _res.get("breadcrumb.piece_group_purchase")} />
+    <@nav menus _res.get("breadcrumb.piece_group_purchase_list") />
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <span class="template-title">基本信息</span>
+        </div>
+        <table class="table table-bordered">
+            <tr>
+                <th style="width:5%"></th>
+                <th style="width:18%">${_res.get("marketing.piece.piece_group_purchase.marketing_name")}</th>
+                <th style="width:17%">产品</th>
+                <th style="width:10%">${_res.get("marketing.piece.piece_group_purchase.status")}</th>
+                <th style="width:10%">${_res.get("marketing.piece.piece_group_purchase.min_participator_count")}</th>
+                <th style="width:10%">${_res.get("marketing.piece.piece_group_purchase.duration")}</th>
+                <th style="width:10%">${_res.get("marketing.piece.piece_group_purchase.price")}</th>
+                <th style="width:10%">${_res.get("marketing.piece.piece_group_purchase.suggested_price")}</th>
+                <th style="width:10%">${_res.get("marketing.piece.piece_group_purchase.sale")}</th>
+            </tr>
+            <tr>
+                <td>
+                    <img src="${(pieceGroupPurchase.cover)!}" height="40" />
+                </td>
+                <td>
+                    <a href="${base}/piece_group_purchase/edit/${pieceGroupPurchase.id}">${pieceGroupPurchase.marketing_name!}</a>
+                </td>
+                <td>
+                    <a target="_blank" href="${base}/product/edit/${pieceGroupPurchase.product.id!}">
+                        ${pieceGroupPurchase.product.name!}
+                    </a>
+                </td>
+                <td>
+                    <span class="label <@pieceGroupPurchaseStatus pieceGroupPurchase.status />">
+                        ${_res.get("marketing.piece.piece_group_purchase.status." + pieceGroupPurchase.status?lower_case)}
+                    </span>
+                </td>
+                <td>${pieceGroupPurchase.min_participator_count!}</td>
+                <td>${pieceGroupPurchase.duration/3600}</td>
+                <td><span class="show-off">${pieceGroupPurchase.price!}</span></td>
+                <td>${pieceGroupPurchase.suggested_price!}</td>
+                <td>${pieceGroupPurchase.sale!}</td>
+            </tr>
+            <#if !(pieceGroupPurchase.pricings?size == 0)>
+            <tr>
+                <td>价格阶梯</td>
+                <td colspan="10">
+                    <#list pieceGroupPurchase.pricings as pricing>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar"  style="width: ${(pricing.participator_count)/maxParticipatorCount*100}%;">
+                                        ${pricing.participator_count!}人
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-left">
+                                <span class="show-off ">${pricing.price!}</span>元
+                            </div>
+                        </div>
+                    </#list>
+                </td>
+            </tr>
+            </#if>
+        </table>
+    </div>
+
+    <div class="search-box">
+        <form role="form" class="form-inline">
+            <div class="form-group">
+                <label>${_res.get("marketing.piece.piece_group_purchase_master.status")}</label>
+                <select name="status"  class="form-control">
+                    <option value=""></option>
+                    <#list statuses as s>
+                    <option value="${s!}" <#if status?? && status == s>selected="selected"</#if>>
+                        ${_res.get("marketing.piece.piece_group_purchase_master.status."+ s?lower_case)}</option>
+                    </#list>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>${_res.get("start_time")}</label>
+                <input class="form-control datepicker" name="startTime" data-date-format="yyyy-mm-dd" value="${startTime!}" />
+            </div>
+            <div class="form-group">
+                <label>${_res.get("end_time")}</label>
+                <input class="form-control datepicker" name="endTime" data-date-format="yyyy-mm-dd" value="${endTime!}" />
+            </div>
+            <button type="submit" class="btn btn-primary">${_res.get("btn.search")}</button>
+        </form>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <span class="template-title">参团信息</span>
+        </div>
+        <table class="table table-bordered table-hover">
+            <tr>
+                <th>${_res.get("id")}</th>
+                <th>头像</th>
+                <th>团长</th>
+                <th>uid</th>
+                <th>${_res.get("marketing.piece.piece_group_purchase_master.status")}</th>
+                <th>成员数量</th>
+                <th>${_res.get("marketing.piece.piece_group_purchase_master.end_time")}</th>
+                <th></th>
+            </tr>
+            <#list pieceGroupPurchaseMasters.list as master>
+            <tr>
+                <td>${(master.id)!}</td>
+                <td>
+                    <#if (master.user.avatar)??>
+                        <img src="${master.user.avatar!}" height="40"><#else><img src="${base}/assets/img/find_user.png" height="60">
+                    </#if>
+                </td>
+                <td>${(master.user.name)!}</td>
+                <td>${(master.user.uid)!}</td>
+                <td>
+                    <span class="label <@pieceGroupPurchaseMasterStatus master.status />">
+                        ${_res.get("marketing.piece.piece_group_purchase_master.status." + master.status?lower_case)}
+                    </span>
+                </td>
+                <td>
+                    <div><label>成员总数：</label>
+                        <span class="show-off">${master.membersCount!}</span>
+                        人
+                    </div>
+                    <div>
+                        <label>已支付成员数：</label>
+                        <span class="show-off">${master.paidMembersCount!}</span>人
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar"  style="<#if master.membersCount?? && master.membersCount!=0>width: ${(master.paidMembersCount)/(master.membersCount)*100}%;</#if>">
+                            ${master.paidMembersCount!}/${master.membersCount!}
+                        </div>
+                    </div>
+                </td>
+                <td>${(master.end_time)!}</td>
+                <td>
+                    <a href="${base}/piece_group_purchase/memberList/${master.id!}">查看</a>
+                </td>
+            </tr>
+            </#list>
+            <#if pieceGroupPurchaseMasters.list?size == 0>
+            <tr><td colspan="10">没有任何团长</td></tr>
+            </#if>
+        </table>
+    </div>
+    <@paginate currentPage=pieceGroupPurchaseMasters.pageNumber totalPage=pieceGroupPurchaseMasters.totalPage actionUrl="${base}/piece_group_purchase/pieceGroupPurchaseList/${pieceGroupPurchase.id!}?pageNumber=" urlParas="&pageSize=${pageSize!}&status=${status!}&startTime=${startTime!}&endTime=${endTime!}" />
+
+</@layout.layout>

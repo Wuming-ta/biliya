@@ -1,0 +1,101 @@
+<#macro script>
+    <script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+    <script src="${base}/assets/js/echarts.min.js"></script>
+    <script>
+    $(document).ready(function () {
+        $('.datepicker').datepicker();
+        var myChart = echarts.init(document.getElementById('purchase-statistic-chart'));
+        option = ${option};
+        myChart.setOption(option);
+    });
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .col-key {
+            width: 20%;
+        }
+        .col-value {
+            width: 30%;
+        }
+        .summary-header {
+          border-left: 4px solid orange;
+          font-size: 14px;
+          font-weight: bold;
+          margin: 5px;
+          margin-top: 40px;
+          padding-left: 10px;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.physicalPurchaseSummary") modal>
+    <#assign menus={"/": _res.get("breadcrumb.home"), "/physical_seller": _res.get("breadcrumb.physicalSeller")}/>
+    <@nav menus _res.get("breadcrumb.physicalPurchaseSummary")/>
+
+    <div class="search-box">
+        <form class="form-inline">
+            <div class="form-group">
+                <label>UID</label>
+                <input type="text" class="form-control" name="uid" value="${uid!}">
+            </div>
+
+            <button type="submit" class="btn btn-primary">${_res.get("partner.seller.search")}</button>
+        </form>
+    </div>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">经销商信息</div>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <td class="col-key">UID</td>
+                <td class="col-value">${user.uid!}</td>
+                <td class="col-key">${_res.get("partner.seller.name")}</td>
+                <td class="col-value">${user.name!}</td>
+            </tr>
+            <tr>
+                <td class="col-key">手机</td>
+                <td class="col-value">${user.phone!}</td>
+                <td class="col-key">真实姓名</td>
+                <td class="col-value">${user.real_name!}</td>
+            </tr>
+            <tr>
+                <td class="col-key">角色</td>
+                <td colspan="3">
+                    <span class="label <#if seller.seller_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.seller")}</span>
+                    <span class="label <#if seller.partner_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.partner")}</span>
+                    <span class="label <#if seller.crown_ship==1>label-success<#else>label-default</#if>">${_res.get("partner.crown")}</span>
+                </td>
+            </tr>
+        </table>
+
+        <div class="panel-body">
+            <div id="purchase-statistic-chart" style="width: 100%;height:400px;"></div>
+        </div>
+
+        <div class="summary-header">入货汇总记录</div>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th style="width: 20%">统计月份</th>
+                <th style="width: 20%">当月进货额</th>
+                <th style="width: 20%">当月提成额</th>
+                <th style="width: 10%">当月提成比例</th>
+                <th style="width: 10%">已转积分？</th>
+                <th style="width: 20%">转积分额</th>
+            </tr>
+            <#list purchaseSummaryList as summary>
+                <tr>
+                    <td>${summary.statistic_month}</td>
+                    <td>${summary.monthly_amount}</td>
+                    <td>${summary.monthly_settled_amount}</td>
+                    <td>${summary.settlement_proportion}%</td>
+                    <td><label class="label <#if summary.transferred==1>label-primary<#else>label-default</#if>">${_res.get("summary.transferred." + summary.transferred)}</label></td>
+                    <td>${summary.transferred_amount!}</td>
+                </tr>
+            </#list>
+        </table>
+    </div>
+
+</@layout.layout>

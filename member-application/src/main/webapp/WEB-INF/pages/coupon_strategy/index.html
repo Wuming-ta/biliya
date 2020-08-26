@@ -1,0 +1,101 @@
+<#macro script>
+<script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+<script>
+  $(document).ready(function(){
+    $('.datepicker').datepicker();
+  });
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "../template/pagination.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.coupon_strategy") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.coupon_strategy")/>
+    <@msg message />
+    <@msg link />
+
+    <div class="search-box">
+        <form role="form" class="form-inline">
+            <div class="form-group">
+                <label for="name">${_res.get("member.coupon_strategy.name")}</label>
+                <input type="text" class="form-control" id="name" name="name" value="${name!}">
+            </div>
+            <div class="form-group">
+                <label>${_res.get("member.coupon_strategy.status")}</label>
+                <select name="status" class="form-control">
+                    <option></option>
+                    <#list statuses as s>
+                    <option value="${s}" <#if (status??&&status==s)>selected="selected"</#if> >${_res.get("member.coupon_strategy.status." + s?lower_case)}</option>
+            </#list>
+            </select>
+            </div>
+            <div class="form-group">
+                <label for="startDate">${_res.get("member.coupon_strategy.start_date")}</label>
+                <input id="startDate" name="startDate" class="form-control datepicker" data-date-format="yyyy-mm-dd" value="${startDate!}">
+                <label for="endDate">${_res.get("member.coupon_strategy.end_date")}</label>
+                <input id="endDate" name="endDate" class="form-control datepicker" data-date-format="yyyy-mm-dd" value="${endDate!}">
+            </div>
+
+            <button type="submit" class="btn btn-primary">${_res.get("member.coupon.search")}</button>
+            <@shiro.hasPermission name="coupon.edit">
+            <span class="vertical-separator"></span>
+            <a class="btn btn-primary" href="${base}/coupon_strategy/add">${_res.get("member.coupon_strategy.btn.new")}</a>
+            </@shiro.hasPermission>
+        </form>
+
+    </div>
+
+    <table class="table table-hover ">
+        <tr>
+            <th style="width: 20%">${_res.get("member.coupon_strategy.name")}</th>
+            <th style="width: 10%">${_res.get("member.coupon_strategy.type")}</th>
+            <th style="width: 10%">${_res.get("member.coupon_strategy.status")}</th>
+            <th style="width: 10%">${_res.get("member.coupon_strategy.version")}</th>
+            <th style="width: 10%">${_res.get("member.coupon_strategy.start_date")}</th>
+            <th style="width: 10%">${_res.get("member.coupon_strategy.end_date")}</th>
+            <th style="width: 30%">${_res.get("member.coupon_strategy.action")}</th>
+        </tr>
+        <#list strategies as strategy>
+            <tr>
+                <td><a href="${base}/coupon_strategy/edit/${strategy.id}">${strategy.name}</a></td>
+                <td>${_res.get("member.coupon_strategy.type."+strategy.type?lower_case)}</td>
+                <td>${_res.get("member.coupon_strategy.status."+strategy.status?lower_case)}</td>
+                <td>${strategy.version}</td>
+                <td><#if strategy.start_time??>${strategy.start_time?string('yyyy-MM-dd')}<#else>-</#if></td>
+                <td><#if strategy.end_time??>${strategy.end_time?string('yyyy-MM-dd')}<#else>-</#if></td>
+                <td>
+                    <@shiro.hasPermission name="coupon.edit">
+                    <#if strategy.status == 'FINISHED' || strategy.status == 'DRAFT'>
+                        <a class="btn btn-danger btn-sm" href="${base}/coupon_strategy/delete/${strategy.id}" onclick="javascript:return confirm('${_res.get("member.coupon_strategy.delete_confirm")}');" >${_res.get("btn.delete")}</a>
+                        <a class="btn btn-primary btn-sm" href="${base}/coupon_strategy/publish/${strategy.id}">${_res.get("btn.publish")}</a>
+                    </#if>
+                    <#if strategy.status == 'EXECUTING'>
+                        <a class="btn btn-primary btn-sm" href="${base}/coupon_strategy/suspended/${strategy.id}">${_res.get("btn.suspended")}</a>
+                        <a class="btn btn-primary btn-sm" href="${base}/coupon_strategy/finish/${strategy.id}">${_res.get("btn.finish")}</a>
+                    </#if>
+                    <#if strategy.status == 'SUSPENDED'>
+                        <a class="btn btn-primary btn-sm" href="${base}/coupon_strategy/resume/${strategy.id}">${_res.get("btn.resume")}</a>
+                        <a class="btn btn-primary btn-sm" href="${base}/coupon_strategy/finish/${strategy.id}">${_res.get("btn.finish")}</a>
+                    </#if>
+                    <#if strategy.status == 'DRAFT' || strategy.status == 'SUSPENDED' || strategy.status == 'FINISHED' >
+                        <a class="btn btn-primary btn-sm" href="${base}/coupon_strategy/edit/${strategy.id}">${_res.get("btn.edit")}</a>
+                    </#if>
+                    </@shiro.hasPermission>
+                    <#if strategy.type == 'SYSTEM'>
+                        <a class="btn btn-primary btn-sm" href="${base}/coupon_strategy/viewShareLink">${_res.get("breadcrumb.view_share_link")}</a>
+                    </#if>
+                </td>
+            </tr>
+        </#list>
+        <#if strategies?size == 0>
+            <tr>
+                <td colspan="15">No Data</td>
+            </tr>
+        </#if>
+
+    </table>
+</@layout.layout>

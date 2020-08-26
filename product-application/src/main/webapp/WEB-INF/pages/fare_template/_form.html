@@ -1,0 +1,286 @@
+<#include "regionConvert.ftl"/>
+<div class="form-group">
+    <label for="name" class="col-md-2 control-label">${_res.get("fare_template.name")}<span class="required-field">*</span></label>
+    <div class="col-md-4">
+        <input type="text" class="form-control required" id="name" name="fareTemplate.name" value="${template.name!}">
+    </div>
+</div>
+<div class="form-group">
+    <label for="title" class="col-md-2 control-label">${_res.get("fare_template.title")}<span class="required-field">*</span></label>
+    <div class="col-md-4">
+        <input type="text" class="form-control required" id="title" name="fareTemplate.title" value="${template.title!}">
+    </div>
+</div>
+<div class="form-group">
+    <label for="content" class="col-md-2 control-label">${_res.get("fare_template.content")}<span class="required-field">*</span></label>
+    <div class="col-md-8">
+        <input type="text" class="form-control required" id="content" name="fareTemplate.content" value="${template.content!}">
+    </div>
+</div>
+<div class="form-group">
+    <label for="content" class="col-md-2 control-label">${_res.get("fare_template.message_format")}</label>
+    <div class="col-md-8">
+        <input type="text" class="form-control" id="message_format" name="fareTemplate.message_format" value="${template.message_format!}">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label"></label>
+    <div class="col-md-8">
+        <p class="form-control-static text-muted">
+            定义前端结算页计算出运费结果时显示的消息。<br>
+            如果有定义条件包邮, 那么消息格式建议定义为: <small class="text-primary">还差%1$s元就可以包邮了哦!</small><br>
+            如果没定义条件包邮, 那么消息格式建议定义为: <small class="text-primary">付同样的运费,还可以拼单%1$sKG哦.</small><br>
+            注意: <span class="text-danger">%1$s</span>是动态参数。根据定义的计价方式来选取相应的单位. 可选的单位有: <i>件, 元, KG</i><br>
+            如果不配置该项, 那么前端就不做消息显示。
+        </p>
+    </div>
+</div>
+<div class="form-group">
+    <label for="shop_addr" class="col-md-2 control-label">${_res.get("fare_template.shop_addr")}</label>
+    <div class="col-md-4">
+        <input type="text" class="form-control form-control-inline" id="shop_addr" name="fareTemplate.shop_addr" value="${template.shop_addr!}">
+        <a id="shop-addr-select" class="btn btn-link">选择</a>
+    </div>
+</div>
+<div class="form-group">
+    <label for="dispatch_time" class="col-md-2 control-label">${_res.get("fare_template.dispatch_time")}<span class="required-field">*</span></label>
+    <div class="col-md-2">
+        <input type="number" class="form-control required" id="dispatch_time" name="fareTemplate.dispatch_time" value="${template.dispatch_time!}">
+    </div>
+    <div class="col-md-8">
+        <p class="form-control-static text-muted">单位: 小时。 <small>如实设置发货时间, 不仅可避免发货咨询和纠纷, 还能促进成交。</small></p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label">${_res.get("fare_template.is_incl_postage")}</label>
+    <div class="col-md-6">
+        <label class="radio-inline"> 
+            <input type="radio" name="fareTemplate.is_incl_postage" value="1" <#if template.is_incl_postage==1>checked</#if>>${_res.get("fare_template.is_incl_postage.1")} 
+        </label> 
+        <label class="radio-inline"> 
+            <input type="radio" name="fareTemplate.is_incl_postage" value="0" <#if template.is_incl_postage==0>checked</#if>> ${_res.get("fare_template.is_incl_postage.0")}  
+        </label>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label">${_res.get("fare_template.valuation_model")}</label>
+    <div class="col-md-6">
+        <#list valuationModels as valuationModel>
+            <label class="radio-inline"> 
+                <input type="radio" name="fareTemplate.valuation_model"
+                <#if (template.valuation_model==valuationModel.value)>checked</#if>
+                value="${valuationModel.value}" >${_res.get("fare_template.valuation_model."+valuationModel.value)} 
+            </label> 
+        </#list>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-2 control-label">${_res.get("fare_template.carry_mode")}<span class="required-field">*</span></label>
+    <div class="col-md-10">
+        <p class="form-control-static text-muted"><small>除指定地区外, 其他地区的运费采用"默认运费".</small></p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label"></label>
+    <div class="col-md-10">
+        <div>
+            <#list carryWays as carryWay>
+                <#assign carryModeChecked = false />
+                <div>
+                    <label>
+                        <input name="carry-mode" type="checkbox" value="${carryWay.value}"
+                            <#if template.id??>
+                            <#list template.carryModes as carryMode>
+                                <#if carryMode.carry_way==carryWay.value>
+                                    <#assign carryModeChecked = true />
+                                    checked</#if>
+                            </#list>
+                            </#if>
+                        > ${_res.get("fare_template.carry_way."+carryWay.value)}
+                    </label>
+                </div>
+                <div class="carry-mode <#if !carryModeChecked>hidden</#if>" id="carry-mode-${carryWay.value}">
+                    <#if carryModeChecked>
+                        <#list template.carryModes as carryMode>
+                            <#if carryMode.carry_way==carryWay.value && carryMode.is_default==1>
+                            <div>
+                                <span>默认运费: </span>
+                                <#if template.valuation_model==0>
+                                    <span>${_res.get("fare_template.first_piece")}</span>
+                                    <span><input type="number" class="required" name="carryMode[${carryMode.id}].first_piece" value="${carryMode.first_piece!}"></span>
+                                </#if>
+                                <#if template.valuation_model==1>
+                                    <span>${_res.get("fare_template.first_weight")}</span>
+                                    <span><input type="number" class="required" name="carryMode[${carryMode.id}].first_weight" value="${carryMode.first_weight!}"></span>
+                                </#if>
+                                <#if template.valuation_model==2>
+                                    <span>${_res.get("fare_template.first_bulk")}</span>
+                                    <span><input type="number" class="required" name="carryMode[${carryMode.id}].first_bulk" value="${carryMode.first_bulk!}"></span>
+                                </#if>
+                                <span>${_res.get("fare_template.first_amount")}</span>
+                                <span><input type="number" class="required" name="carryMode[${carryMode.id}].first_amount" value="${carryMode.first_amount!}">元, </span>
+                                <#if template.valuation_model==0>
+                                    <span>${_res.get("fare_template.second_piece")}</span>
+                                    <span><input type="number" class="required" name="carryMode[${carryMode.id}].second_piece" value="${carryMode.second_piece!}"></span>
+                                </#if>
+                                <#if template.valuation_model==1>
+                                    <span>${_res.get("fare_template.second_weight")}</span>
+                                    <span><input type="number" class="required" name="carryMode[${carryMode.id}].second_weight" value="${carryMode.second_weight!}"></span>
+                                </#if>
+                                <#if template.valuation_model==2>
+                                    <span>${_res.get("fare_template.second_bulk")}</span>
+                                    <span><input type="number" class="required" name="carryMode[${carryMode.id}].second_bulk" value="${carryMode.second_bulk!}"></span>
+                                </#if>
+                                <span>${_res.get("fare_template.second_amount")}</span>
+                                <span><input type="number" class="required" name="carryMode[${carryMode.id}].second_amount" value="${carryMode.second_amount!}">元</span>
+                                <input type="hidden" name="carryMode[${carryMode.id}].is_default" value="1">
+                                <input type="hidden" name="carryMode[${carryMode.id}].carry_way" value="${carryMode.carry_way!}">
+                                <input type="hidden" name="carryMode[${carryMode.id}].id" value="${carryMode.id!}">
+                            </div>
+                            </#if>
+                        </#list>
+
+                        <div style="margin: 5px;">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th style="width: 40%">${_res.get("fare_template.region")}</th>
+                                    <#if template.valuation_model==0>
+                                    <th style="width: 12.5%">${_res.get("fare_template.first_piece")}</th>
+                                    </#if>
+                                    <#if template.valuation_model==1>
+                                        <th style="width: 12.5%">${_res.get("fare_template.first_weight")}</th>
+                                    </#if>
+                                    <#if template.valuation_model==2>
+                                        <th style="width: 12.5%">${_res.get("fare_template.first_bulk")}</th>
+                                    </#if>
+                                    <th style="width: 12.5%">${_res.get("fare_template.first_amount")}</th>
+                                    <#if template.valuation_model==0>
+                                    <th style="width: 12.5%">${_res.get("fare_template.second_piece")}</th>
+                                    </#if>
+                                    <#if template.valuation_model==1>
+                                        <th style="width: 12.5%">${_res.get("fare_template.second_weight")}</th>
+                                    </#if>
+                                    <#if template.valuation_model==2>
+                                        <th style="width: 12.5%">${_res.get("fare_template.second_bulk")}</th>
+                                    </#if>
+                                    <th style="width: 12.5%">${_res.get("fare_template.second_amount")}</th>
+                                    <th style="width: 10%"></th>
+                                </tr>
+                                <#list template.carryModes as carryMode>
+                                    <#if carryMode.carry_way==carryWay.value && carryMode.is_default==0>
+                                        <tr>
+                                            <input type="hidden" name="carryMode[${carryMode.id}].id" value="${carryMode.id}">
+                                            <input type="hidden" name="carryMode[${carryMode.id}].carry_way" value="${carryMode.carry_way}">
+                                            <input type="hidden" name="carryMode[${carryMode.id}].is_default" value="0">
+                                            <td>
+                                                <span>
+                                                    <input type='hidden' name='carryMode[${carryMode.id}].region' value='${carryMode.region!}'>
+                                                    <small><@regionConv carryMode.region! /></small>
+                                                </span>
+                                                <a class="pull-right btn btn-link btn-sm" onclick="selectRegion(this, ${carryMode.id});">编辑</a>
+                                            </td>
+                                            <#if template.valuation_model==0>
+                                            <td><input type="number" class="required" name="carryMode[${carryMode.id}].first_piece" value="${carryMode.first_piece!}"></td>
+                                            </#if>
+                                            <#if template.valuation_model==1>
+                                                <td><input type="number" class="required" name="carryMode[${carryMode.id}].first_weight" value="${carryMode.first_weight!}"></td>
+                                            </#if>
+                                            <#if template.valuation_model==2>
+                                                <td><input type="number" class="required" name="carryMode[${carryMode.id}].first_bulk" value="${carryMode.first_bulk!}"></td>
+                                            </#if>
+                                            <td><input type="number" class="required" name="carryMode[${carryMode.id}].first_amount" value="${carryMode.first_amount}"></td>
+                                            <#if template.valuation_model==0>
+                                            <td><input type="number" class="required" name="carryMode[${carryMode.id}].second_piece" value="${carryMode.second_piece!}"></td>
+                                            </#if>
+                                            <#if template.valuation_model==1>
+                                                <td><input type="number" class="required" name="carryMode[${carryMode.id}].second_weight" value="${carryMode.second_weight!}"></td>
+                                            </#if>
+                                            <#if template.valuation_model==2>
+                                                <td><input type="number" class="required" name="carryMode[${carryMode.id}].second_bulk" value="${carryMode.second_bulk!}"></td>
+                                            </#if>
+                                            <td><input type="number" class="required" name="carryMode[${carryMode.id}].second_amount" value="${carryMode.second_amount}"></td>
+                                            <td><a class="btn btn-danger btn-sm" onclick="removeCarryMode(this);">删除</a></td>
+                                        </tr>
+                                    </#if>
+                                </#list>
+                                <tr>
+                                    <td colspan="9"><a class="btn btn-link" onclick="addRegion(this, ${carryWay.value});">为指定地区城市设置运费</a></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                    </#if>
+                </div>
+            </#list>
+        </div>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-md-2 control-label">${_res.get("fare_template.is_incl_postage_by_if")}</label>
+    <div class="col-md-6">
+        <label class="radio-inline"> 
+            <input type="radio" name="fareTemplate.is_incl_postage_by_if" value="0" <#if template.is_incl_postage_by_if==0>checked</#if> >${_res.get("fare_template.is_incl_postage_by_if.0")} 
+        </label> 
+        <label class="radio-inline"> 
+            <input type="radio" name="fareTemplate.is_incl_postage_by_if" value="1" <#if template.is_incl_postage_by_if==1>checked</#if>> ${_res.get("fare_template.is_incl_postage_by_if.1")}  
+        </label>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label"></label>
+    <div class="col-md-10 <#if !template?? || template.is_incl_postage_by_if==0>hidden</#if>" id="incl-post-by-if">
+        <#if template?? && template.is_incl_postage_by_if==1>
+            <table class="table table-bordered">
+                <tr>
+                    <th style="width: 40%">${_res.get("fare_template.incl_postage.region")}</th>
+                    <th style="width: 15%">${_res.get("fare_template.carry_mode")}</th>
+                    <th style="width: 35%">${_res.get("fare_template.incl_postage.type")}</th>
+                    <th style="width: 10%"></th>
+                </tr>
+                <#list template.inclPostageProvisoes as inclPostageProviso>
+                <tr>
+                    <td>
+                        <span>
+                            <input type='hidden' name='inclPostageProviso[${inclPostageProviso.id}].region' value='${inclPostageProviso.region!}'>
+                            <small><@regionConv inclPostageProviso.region! /></small>
+                        </span>
+                        <a class="pull-right btn btn-link btn-sm" onclick="selectRegionForInclPostage(this, ${inclPostageProviso.id});">编辑</a>
+                    </td>
+                    <td>
+                        <select class="form-control" name="inclPostageProviso[${inclPostageProviso.id}].carry_way">
+                            <#list carryWays as carryWay>
+                                <option value="${carryWay.value}" <#if inclPostageProviso.carry_way==carryWay.value>selected="selected"</#if> >${_res.get("fare_template.carry_way."+carryWay.value)}</option>
+                            </#list>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" style="width: auto; display: inline-block;" name="inclPostageProviso[${inclPostageProviso.id}].type" onchange="changeInclPostageType(this, ${inclPostageProviso.id});">
+                            <#list inclPostageTypes as type>
+                                <option value="${type.value}" <#if inclPostageProviso.type==type.value>selected="selected"</#if> >${_res.get("fare_template.incl_postage.type."+type.value)}</option>
+                            </#list>
+                        </select>
+                        <#list inclPostageTypes as type>
+                            <#assign key = type?lower_case />
+                            <input type="number" class="form-control required <#if inclPostageProviso.type!=type.value>hidden</#if>" style="width: auto; display: inline-block;"
+                                   value="${inclPostageProviso[key]!}"
+                                   id="incl-postage-proviso-${inclPostageProviso.id}-type-${type.value}" name="inclPostageProviso[${inclPostageProviso.id}].${type?lower_case}">
+                        </#list>
+                    </td>
+                    <td><a class="btn btn-danger btn-sm" onclick="removeInclPostage(this);">删除</a></td>
+                </tr>
+                </#list>
+
+                <tr>
+                    <td colspan="9"><a class="btn btn-link" onclick="addInclPostageRegion(this);">为指定地区城市设置条件包邮</a></td>
+                </tr>
+            </table>
+        </#if>
+    </div>
+</div>
+
+<hr>
+<button id="submitBtn" type="submit" class="btn btn-primary">${_res.get("btn.submit")}</button>
+<a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>

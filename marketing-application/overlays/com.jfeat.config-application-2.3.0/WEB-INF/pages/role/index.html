@@ -1,0 +1,53 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+</script>  
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.role") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.role")/>
+    <@msg message />
+
+    <@shiro.hasPermission name="identity.edit">
+    <div class="search-box">
+        <a class="btn btn-primary" href="${base}/role/add">${_res.get("identity.role.btn.new")}</a>
+    </div>
+    </@shiro.hasPermission>
+
+    <table class="table table-hover">
+        <tr>
+            <th>${_res.get("identity.role.id")}</th>
+            <th>${_res.get("identity.role.name")}</th>
+            <th>${_res.get("identity.role.action")}</th>
+        </tr>
+        <#list roles as role>
+            <tr>
+                <td>${role.id}</td>
+                <td>
+                    <@shiro.hasPermission name="identity.edit"><a href="${base}/role/edit/${role.id}"></@shiro.hasPermission>
+                    ${role.name!}
+                    <@shiro.hasPermission name="identity.edit"></a></@shiro.hasPermission>
+                </td>
+                <td>
+                    <@shiro.hasPermission name="identity.edit">
+                    <a class="btn btn-primary btn-sm" href="${base}/role/edit/${role.id}">${_res.get("btn.edit")}</a>
+                    </@shiro.hasPermission>
+                    <@shiro.hasPermission name="identity.delete">
+                    <#if (role.system==0)>
+                    <a class="btn btn-danger btn-sm" href="${base}/role/delete/${role.id}"
+                       onclick="javascript:if (confirm('${_res.get("identity.role.delete_confirm")}')){return true;} return false;">${_res.get("btn.delete")}</a>
+                    </#if>
+                    </@shiro.hasPermission>
+                </td>
+            </tr>
+        </#list>
+    </table>
+
+</@layout.layout>

@@ -1,0 +1,99 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+    $("#form").validate();
+  });
+</script>
+</#macro>
+<#macro css>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "../template/relatedareas.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.profile") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.profile")/>
+    <@msg message />
+    <form id="form"  role="form"
+          enctype="multipart/form-data"
+          action="${base}/profile/update" method="post">
+        <input type="hidden" id="id" name="user.id" value="${user.id!}">
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="form-group label-floating">
+                            <label class="control-label">${_res.get("identity.user.login_name")}</label>
+                            <input type="text" class="form-control" disabled value="${user.login_name!}">
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="form-group label-floating">
+                            <label class="control-label">${_res.get("identity.user.register_date")}</label>
+                            <input type="text" class="form-control" disabled value="${user.register_date!}">
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="form-group label-floating">
+                            <label class="control-label">${_res.get("identity.user.last_login_date")}</label>
+                            <input type="text" class="form-control" disabled value="${user.last_login_date!}">
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="form-group label-floating">
+                            <label class="control-label required-label">${_res.get("identity.user.name")}</label>
+                            <input type="text" class="form-control required" id="name" name="user.name" value="${user.name!}">
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="form-group label-floating">
+                            <label class="control-label required-label">${_res.get("identity.user.email")}</label>
+                            <input type="email" class="form-control required" id="email" name="user.email" value="${user.email!}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="form-group label-floating">
+                            <input type="hidden" name="user.avatar" value="${user.avatar!}">
+                            <#if (user.avatar??)>
+                                <img src="${user.avatar}" height="120">
+                            <#else>
+                                <img src="${base}/assets/img/find_user.png" height="120"/>
+                            </#if>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="form-group label-floating">
+                            <input type="file" accept="image/*" id="avatar" name="avatar">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-md-12">
+                <button type="submit" class="btn btn-primary">${_res.get("btn.update")}</button>
+                <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+            </div>
+        </div>
+
+    </form>
+
+     <p></p>
+     <@relatedareas>
+        <ul class="nav nav-pills" role="tablist">
+            <li role="presentation"><a class="btn btn-link" href="${base}/profile/changePassword">${_res.get("identity.change_password")}</a></li>
+        </ul>
+    </@relatedareas>
+
+</@layout.layout>

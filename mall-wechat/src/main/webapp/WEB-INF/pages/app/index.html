@@ -1,0 +1,52 @@
+<html ng-app="app">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+<title>${mall_name!'商城'}</title>
+    <link rel="SHORTCUT ICON" href="img/about.png" lazyload/>
+    <link rel="stylesheet" href="lib/css/ionicons/ionicons.min.css">
+<link rel="stylesheet" href="${weuiCss!'lib/css/weui/weui.min.css'}">
+    <link rel="stylesheet" href="css/home.css">
+</head>
+<body ontouchstart="">
+<div hidden>
+    <img src="img/logo.png" lazyload>
+</div>
+<div>
+    <div id="spinner-wrap" loader>
+        <img src="img/spinner.png" class="spinner-loader spinner-rotating"/>
+    </div>
+    <div id="container" style="background-color: #efeff3;">
+        <div ui-view></div>
+    </div>
+</div>
+<script src="${angularJs!'bower_components/angular/angular.min.js'}"></script>
+<script src="${angularUiRouterJs!'bower_components/angular-ui-router/release/angular-ui-router.min.js'}"></script>
+<script src="${ocLazyLoadJs!'bower_components/oclazyload/dist/ocLazyLoad.min.js'}"></script>
+<script src="js/apps.js"></script>
+<script src="js/home.js"></script>
+<script src="js/page-route.js"></script>
+<script>
+  angular.module('global', [])
+    .constant('API', '${api_url}/rest')
+    .constant('GlobalVariable', {
+      MALL_NAME: '${mall_name!}',
+      WPAY_URL: '${wpay_url}',
+      SERVER_PATH: '${api_url}/rest',
+      ACCESS_TOKEN: '${access_token!}',
+      SELLER_SHIP: '${sellership}',
+      FOLLOW_US_URL: '${followus_url!}',
+      CAN_APPLY_CROWN: ${can_apply_crown?c},
+      APPLY_PHYSICAL_CROWN_TEXT: '${apply_physical_crown_text!}',
+      APPLY_PHYSICAL_SELLER_TEXT: '${apply_physical_seller_text!}',
+      SHOW_PRODUCT_CATEGORY_MENU: ${show_product_category_menu?c},
+      EXTENSION: { ${extension!} },
+      ${merchant!}
+    })
+    .value('LoginSession', {
+      token: 'token'
+    });
+</script>
+</body>
+</html>

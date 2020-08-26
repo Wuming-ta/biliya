@@ -1,0 +1,95 @@
+<#macro script>
+<script>
+    <#include 'editPhysicalAgentBonus.js' />
+</script>
+    <#include 'physical_agent_bonus.tpl.js' />
+</#macro>
+
+<#macro css>
+    <style>
+        .save-btn-div {
+            padding:10px 0px;
+        }
+
+        .col {
+            width: 50%;
+        }
+
+        .btn-bonus {
+            border: 2px dashed orange;
+        }
+    </style>
+</#macro>
+<#macro modal>
+    <#include "editPhysicalAgentBonusModal.html" />
+</#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl" />
+<@layout.layout script css _res.get("breadcrumb.physical_agent_bonus") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/agent": _res.get("breadcrumb.agent")}/>
+    <@nav menus _res.get("breadcrumb.physical_agent_bonus")/>
+    <@msg message />
+    <div style="float:right;">
+        <span class="label label-info" >提示</span>
+        若某地区不设置奖金比例，则此地区无奖金
+    </div>
+    <br/><br/>
+    <div class="row">
+        <div class="col-md-4" id="provinceQualify">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">省级代理奖金比例（%）</h3>
+                </div>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th class="col">省</th>
+                        <th class="col">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="province-qualify-tbody">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-4" id="cityQualify">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">市级代理奖金比例（%）</h3>
+                </div>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th class="col">市</th>
+                        <th class="col">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="city-qualify-tbody">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-4" id="districtQualify">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">县级代理奖金比例（%）</h3>
+                </div>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th class="col">区</th>
+                            <th class="col">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="district-qualify-tbody">
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</@layout.layout>

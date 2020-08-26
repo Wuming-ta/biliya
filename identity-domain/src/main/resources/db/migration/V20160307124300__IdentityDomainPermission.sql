@@ -1,0 +1,11 @@
+----Remove the comments if using identity module
+--INSERT INTO t_permission_definition (identifier, name, description)
+-- values ('IdentityDomain.view', 'IdentityDomain View', 'View the IdentityDomain information.');
+--INSERT INTO t_permission_definition (identifier, name, description)
+-- values ('IdentityDomain.edit', 'IdentityDomain Edit', 'Edit the IdentityDomain information.');
+--INSERT INTO t_permission_definition (identifier, name, description)
+-- values ('IdentityDomain.delete', 'IdentityDomain Delete', 'Delete IdentityDomain.');
+--
+--INSERT INTO t_permission_group_definition (identifier, name, description, permissions)
+-- values ('IdentityDomain.mgmt', 'IdentityDomain Management', 'Manage the IdentityDomain.', 'IdentityDomain.view|IdentityDomain.edit|IdentityDomain.delete');
+

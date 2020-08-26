@@ -1,0 +1,205 @@
+<#include "regionConvert.ftl"/>
+<table class="table table-bordered">
+    <tr>
+        <td class="col-key">${_res.get("marketing.wholesale.wholesale.marketing_name")}<span class="star-required">*</span></td>
+        <td colspan="3"><input type="text" class="form-control required"  name="wholesale.marketing_name" value="${wholesale.marketing_name!}"></td>
+    </tr>
+
+    <tr>
+        <td class="col-key">${_res.get("marketing.wholesale.wholesale.marketing_short_name")}</td>
+        <td class="col-value"><input type="text" class="form-control"  name="wholesale.marketing_short_name" value="${wholesale.marketing_short_name!}"></td>
+        <td class="col-key">${_res.get("marketing.wholesale.wholesale.sort_order")}</td>
+        <td class="col-value"><input type="number" class="form-control digits"  name="wholesale.sort_order" value="${wholesale.sort_order!}"></td>
+    </tr>
+    <tr>
+        <td class="col-key">${_res.get("marketing.wholesale.wholesale.wholesale_category_name")}</td>
+        <td class="col-value">
+            <select class="form-control" name="wholesale.category_id">
+                <option value=""></option>
+                <#list wholesaleCategories as wholesaleCategory>
+                    <option value="${wholesaleCategory.id!}" <#if wholesale.category_id?? && wholesale.category_id == wholesaleCategory.id>selected="selected"</#if>>${wholesaleCategory.name!}</option>
+                </#list>
+            </select>
+        </td>
+        <td class="col-key">${_res.get("marketing.wholesale.wholesale.unit")}</td>
+        <td class="col-value"><input type="text" class="form-control"  name="wholesale.unit" value="${wholesale.unit!}"></td>
+    </tr>
+    <tr>
+        <td class="col-key">${_res.get("marketing.wholesale.wholesale_pricing.suggested_retail_unit")}</td>
+        <td class="col-value"><input type="text" class="form-control"  name="wholesale.suggested_retail_unit" value="${wholesale.suggested_retail_unit!}"></td>
+        <td class="col-key">${_res.get("marketing.wholesale.wholesale_pricing.suggested_wholesale_unit")}</td>
+        <td class="col-value"><input type="text" class="form-control"  name="wholesale.suggested_wholesale_unit" value="${wholesale.suggested_wholesale_unit!}"></td>
+    </tr>
+    <tr>
+        <td class="col-key">${_res.get("marketing.wholesale.wholesale.product_name")}<span class="star-required">*</span></td>
+        <td colspan="3">
+            <input id="product_id" type="hidden" name="wholesale.product_id" value="${wholesale.product_id!}"/>
+            <div>
+                <a href="#" class="btn btn-info" data-toggle="modal" data-target="#myModal">选择产品</a>
+            </div>
+            <div style="margin-top:3px;">
+                <span id="product-select-result"></span>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="col-key">价格<span class="star-required">*</span></td>
+        <td colspan="3">
+            <#list wholesale.wholesalePricings as wholesalePricing>
+                <#if wholesalePricing.is_default?? && wholesalePricing.is_default==1>
+                    <div>
+                        <input type="hidden" name="wholesalePricing[${wholesalePricing.id}].is_default" value="1" />
+                        <input type="hidden" name="wholesalePricing[${wholesalePricing.id}].region" value="${wholesalePricing.region!}" />
+                        <table class="table table-hover ">
+                            <tr>
+                                <th></th>
+                                <th>${_res.get("marketing.wholesale.wholesale_pricing.price")}</th>
+                                <th>${_res.get("marketing.wholesale.wholesale_pricing.suggested_retail_price")}</th>
+                                <th>${_res.get("marketing.wholesale.wholesale_pricing.suggested_wholesale_price")}</th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <td>默认</td>
+                                <td>
+                                    <input type="number" class="required" name="wholesalePricing[${wholesalePricing.id}].price" value="${wholesalePricing.price!}"></td>
+                                <td>
+                                    <input type="number" class="required" name="wholesalePricing[${wholesalePricing.id}].suggested_retail_price" value="${wholesalePricing.suggested_retail_price!}">
+                                </td>
+                                <td>
+                                    <input type="number" class="required" name="wholesalePricing[${wholesalePricing.id}].suggested_wholesale_price" value="${wholesalePricing.suggested_wholesale_price!}">
+                                </td>
+                                <td>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="wholesalePricing[${wholesalePricing.id}].enabled" value="1"
+                                        <#if wholesalePricing.enabled==1>checked="checked"</#if> />非指定地区使用默认价格
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="wholesalePricing[${wholesalePricing.id}].enabled" value="0"
+                                        <#if wholesalePricing.enabled==0>checked="checked"</#if> />非指定地区禁售
+                                    </label>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </#if>
+            </#list>
+            <#if wholesale.wholesalePricings?size==0>
+                <div>
+                    <input type="hidden" name="wholesalePricing[0].is_default" value="1" />
+                    <input type="hidden" name="wholesalePricing[0].region"  />
+                    <table class="table table-hover ">
+                        <tr>
+                            <th></th>
+                            <th>${_res.get("marketing.wholesale.wholesale_pricing.price")}</th>
+                            <th>${_res.get("marketing.wholesale.wholesale_pricing.suggested_retail_price")}</th>
+                            <th>${_res.get("marketing.wholesale.wholesale_pricing.suggested_wholesale_price")}</th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <td>默认</td>
+                            <td>
+                                <input type="number" class="required" name="wholesalePricing[0].price">
+                            </td>
+                            <td>
+                                <input type="number" class="required" name="wholesalePricing[0].suggested_retail_price">
+                            </td>
+                            <td>
+                                <input type="number" class="required" name="wholesalePricing[0].suggested_wholesale_price">
+                            </td>
+                            <td>
+                                <label class="radio-inline">
+                                    <input type="radio" name="wholesalePricing[0].enabled" value="1" checked="checked" />非指定地区使用默认价格
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="wholesalePricing[0].enabled" value="0" />非指定地区禁售
+                                </label>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </#if>
+            <div style="margin: 5px;">
+                <table class="table table-bordered">
+                    <tr>
+                        <th style="width:30%;">${_res.get("marketing.wholesale.wholesale_pricing.region")}</th>
+                        <th style="width:15%;">${_res.get("marketing.wholesale.wholesale_pricing.price")}</th>
+                        <th style="width:15%;">${_res.get("marketing.wholesale.wholesale_pricing.suggested_retail_price")}</th>
+                        <th style="width:15%">${_res.get("marketing.wholesale.wholesale_pricing.suggested_wholesale_price")}</th>
+                        <th style="width:15%;">是否配送此地区</th>
+                        <th style="width:10%;"></th>
+                    </tr>
+                    <#list wholesale.wholesalePricings as wholesalePricing>
+                        <#if wholesalePricing.is_default?? && wholesalePricing.is_default==0>
+                            <tr>
+                                <input type="hidden" name="wholesalePricing[${wholesalePricing.id}].is_default" value="0" />
+                                <td>
+                                    <span>
+                                        <input type='hidden' name='wholesalePricing[${wholesalePricing.id}].region' value='${wholesalePricing.region!}'>
+                                        <small><@regionConv wholesalePricing.region! /></small>
+                                    </span>
+                                    <a class="pull-right btn btn-link btn-sm" onclick="selectRegion(this, ${wholesalePricing.id}, 'wholesalePricing');">编辑</a>
+                                </td>
+                                <td><input type="number" class="required" name="wholesalePricing[${wholesalePricing.id}].price" value="${wholesalePricing.price!}"></td>
+                                <td><input type="number" name="wholesalePricing[${wholesalePricing.id}].suggested_retail_price" value="${wholesalePricing.suggested_retail_price!}"></td>
+                                <td><input type="number" name="wholesalePricing[${wholesalePricing.id}].suggested_wholesale_price" value="${wholesalePricing.suggested_wholesale_price!}"></td>
+                                <td>
+                                    <span>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="wholesalePricing[${wholesalePricing.id}].enabled" value="1"
+                                            <#if wholesalePricing.enabled==1>checked="checked"</#if> />启用
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="wholesalePricing[${wholesalePricing.id}].enabled" value="0"
+                                            <#if wholesalePricing.enabled==0>checked="checked"</#if>/>禁用
+                                        </label>
+                                    </span>
+                                </td>
+                                <td><a class="btn btn-danger btn-sm" onclick="removeRegion(this);">删除</a></td>
+                            </tr>
+                        </#if>
+                    </#list>
+                    <tr>
+                        <td colspan="9"><a class="btn btn-link" onclick="addRegion(this, 'wholesalePricing');">为指定地区城市设置价格</a></td>
+                    </tr>
+                </table>
+            </div>
+            <p class="form-control-static text-muted">
+                提示：仅此处设置的价格生效，而“建议零售价”和“批发价”仅用于显示。
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td class="col-key">${_res.get("marketing.wholesale.wholesale.settlement_proportion")}<span class="star-required">*</span></td>
+        <td class="col-value">
+            <input type="number" name="wholesale.settlement_proportion" class="form-control required" value="${wholesale.settlement_proportion!}" />
+        </td>
+        <td class="col-key">${_res.get("marketing.wholesale.wholesale.agent_proportion")}<span class="star-required">*</span></td>
+        <td class="col-value">
+            <input type="number" name="wholesale.agent_proportion" class="form-control required" value="${wholesale.agent_proportion!}" />
+        </td>
+    </tr>
+    <tr>
+        <td class="col-key">${_res.get("marketing.wholesale.wholesale.cover")}<span class="star-required">*</span></td>
+        <td colspan="3">
+            <div class="row">
+                <div class="col-md-2 col-sm-4">
+                    <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                        <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                        <img id="cover" style="width:100%;height:100%;" src="${wholesale.cover!}">
+                    </div>
+                    <input type="file" class="cover-form-control" accept="image/*" name="cover-1" onchange="previewCover(this);">
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="col-key">${_res.get("marketing.wholesale.wholesale.description")}</td>
+        <td colspan="3">
+            <script type="text/plain" id="myEditor" name="wholesale.description" style="width: 100%; min-height: 400px">${wholesale.description!}</script>
+        </td>
+    </tr>
+
+</table>
+<hr>
+<button id="submitBtn" type="submit" class="btn btn-primary" onclick="return doSubmit();">${_res.get("btn.save")}</button>
+<a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>

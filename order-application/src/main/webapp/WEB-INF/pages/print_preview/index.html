@@ -1,0 +1,129 @@
+<#macro script>
+
+<script>
+
+  $(document).ready(function(){
+    $('#print').click(function() {
+        window.print();
+        window.close();
+    });
+    $('#close').click(function() {
+        window.close();
+    });
+  });
+
+</script>
+</#macro>
+<#macro css>
+<style>
+    .title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .title > h2 {
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
+    .info-table > tbody > tr > td {
+        border-top: 0px;
+    }
+    .info-key-col {
+        font-weight: bold;
+        width: 20%;
+    }
+    .info-value-col {
+        width: 30%;
+    }
+    .note {
+        margin-left: 20px;
+    }
+    .note-total-price {
+        font-size: 25px;
+    }
+</style>
+<style media=print type="text/css">
+    .noprint {
+        visibility: hidden
+    }
+</style>
+</#macro>
+<#import "../template/blankLayout.ftl" as layout>
+
+<@layout.layout script css _res.get("breadcrumb.order")>
+
+<div style="padding: 10px">
+    <div class="text-center title">
+        <#if logo??><img src="${logo!}" class="img-rounded"></#if>
+        <h2>${title!}</h2>
+    </div>
+    <h3 class="text-center">订单信息</h3>
+
+    <div class="text-center">
+        <table class="table info-table">
+            <tr>
+                <td class="info-key-col">订单编号</td>
+                <td class="info-value-col text-left">${order.order_number!}</td>
+                <td class="info-key-col">支付时间</td>
+                <td class="info-value-col text-left">${order.pay_date!}</td>
+            </tr>
+            <tr>
+                <td class="info-key-col">买家姓名</td>
+                <td class="info-value-col text-left">${order.contact_user!!}</td>
+                <td class="info-key-col">联系方式</td>
+                <td class="info-value-col text-left">${order.phone!}</td>
+            </tr>
+            <tr>
+                <td class="info-key-col">收货地址</td>
+                <td colspan="3" class=" text-left">${order.address!!}</td>
+            </tr>
+            <tr>
+                <td class="info-key-col">买家留言</td>
+                <td colspan="3" class=" text-left">${order.remark!!}</td>
+            </tr>
+        </table>
+    </div>
+
+    <#assign totalQuantity = 0 />
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th>商品序号</th>
+            <th>商品名称</th>
+            <th>商品条码</th>
+            <th>价格</th>
+            <th>数量</th>
+            <th>小计</th>
+        </tr>
+        <#list order.orderItems as item>
+        <#assign totalQuantity = totalQuantity + item.quantity />
+        <tr>
+            <td>${item_index + 1}</td>
+            <td>${item.product_name!}</td>
+            <td>${item.barcode!}</td>
+            <td>${item.price}</td>
+            <td>${item.quantity}</td>
+            <td><i class="fa fa-cny" aria-hidden="true"></i>${item.final_price!}</td>
+        </tr>
+        </#list>
+    </table>
+
+    <div class="text-right">
+        <p>
+            <span class="note">商品总数：${totalQuantity} </span>
+            <span class="note">运费：+ <i class="fa fa-cny" aria-hidden="true"></i> ${order.freight!} </span>
+            <span class="note">优惠券：- <i class="fa fa-cny" aria-hidden="true"></i> ${order.coupon_price!} </span>
+            <span class="note">积分抵扣：- <i class="fa fa-cny" aria-hidden="true"></i> ${order.credit_price!}</span>
+        </p>
+        <p>
+            <#if order.payment_type??><span class="note">支付方式：${_res.get("order.payment_type."+order.payment_type?lower_case)}</span></#if>
+            <span class="note">实付金额：<span class="note-total-price"><i class="fa fa-cny" aria-hidden="true"></i> ${order.total_price!}</span></span>
+        </p>
+    </div>
+
+</div>
+
+<div class="text-center noprint">
+    <button class="btn btn-primary" id="print">打印</button>
+    <button class="btn btn-default" id="close">关闭</button>
+</div>
+</@layout.layout>

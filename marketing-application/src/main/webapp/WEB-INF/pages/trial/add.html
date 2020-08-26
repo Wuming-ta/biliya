@@ -1,0 +1,42 @@
+<#macro script>
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.config.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.all.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/lang/zh-cn/zh-cn.js"></script>
+    <script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('.datepicker').datepicker();
+        });
+    </script>
+
+
+    <#include "common.js" />
+    <#include "add.js" />
+    <#include "../product_select/listProducts.js" />
+
+
+
+</#macro>
+<#macro css>
+    <link href="${base}/assets/ueditor-1.4.3.3/themes/default/css/ueditor.css" type="text/css" rel="stylesheet">
+    <style><#include "common.css"/></style>
+    <style>
+        .tips {
+            color: rgb(57,113,182)
+        }
+    </style>
+</#macro>
+<#macro modal>
+    <#include "../product_select/_modal.html" />
+</#macro>
+<#import "../template/layout.ftl" as layout>
+    <#include "../template/breadcrumb.ftl"/>
+    <@layout.layout script css _res.get("breadcrumb.trial") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/trial": _res.get("breadcrumb.trial")}>
+        <@nav menus _res.get("breadcrumb.add")/>
+
+        <form id="form" role="form" enctype="multipart/form-data" action="${base}/trial/save/" method="post">
+            <#include "_form.html"/>
+        </form>
+    </@layout.layout>

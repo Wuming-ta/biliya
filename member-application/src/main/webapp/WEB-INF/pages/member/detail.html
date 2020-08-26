@@ -1,0 +1,243 @@
+<#macro script>
+<script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+<script>
+  $(document).ready(function(){
+    $('.datepicker').datepicker();
+  });
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .col-name {
+          width: 150px;
+        }
+        .tab-panel {
+          margin-top: 10px;
+        }
+        .wallet {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .wallet-block {
+            width: 120px;
+            text-align: center;
+            background: #3071a9;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 10px;
+        }
+        .wallet-block-green {
+            background: #2ca217;
+        }
+        .wallet-block-purple {
+            background: #9b20c8;
+        }
+        .wallet-block-red {
+            background: #bf1f3c;
+        }
+        .wallet-block-text {
+          font-size: 14px;
+          color: #fff;
+        }
+        .wallet-block-number {
+          font-size: 30px;
+          color: #fff;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "../template/pagination.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.member_detail") modal>
+<#assign menus = {"/": _res.get("breadcrumb.home"), "/member": _res.get("breadcrumb.member")}>
+    <@nav menus _res.get("breadcrumb.member_detail")/>
+    <@msg message />
+
+    <table class="table table-hover table-bordered">
+        <tr>
+            <td class="col-name">${_res.get("identity.user.name")}</td>
+            <td><a href="${base}/user/edit/${user.id}">${user.name!} - ${user.uid!}</a></td>
+        </tr>
+        <tr>
+            <td>${_res.get("identity.user.invitation_code")}</td>
+            <td>${user.invitation_code!}</td>
+        </tr>
+        <tr>
+            <td>${_res.get("identity.user.email")}</td>
+            <td>${user.email!}</td>
+        </tr>
+        <tr>
+            <td>${_res.get("identity.user.phone")}</td>
+            <td>${user.phone!}</td>
+        </tr>
+        <tr>
+            <td>${_res.get("member.birthday")}</td>
+            <td>${memberExt.birthday!}</td>
+        </tr>
+        <tr>
+            <td>${_res.get("member.address")}</td>
+            <td>${memberExt.address!}</td>
+        </tr>
+        <tr>
+            <td>${_res.get("member.level")}</td>
+            <td>${memberExt.level.name} - [${memberExt.level.point}]</td>
+        </tr>
+        <tr>
+            <td>${_res.get("member.point")}</td>
+            <td>${memberExt.point}</td>
+        </tr>
+        <tr>
+            <td>${_res.get("member.wallet")}</td>
+            <td>
+                <div class="wallet">
+                    <div class="wallet-block wallet-block-green">
+                        <div class="wallet-block-number">${wallet.balance}</div>
+                        <div class="wallet-block-text">${_res.get("member.wallet.balance")}</div>
+                    </div>
+                    <div class="wallet-block wallet-block-green">
+                        <div class="wallet-block-number">${wallet.gift_balance}</div>
+                        <div class="wallet-block-text">${_res.get("member.wallet.gift_balance")}</div>
+                    </div>
+                    <div class="wallet-block wallet-block-purple">
+                        <div class="wallet-block-number">${wallet.accumulative_amount}</div>
+                        <div class="wallet-block-text">${_res.get("member.wallet.accumulative_amount")}</div>
+                    </div>
+                    <div class="wallet-block wallet-block-purple">
+                        <div class="wallet-block-number">${wallet.accumulative_gift_amount}</div>
+                        <div class="wallet-block-text">${_res.get("member.wallet.accumulative_gift_amount")}</div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" <#if !(active??)>class="active"</#if> ><a href="#point" aria-controls="point" role="tab" data-toggle="tab">${_res.get("member.point.historical")}</a></li>
+        <li role="presentation" <#if (active?? && active=="coupon")>class="active"</#if> ><a href="#coupon" aria-controls="coupon" role="tab" data-toggle="tab">${_res.get("member.coupon")}</a></li>
+        <li role="presentation" <#if (active?? && active=="wallet")>class="active"</#if> ><a href="#wallet" aria-controls="wallet" role="tab" data-toggle="tab">${_res.get("member.wallet.historical")}</a></li>
+    </ul>
+
+
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane <#if !(active??)>active</#if>" id="point">
+            <div class="panel panel-default tab-panel">
+                <div class="panel-body">
+                    <form class="form-inline">
+                        <div class="form-group">
+                            <label>${_res.get("member.point.historical.start_date")}</label>
+                            <input id="startTime" class="form-control datepicker order-form-control" data-date-format="yyyy-mm-dd" name="startTime" value="${startTime!}">
+                        </div>
+                        <div class="form-group">
+                            <label>${_res.get("member.point.historical.end_date")}</label>
+                            <input id="endTime" class="form-control datepicker order-form-control" data-date-format="yyyy-mm-dd" name="endTime" value="${endTime!}">
+                        </div>
+                        <button type="submit" class="btn btn-primary">${_res.get("member.point.historical.search")}</button>
+                    </form>
+                </div>
+                <table class="table table-hover table-responsive table-bordered">
+                    <tr>
+                        <th>${_res.get("member.point.historical.changed_date")}</th>
+                        <th>${_res.get("member.point.historical.point")}</th>
+                        <th>${_res.get("member.point.historical.changed_point")}</th>
+                        <th>${_res.get("member.point.historical.description")}</th>
+                    </tr>
+                    <#list memberPointHistory.list as h>
+                        <tr>
+                            <td>${h.changed_date}</td>
+                            <td>${h.point}</td>
+                            <td>${h.changed_point}</td>
+                            <td>${h.description!}</td>
+                        </tr>
+                    </#list>
+                    <#if (memberPointHistory.list?size=0)>
+                        <td colspan="4">No Data</td>
+                    </#if>
+                </table>
+                <@paginate currentPage=memberPointHistory.pageNumber totalPage=memberPointHistory.totalPage actionUrl="${base}/member/detail/${user.id}?startTime=${startTime!}&endTime=${endTime!}&pageNumber=" />
+            </div>
+        </div>
+
+        <div role="tabpanel" class="tab-pane <#if (active?? && active=="coupon")>active</#if>" id="coupon">
+            <div class="panel panel-default tab-panel">
+                <table class="table table-hover table-responsive table-bordered">
+                    <tr>
+                        <th>${_res.get("member.coupon.name")}</th>
+                        <th>${_res.get("member.coupon.code")}</th>
+                        <th>${_res.get("member.coupon.status")}</th>
+                        <th>${_res.get("member.coupon.valid_date")}</th>
+                        <th>${_res.get("member.coupon.action")}</th>
+                    </tr>
+
+                    <#list coupons.list as coupon>
+                        <tr>
+                            <td>${coupon.name!}</td>
+                            <td><a href="${base}/coupon/detail/${coupon.id}">${coupon.code!}</a></td>
+                            <td><label class="label <#if coupon.status=='ACTIVATION'>label-success<#else>label-default</#if>">${_res.get("member.coupon.status." + coupon.status?lower_case)}</label></td>
+                            <td>${coupon.valid_date!}</td>
+                            <td>
+                                <#assign returnUrl = "/member/detail/" + user.id + "%3factive=coupon">
+                                <#if (coupon.status=='NON_ACTIVATION')>
+                                    <a class="btn btn-success btn-sm" href="${base}/coupon/activate/${coupon.id}?returnUrl=${returnUrl}">${_res.get("member.coupon.activate")}</a>
+                                </#if>
+                                <a class="btn btn-danger btn-sm" href="${base}/coupon/delete/${coupon.id}?returnUrl=${returnUrl}"
+                                   onclick="javascript:if (confirm('${_res.get("member.coupon.delete_confirm")}')){return true;} return false;">
+                                ${_res.get("member.coupon.delete")}</a>
+                            </td>
+                        </tr>
+                    </#list>
+
+                    <#if (coupons.list?size==0)>
+                        <td colspan="6">No Data</td>
+                    </#if>
+
+                </table>
+                <@paginate currentPage=coupons.pageNumber totalPage=coupons.totalPage actionUrl="${base}/member/detail/${user.id}?couponPageNumber=" urlParas="&active=coupon"/>
+            </div>
+        </div>
+
+
+        <div role="tabpanel" class="tab-pane <#if (active?? && active=="wallet")>active</#if>" id="wallet">
+            <div class="panel panel-default tab-panel">
+                <table class="table table-hover table-responsive table-bordered">
+                    <tr>
+                        <th>${_res.get("member.wallet.historical.type")}</th>
+                        <th>${_res.get("member.wallet.historical.amount")}</th>
+                        <th>${_res.get("member.wallet.historical.gift_amount")}</th>
+                        <th>${_res.get("member.wallet.historical.balance")}</th>
+                        <th>${_res.get("member.wallet.historical.gift_balance")}</th>
+                        <th>${_res.get("member.wallet.historical.date")}</th>
+                        <th>${_res.get("member.wallet.historical.note")}</th>
+                    </tr>
+
+                    <#list walletHistory.list as wallet>
+                    <tr>
+                        <td>${wallet.type!}</td>
+                        <td>${wallet.amount}</td>
+                        <td>${wallet.gift_amount}</td>
+                        <td>${wallet.balance}</td>
+                        <td>${wallet.gift_balance}</td>
+                        <td>${wallet.created_time}</td>
+                        <td>${wallet.note!}</td>
+                    </tr>
+                    </#list>
+
+                    <#if (walletHistory.list?size==0)>
+                    <td colspan="6">No Data</td>
+                    </#if>
+
+                </table>
+            <@paginate currentPage=walletHistory.pageNumber totalPage=walletHistory.totalPage actionUrl="${base}/member/detail/${user.id}?pageNumber=" urlParas="&active=wallet"/>
+            </div>
+        </div>
+
+    </div>
+
+
+    <hr>
+    <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+</@layout.layout>

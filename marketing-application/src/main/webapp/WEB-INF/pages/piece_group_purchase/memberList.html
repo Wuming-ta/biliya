@@ -1,0 +1,158 @@
+<#macro script>
+    <#include "memberList.js" />
+</#macro>
+<#macro css>
+    <style>
+        tr, td, th {
+            text-align: center;
+        }
+
+        .show-off{
+            color:red;
+            font-size:18px
+        }
+
+        .title {
+            border-left: 4px solid orange;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 5px 0px;
+            padding-left: 10px;
+        }
+
+        .box {
+            border:solid #ccc 1px;
+            padding:10px;
+        }
+
+        .mt-10 {
+            margin-top: 10px;
+        }
+
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+<#include "./_piece_group_purchase_label.ftl" />
+<#include "../template/pagination.ftl" />
+<@layout.layout script css _res.get("breadcrumb.piece_group_purchase_member") modal>
+<#assign menus = {"/": _res.get("breadcrumb.home"), "/piece_group_purchase": _res.get("breadcrumb.piece_group_purchase")} />
+<@nav menus _res.get("breadcrumb.piece_group_purchase_member") />
+        <div class="row">
+            <div class="col-md-6">
+                <div class="title">活动基本信息：</div>
+                <ul class="list-group mt-10">
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-3">${_res.get("marketing.piece.piece_group_purchase.marketing_name")}</div>
+                            <div class="col-md-9">  ${(pieceGroupPurchaseMaster.pieceGroupPurchase.marketing_name)!}</div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-3">活动状态：</div>
+                            <div class="col-md-2">
+                                <span class="label <@pieceGroupPurchaseMasterStatus pieceGroupPurchaseMaster.status />">${_res.get("marketing.piece.piece_group_purchase_master.status." + pieceGroupPurchaseMaster.status?lower_case)}</span>
+                            </div>
+                            <div class="col-md-7" id="time"></div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-3" style="padding-top:15px;">产品：</div>
+                            <div class="col-md-9">
+                                <#if (pieceGroupPurchaseMaster.pieceGroupPurchase.product.cover)??>
+                                    <img height="40" src="${(pieceGroupPurchaseMaster.pieceGroupPurchase.product.cover)!}" />
+                                </#if>
+                                <a href="${base}/product/edit/${(pieceGroupPurchaseMaster.pieceGroupPurchase.product.id)!}">
+                                    ${(pieceGroupPurchaseMaster.pieceGroupPurchase.product.name)!}
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-2">市场价：</div>
+                            <div class="col-md-4">¥${(pieceGroupPurchaseMaster.pieceGroupPurchase.suggested_price)!}</div>
+                            <div class="col-md-2">团购价：</div>
+                            <div class="col-md-4">¥<span class="show-off">${(pieceGroupPurchaseMaster.pieceGroupPurchase.price)!}</span></div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <div class="title">价格阶梯：</div>
+                <div class="box">
+                    <#if pieceGroupPurchaseMaster.pieceGroupPurchase.pricings?size gt 0>
+                        <#list pieceGroupPurchaseMaster.pieceGroupPurchase.pricings as pricing>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar"  style="width: ${(pricing.participator_count)/maxParticipatorCount*100}%;">
+                                            ${pricing.participator_count!}人
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-left">
+                                    <span class="show-off ">${pricing.price!}</span>元
+                                </div>
+                            </div>
+                        </#list>
+                    <#else>未指定价格阶梯
+                    </#if>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="title">团长：</div>
+                <div class="box">
+                    <#if (pieceGroupPurchaseMaster.user.avatar)??>
+                        <img src="${(pieceGroupPurchaseMaster.user.avatar)!}" height="60"><#else><img src="${base}/assets/img/find_user.png" height="60">
+                    </#if>
+                    <div>团长：${(pieceGroupPurchaseMaster.user.name)!}</div>
+                    <div>目前成员共<span class="show-off">${pieceGroupPurchaseMaster.members?size}</span>人</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="title">成员</div>
+        <table class="table table-bordered">
+            <tr>
+                <th>${_res.get("id")}</th>
+                <th>头像</th>
+                <th>成员</th>
+                <th>uid</th>
+                <th>${_res.get("marketing.piece.piece_group_purchase_member.status")}</th>
+                <th>订单号</th>
+                <th>${_res.get("marketing.piece.piece_group_purchase_member.created_time")}</th>
+            </tr>
+            <#list pieceGroupPurchaseMembers.list as member>
+                <tr>
+                    <td>${member.id!}</td>
+                    <td>
+                        <#if member.user.avatar??><img src="${member.user.avatar!}" height="40"><#else><img src="${base}/assets/img/find_user.png" height="40"></#if>
+                    </td>
+                    <td>${(member.user.name)!}</td>
+                    <td>${(member.user.uid)!}</td>
+                    <td>
+                        <span class="label <@pieceGroupPurchaseMemberStatus member.status />">${_res.get("marketing.piece.piece_group_purchase_member.status." + member.status?lower_case)}</span>
+                    </td>
+                    <td>
+                        <a href="${base}/order/detail?order_number=${member.order_number!}">
+                            ${member.order_number!}
+                        </a>
+                    </td>
+                    <td>${member.created_time!}</td>
+                </tr>
+            </#list>
+            <#if pieceGroupPurchaseMembers.list?size == 0>
+                <tr>
+                    <td colspan="10">没有任何成员</td>
+                </tr>
+            </#if>
+        </table>
+
+<@paginate currentPage=pieceGroupPurchaseMembers.pageNumber totalPage=pieceGroupPurchaseMembers.totalPage actionUrl="${base}/piece_group_purchase/memberList/${pieceGroupPurchaseMaster.id!}?pageNumber=" urlParas="&pageSize=${pageSize!}"/>
+
+</@layout.layout>

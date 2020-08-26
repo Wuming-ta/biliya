@@ -1,0 +1,88 @@
+<#macro script>
+    <script src="${base}/assets/js/bootstrap-datepicker.js"></script>
+    <script>
+      $(document).ready(function(){
+        $('.datepicker').datepicker();
+        $("#form").validate({
+            focusCleanup: true,
+        	errorPlacement: function(error, element) {
+                element.addClass('error');
+            }
+        });
+      });
+    </script>
+</#macro>
+
+<#macro css>
+    <style>
+         .error {
+            border: 2px solid red;
+        }
+        .last-row {
+            line-height:45px;
+        }
+
+        .submit-btn {
+            height:45px;
+            margin:0px 0px;
+        }
+        #captcha {
+            cursor: pointer;
+        }
+    </style>
+</#macro>
+
+<#import "./reg.ftl" as layout>
+<@layout.layout script css _res.get("login.title")+productName!'Muaskin'>
+    <#if message??>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="alert alert-danger">
+                    <span>${message!}</span>
+                </div>
+            </div>
+        </div>
+    </#if>
+    <form id="form" role="form" action="${base}/auth/regForm" method="post">
+        <div class="form-group label-floating">
+            <label for="login_name" class="control-label sr-only">${_res.get("identity.user.login_name")}</label>
+            <input type="text" class="form-control" id="login_name" name="user.login_name" value="${(user.login_name)!}" required placeholder="请输入用户名">
+        </div>
+        <div class="form-group label-floating">
+            <label for="name" class="control-label sr-only">${_res.get("identity.user.name")}</label>
+            <input type="text" class="form-control" id="name" name="user.name" value="${(user.name)!}" required placeholder="请输入昵称">
+        </div>
+        <div class="form-group label-floating">
+            <label for="password" class="control-label sr-only">${_res.get("identity.user.password")}</label>
+            <input type="password" class="form-control required" id="password" name="user.password" value="${(user.password)!}" required placeholder="请输入密码">
+        </div>
+
+        <#if isCaptchaEnabled>
+        <div class="form-group label-floating">
+            <label for="captcha" class="control-label sr-only">验证码</label>
+            <div class="row">
+                <div class="col-xs-6">
+                    <input name="captcha" type="text" class="form-control" required placeholder="请输入验证码">
+                </div>
+                <div class="col-xs-6">
+                    <img id="captcha" src="${base}/auth/captcha" height="30"
+                         onclick="this.src='${base}/auth/captcha?d='+new Date().getTime()" />
+                </div>
+            </div>
+        </div>
+        </#if>
+
+        <div class="form-group last-row">
+            <div class="row">
+                <div class="col-xs-12"  >
+                    <button id="submitBtn" type="submit" class="btn btn-primary btn-block submit-btn " >${_res.get("login.register")}</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12" >
+                    <small>我已用账户, 现在就 </small><a href="${base}/auth/login">登录</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</@layout.layout>

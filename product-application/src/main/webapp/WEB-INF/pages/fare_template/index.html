@@ -1,0 +1,100 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+</script>
+</#macro>
+<#macro css>
+    <style>
+        .template-title{
+            font-size: 16px;
+            color: #000;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "regionConvert.ftl"/>
+<@layout.layout script css _res.get("menu.fare_template") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}/>
+    <@nav menus _res.get("breadcrumb.fare_template")/>
+    <@msg message />
+
+    <div class="search-box">
+        <a class="btn btn-primary" href="${base}/fare_template/add">${_res.get("fare_template.btn.new")}</a>
+    </div>
+
+    <#list templates as template>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="template-title">${template.name}</span>
+                <span class="pull-right">
+                    <small>${_res.get("fare_template.last_modified_date")}: ${template.last_modified_date!}
+                        <a href="${base}/fare_template/duplicate/${template.id}">复制模版</a> |
+                        <a href="${base}/fare_template/edit/${template.id}">修改</a> |
+                        <a href="${base}/fare_template/delete/${template.id}" onclick="javascript:if (confirm('${_res.get("fare_template.delete_confirm")}')){return true;} return false;">删除</a>
+                    </small>
+                </span>
+            </div>
+            <table class="table table-bordered">
+                <tr>
+                    <th style="width: 20%">${_res.get("fare_template.carry_mode")}</th>
+                    <th style="width: 40%">${_res.get("fare_template.region")}</th>
+                    <th style="width: 10%">
+                        <#if template.valuation_model==0>
+                            ${_res.get("fare_template.first_piece")}
+                        <#elseif template.valuation_model==1>
+                            ${_res.get("fare_template.first_weight")}
+                        <#elseif template.valuation_model==2>
+                            ${_res.get("fare_template.first_bulk")}
+                        </#if>
+                    </th>
+                    <th style="width: 10%">${_res.get("fare_template.first_amount")}</th>
+                    <th style="width: 10%">
+                        <#if template.valuation_model==0>
+                            ${_res.get("fare_template.second_piece")}
+                        <#elseif template.valuation_model==1>
+                            ${_res.get("fare_template.second_weight")}
+                        <#elseif template.valuation_model==2>
+                            ${_res.get("fare_template.second_bulk")}
+                        </#if>
+                    </th>
+                    <th style="width: 10%">${_res.get("fare_template.second_amount")}</th>
+                </tr>
+                <#list template.carryModes as carryMode>
+                    <tr>
+                        <td>${_res.get("fare_template.carry_way."+carryMode.carry_way)}</td>
+                        <td>
+                            <@regionConv carryMode.region! />
+                            <#if carryMode.is_default==1><label class="label label-default">默认</label></#if>
+                        </td>
+                        <td>
+                            <#if template.valuation_model==0>
+                                ${carryMode.first_piece}
+                            <#elseif template.valuation_model==1>
+                                ${carryMode.first_weight}
+                            <#elseif template.valuation_model==2>
+                                ${carryMode.first_bulk}
+                            </#if>
+                        </td>
+                        <td>${carryMode.first_amount}</td>
+                        <td>
+                            <#if template.valuation_model==0>
+                                ${carryMode.second_piece}
+                            <#elseif template.valuation_model==1>
+                                ${carryMode.second_weight}
+                            <#elseif template.valuation_model==2>
+                                ${carryMode.second_bulk}
+                            </#if>
+                        </td>
+                        <td>${carryMode.second_amount}</td>
+                    </tr>
+                </#list>
+            </table>
+        </div>
+    </#list>
+
+</@layout.layout>

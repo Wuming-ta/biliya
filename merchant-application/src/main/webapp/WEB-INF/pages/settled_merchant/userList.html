@@ -1,0 +1,33 @@
+<style>
+    .cover-image {
+        height: 40px;
+        width: 40px;
+        background-size: cover;
+        background-position: center;
+    }
+</style>
+<table class="table table-hover">
+    <tr>
+        <th width="5%"></th>
+        <th width="15%"></th>
+        <th width="20%">UID</th>
+        <th width="20%">用户名</th>
+        <th width="20%">真实名字</th>
+        <th width="20%">手机</th>
+    </tr>
+    <#list users.list as user>
+        <tr>
+            <td><input type="radio" name="supplierCheckbox" value="${user.id}#${user.name}"></td>
+            <td><div class="cover-image" style="background-image: url(${user.avatar!});"></div></td>
+            <td>${user.uid}</td>
+            <td>${user.name!}</td>
+            <td>${user.realName!}</td>
+            <td>${user.phone!}</td>
+        </tr>
+    </#list>
+</table>
+
+<div id="pageNumberSize">
+    <input id="pageNumber" type="hidden" name="pageNumber" value="${users.pageNumber}">
+    <input id="totalPage" type="hidden" name="totalPage" value="${users.totalPage}">
+</div>

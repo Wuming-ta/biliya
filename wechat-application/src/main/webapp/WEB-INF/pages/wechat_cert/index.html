@@ -1,0 +1,52 @@
+<#macro script>
+<script>
+        $(document).ready(function () {
+            $("#form").validate();
+            $("#appForm").validate();
+        });
+
+</script>
+</#macro>
+<#macro css></#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.wechat_cert") modal>
+<#assign menus={"/": _res.get("breadcrumb.home")}/>
+<@nav menus _res.get("breadcrumb.wechat_cert")/>
+<form id="form" class="form-horizontal" enctype="multipart/form-data" action="${base}/wechat_cert/update" method="post">
+    <div class="form-group">
+        <label class="col-md-2 control-label">支付证书路径</label>
+        <div class="col-md-10">
+            <p class="form-control-static">${cert_path!"请上传证书"}</p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input type="file" name="uploadFile" class="required">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">更新</button>
+
+</form>
+
+<hr>
+
+<form id="appForm" class="form-horizontal" enctype="multipart/form-data" action="${base}/wechat_cert/appUpdate" method="post">
+    <div class="form-group">
+        <label class="col-md-2 control-label">移动支付证书路径</label>
+        <div class="col-md-10">
+            <p class="form-control-static">${app_cert_path!"请上传证书"}</p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input type="file" name="uploadAppFile" class="required">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">更新</button>
+
+</form>
+</@layout.layout>

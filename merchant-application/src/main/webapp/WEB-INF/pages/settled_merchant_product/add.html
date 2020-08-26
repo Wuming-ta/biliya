@@ -1,0 +1,339 @@
+<#macro script>
+<script src="${base}/assets/ueditor-1.4.3.3/ueditor.config.js"></script>
+<script src="${base}/assets/ueditor-1.4.3.3/ueditor.all.js"></script>
+<script src="${base}/assets/ueditor-1.4.3.3/lang/zh-cn/zh-cn.js"></script>
+<#include "common.js"/>
+<#include "add.js"/>
+<#include "../sku_select/listSkus.js" />
+</#macro>
+<#macro css>
+<link href="${base}/assets/ueditor-1.4.3.3/themes/default/css/ueditor.css" type="text/css" rel="stylesheet">
+<style>
+<#include "common.css"/>
+</style>
+</#macro>
+<#macro modal>
+    <#include "../sku_select/_sku_select_modal.html" />
+</#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/message.ftl"/>
+<#include "../product_category/product_category_select_option.ftl"/>
+<@layout.layout script css _res.get("menu.product") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/settled_merchant_product": _res.get("breadcrumb.settled_merchant_product")}>
+    <@nav menus _res.get("breadcrumb.add")/>
+    <@msg message />
+    <#assign returnUrl><#if returnUrl??>${returnUrl}<#else>/product</#if></#assign>
+    <form id="product_form" role="form"
+          enctype="multipart/form-data"
+          action="${base}/settled_merchant_product/save/?returnUrl=${returnUrl?replace('&', '%26')}" method="post">
+        <table class="table table-bordered">
+            <tr>
+                <td class="col-key">${_res.get("product.name")}<span class="star-required">*</span></td>
+                <td colspan="3"><input type="text" class="form-control required" id="name" name="product.name"></td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("product.short_name")}<span class="star-required">*</span></td>
+                <td class="col-value"><input type="text" class="form-control required" id="short_name" name="product.short_name"></td>
+                <td class="col-key">${_res.get("product.sort_order")}</td>
+                <td class="col-value"><input type="number" id="sort_order" class="form-control required" name="product.sort_order" value="100"></td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("product.promoted")}</td>
+                <td class="col-value">
+                    <label class="radio-inline">
+                        <input type="radio" name="product.promoted" value="1" >${_res.get("product.promoted.1")}
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="product.promoted" value="0" checked>${_res.get("product.promoted.0")}
+                    </label>
+                </td>
+                <td class="col-key">${_res.get("product.unit")}<span class="star-required">*</span></td>
+                <td class="col-value"><input type="text" class="form-control required" id="unit" name="product.unit"></td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("product.price")}<span class="star-required">*</span></td>
+                <td class="col-value"><input type="number" step="0.01" class="form-control required" id="price" name="product.price" oninput="calcPoint(this,'point');"></td>
+                <td class="col-key">${_res.get("product.point")}</td>
+                <td class="col-value"><p class="form-control-static" id="point"></p></td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("product.cost_price")}<span class="star-required">*</span></td>
+                <td class="col-value"><input type="number" step="0.01" class="form-control required" name="product.cost_price" ></td>
+                <td class="col-key">${_res.get("product.suggested_price")}<span class="star-required">*</span></td>
+                <td class="col-value"><input type="number" step="0.01" class="form-control required" name="product.suggested_price" ></td>
+            </tr>
+            <#if !wmsPluginEnabled>
+            <tr>
+                <td class="col-key">${_res.get("product.stock_balance")}</td>
+                <td class="col-value">
+                    <input type="number" class="form-control" id="stock_balance" name="product.stock_balance" value="1000">
+                </td>
+                <td class="col-key"></td>
+                <td class="col-value"></td>
+            </tr>
+            </#if>
+            <tr>
+                <td class="col-key">${_res.get("product.weight")}<span class="star-required">*</span></td>
+                <td class="col-value"><input type="number" class="form-control digits required" name="product.weight" ></td>
+                <td class="col-key">${_res.get("product.bulk")}</td>
+                <td class="col-value"><input type="number" class="form-control" name="product.bulk" ></td>
+            </tr>
+
+            <tr>
+                <td class="col-key">${_res.get("product.category")}<span class="star-required">*</span></td>
+                <td class="col-value">
+                    <select name="product.category_id" id="category-id" class="form-control">
+                        <@select productCategories/>
+                    </select>
+                </td>
+                <td class="col-key">${_res.get("product.zone")}</td>
+                <td class="col-value">
+                    <#list partnerLevelZones as z>
+                        <label class="radio-inline">
+                            <input type="radio" name="product.partner_level_zone" value="${z.key}"  <#if z.key=="1">checked</#if> >${z.name}
+                        </label>
+                    </#list>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="col-key">${_res.get("product.fare_template")}<span class="star-required">*</span></td>
+                <td class="col-value">
+                    <select class="form-control required" name="product.fare_id">
+                        <#list fareTemplates as template>
+                            <option value="${template.id}">${template.name}</option>
+                        </#list>
+                    </select>
+                </td>
+                <td class="col-key"></td>
+                <td class="col-value"></td>
+            </tr>
+
+            <tr>
+                <#if purchaseStrategies?size gt 0>
+                <td class="col-key">${_res.get("product.purchase_strategy")}</td>
+                <td class="col-value">
+                    <select class="form-control" name="purchase_strategy_id">
+                        <option></option>
+                        <#list purchaseStrategies as strategy>
+                            <option value="${strategy.id}" >${strategy.name}</option>
+                        </#list>
+                    </select>
+                </td>
+                </#if>
+
+                <#if productBrands?size gt 0>
+                <td class="col-key">${_res.get("product.brand_name")}</td>
+                <td class="col-value">
+                    <select name="product.brand_id" class="form-control">
+                        <option value="">未选择</option>
+                        <#list productBrands as productBrand>
+                            <option value="${productBrand.id!}">${productBrand.name!}</option>
+                        </#list>
+                    </select>
+                </td>
+                </#if>
+            </tr>
+
+            <#if !wmsPluginEnabled>
+            <tr>
+                <td class="col-key">${_res.get("product.barcode")}</td>
+                <td class="col-value"><input type="text" class="form-control" name="product.barcode" ></td>
+                <td class="col-key">${_res.get("product.store_location")}</td>
+                <td class="col-value"><input type="text" class="form-control" name="product.store_location" ></td>
+            </tr>
+            </#if>
+
+            <#if wmsPluginEnabled>
+            <tr id="sku-tr">
+                <td class="col-key">SKU</td>
+                <td colspan="3">
+                    <input id="sku_id" type="hidden" name="product.sku_id" />
+                    <input id="sku_code" type="hidden" name="product.sku_code" />
+                    <input id="sku_name" type="hidden" name="product.sku_name" />
+                    <input id="bar_code" type="hidden" name="product.bar_code" />
+                    <div>
+                        <a href="#" class="btn btn-info" data-toggle="modal" data-target="#skuSelectModal">关联SKU</a>
+                    </div>
+                    <div style="margin-top:3px;">
+                        <span id="sku-select-result"></span>
+                    </div>
+                </td>
+            </tr>
+            </#if>
+
+            <tr>
+                <td class="col-key">规格</td>
+                <td colspan="3">
+                    <input type="hidden" id="spec-count" />
+                    <div>用户选购产品时需要选择的产品特性,比如颜色,香味等</div>
+                        <table class="table table-bordered table-hover">
+                        <tr>
+                            <th style="width: 10%">${_res.get("product.name")}</th>
+                            <th style="width: 8%">${_res.get("product.price")}</th>
+                            <th style="width: 8%">${_res.get("product.point")}</th>
+                            <th style="width: 8%">${_res.get("product.weight")}</th>
+                            <th style="width: 8%">${_res.get("product.cost_price")}</th>
+                            <th style="width: 10%">${_res.get("product.suggested_price")}</th>
+                            <#if !wmsPluginEnabled>
+                                <th style="width: 10%">${_res.get("product.stock_balance")}</th>
+                            </#if>
+                            <#if wmsPluginEnabled>
+                                <th style="25%">sku</th>
+                            </#if>
+                            <th style="width: 13%">${_res.get("product.action")}</th>
+                        </tr>
+                        <tr>
+                            <td colspan="10"><a id="spec-create-btn" class="btn btn-default btn-spec">+</a></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("product_category.properties")}</td>
+                <td colspan="3" id="properties-div"></td>
+            </tr>
+
+            <#if showSettlementSetting>
+            <tr>
+                <td class="col-key">${_res.get("product.settlement_proportion")}</td>
+                <td colspan="3">
+                    <table class="table table-hover table-bordered">
+                        <tr>
+                            <th>级别</th>
+                            <th>级别名称</th>
+                            <th>每件分成（元）</th>
+                        </tr>
+                        <tr>
+                            <input type="hidden" name="productSettlementProportion[0].id" value="0" />
+                            <input type="hidden" name="productSettlementProportion[0].level" value="0" />
+                            <input type="hidden" name="proportion[0].fixedvalue" value="true" />
+                            <input type="hidden" name="productSettlementProportion[0].type" value="PARTNER" />
+                            <td>0</td>
+                            <td><input type="text" class="form-control required"  name="productSettlementProportion[0].name" value="皇冠商"/></td>
+                            <td><input type="number" step="0.1" class="form-control" name="proportion[0].value" /></td>
+                        </tr>
+                        <tr>
+                            <input type="hidden" name="productSettlementProportion[1].id" value="1" />
+                            <input type="hidden" name="productSettlementProportion[1].level" value="1" />
+                            <input type="hidden" name="proportion[1].fixedvalue" value="true" />
+                            <input type="hidden" name="productSettlementProportion[1].type" value="PARTNER" />
+                            <td>1</td>
+                            <td><input type="text" class="form-control required"  name="productSettlementProportion[1].name" value="一星经销商"/></td>
+                            <td><input type="number" step="0.1" class="form-control" name="proportion[1].value" /></td>
+                        </tr>
+                        <tr>
+                            <input type="hidden" name="productSettlementProportion[2].id" value="2" />
+                            <input type="hidden" name="productSettlementProportion[2].level" value="2" />
+                            <input type="hidden" name="proportion[2].fixedvalue" value="true" />
+                            <input type="hidden" name="productSettlementProportion[2].type" value="PARTNER" />
+                            <td>2</td>
+                            <td><input type="text" class="form-control required" name="productSettlementProportion[2].name" value="二星经销商"/></td>
+                            <td><input type="number" step="0.1"  class="form-control" name="proportion[2].value" /></td>
+                        </tr>
+                        <tr>
+                            <input type="hidden" name="productSettlementProportion[3].id" value="3" />
+                            <input type="hidden" name="productSettlementProportion[3].level" value="3" />
+                            <input type="hidden" name="proportion[3].fixedvalue" value="true" />
+                            <input type="hidden" name="productSettlementProportion[3].type" value="PARTNER" />
+                            <td>3</td>
+                            <td><input type="text" class="form-control required" name="productSettlementProportion[3].name" value="三星经销商"/></td>
+                            <td><input type="number" step="0.1"  class="form-control" name="proportion[3].value" /></td>
+                        </tr>
+                        <tr>
+                            <input type="hidden" name="productSettlementProportion[4].id" value="4" />
+                            <input type="hidden" name="productSettlementProportion[4].level" value="4" />
+                            <input type="hidden" name="proportion[4].fixedvalue" value="true" />
+                            <input type="hidden" name="productSettlementProportion[4].type" value="PARTNER" />
+                            <td>4</td>
+                            <td><input type="text" class="form-control required" name="productSettlementProportion[4].name" value="四星经销商"/></td>
+                            <td><input type="number" step="0.1"  class="form-control" name="proportion[4].value" /></td>
+                        </tr>
+                        <tr>
+                            <input type="hidden" name="productSettlementProportion[5].id" value="5" />
+                            <input type="hidden" name="productSettlementProportion[5].level" value="5" />
+                            <input type="hidden" name="proportion[5].fixedvalue" value="true" />
+                            <input type="hidden" name="productSettlementProportion[5].type" value="PARTNER" />
+                            <td>5</td>
+                            <td><input type="text" class="form-control required" name="productSettlementProportion[5].name" value="五星经销商"/></td>
+                            <td><input type="number" step="0.1"  class="form-control" name="proportion[5].value" /></td>
+                        </tr>
+                        <tr>
+                            <input type="hidden" name="productSettlementProportion[6].id" value="6" />
+                            <input type="hidden" name="productSettlementProportion[6].level" value="6" />
+                            <input type="hidden" name="proportion[6].fixedvalue" value="true" />
+                            <input type="hidden" step="0.1" name="productSettlementProportion[6].type" value="PARTNER" />
+                            <td>6</td>
+                            <td><input type="text" class="form-control required" name="productSettlementProportion[6].name" value="六星经销商"/></td>
+                            <td><input type="number" step="0.1"  class="form-control" name="proportion[6].value" /></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            </#if>
+
+            <tr>
+                <td class="col-key">${_res.get("product.cover")}<span class="star-required">*</span></td>
+                <td colspan="3">
+                    <div class="row">
+                        <div class="col-md-2 col-sm-4">
+                            <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                                <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                                <img width="100%">
+                            </div>
+                            <input type="file" class="cover-form-control" accept="image/*" name="cover-1" onchange="previewCover(this);">
+                        </div>
+                        <div class="col-md-2 col-sm-4">
+                            <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                                <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                                <img width="100%">
+                            </div>
+                            <input type="file" class="cover-form-control" accept="image/*" name="cover-2" onchange="previewCover(this);">
+                        </div>
+                        <div class="col-md-2 col-sm-4">
+                            <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                                <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                                <img width="100%">
+                            </div>
+                            <input type="file" class="cover-form-control" accept="image/*" name="cover-3" onchange="previewCover(this);">
+                        </div>
+                        <div class="col-md-2 col-sm-4">
+                            <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                                <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                                <img width="100%">
+                            </div>
+                            <input type="file" class="cover-form-control" accept="image/*" name="cover-4" onchange="previewCover(this);">
+                        </div>
+                        <div class="col-md-2 col-sm-4">
+                            <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                                <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                                <img width="100%">
+                            </div>
+                            <input type="file" class="cover-form-control" accept="image/*" name="cover-5" onchange="previewCover(this);">
+                        </div>
+                        <div class="col-md-2 col-sm-4">
+                            <div onmouseenter="mouseEnterCover(this);" onmouseleave="mouseLeaveCover(this);" class="cover-box">
+                                <span class="glyphicon glyphicon-trash cover-delete hidden" onclick="coverDeleteClick(this);"></span>
+                                <img width="100%">
+                            </div>
+                            <input type="file" class="cover-form-control" accept="image/*" name="cover-6" onchange="previewCover(this);">
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-key">${_res.get("product.description")}</td>
+                <td colspan="3">
+                    <script type="text/plain" id="myEditor" name="description" style="width: 100%; min-height: 400px"></script>
+                </td>
+            </tr>
+        </table>
+
+
+        <hr>
+        <button id="submitBtn" type="submit" class="btn btn-primary">${_res.get("btn.save")}</button>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+
+    </form>
+</@layout.layout>

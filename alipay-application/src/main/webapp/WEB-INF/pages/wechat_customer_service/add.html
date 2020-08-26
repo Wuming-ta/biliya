@@ -1,0 +1,45 @@
+<#macro script>
+    <script>
+        $(document).ready(function(){
+            $('#form').validate();
+        });
+    </script>
+</#macro>
+<#macro css>
+    <style>
+        .tips {
+            font-weight: bold;
+            margin-top:6px;
+            padding-left: 10px;
+            border-left: 5px solid orange;
+        }
+    </style>
+</#macro>
+<#macro modal></#macro>
+
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+
+<@layout.layout script css _res.get("breadcrumb.wechat_customer_service") modal>
+    <#assign menus={"/": _res.get("breadcrumb.home"), "/wechat_customer_service": _res.get("breadcrumb.wechat_customer_service")}/>
+    <@nav menus _res.get("breadcrumb.add") />
+
+    <form class="form-horizontal" role="form" id="form" action="${base}/wechat_customer_service/save" method="post">
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="kf_account">${_res.get("wechat.wechat_customer_service.kf_account")}</label>
+            <div class="col-md-4">
+                <input type="text" class="form-control required" name="kf_account" id="kf_account" placeholder="帐号前缀@公众号微信号"/>
+                <div class="tips">提示: 帐号前缀最多10个字符，后缀为公众号微信号，最多30个字符</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="nickname">${_res.get("wechat.wechat_customer_service.nickname")}</label>
+            <div class="col-md-4">
+                <input type="text" class="form-control required" id="nickname" name="nickname" placeholder="最长6个汉字或12个英文字符"/>
+            </div>
+        </div>
+        <hr/>
+        <button type="submit" class="btn btn-primary">${_res.get("btn.submit")}</button>
+        <a class="btn btn-default" onclick="javascript:history.back();">${_res.get("btn.back")}</a>
+    </form>
+</@layout.layout>

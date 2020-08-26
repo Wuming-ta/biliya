@@ -1,0 +1,105 @@
+<#macro script>
+<script>
+  $(document).ready(function(){
+
+  });
+
+
+function openWindow(link) {
+    var win = window.open(link, 'view-qrcode', 'dialog=yes,modal=yes,width=300,height=500');
+    win.focus();
+}
+</script>  
+</#macro>
+<#macro css>
+<style>
+    .cover-image {
+        height: 60px;
+        width: 60px;
+        background-size: cover;
+        background-position: center;
+    }
+</style>
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.user") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home")}>
+    <@nav menus _res.get("breadcrumb.user")/>
+    <@msg message />
+
+    <div class="search-box">
+        <form class="form-inline">
+            <div class="form-group">
+                <label>${_res.get("identity.user.name")}/${_res.get("identity.user.login_name")}</label>
+                <input type="text" name="name" class="form-control" value="${name!}">
+            </div>
+            <div class="form-group">
+                <label>${_res.get("identity.user.status")}</label>
+                <select class="form-control" name="status">
+                    <option></option>
+                    <#list statuses as s>
+                    <option value="${s}" <#if (status??&&status==s)>selected="selected"</#if> >${_res.get("identity.user.status."+s?lower_case)}</option>
+            </#list>
+            </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">${_res.get("identity.user.search")}</button>
+            <@shiro.hasPermission name="identity.edit">
+            <span class="vertical-separator"></span>
+            <a class="btn btn-danger btn-sm" href="${base}/user/invalidQrcodeUrl"
+               onclick="javascript:if (confirm('${_res.get("identity.user.invalid_qrcode_confirm")}')){return true;} return false;">${_res.get("identity.user.btn.invalid_qrcode")}</a>
+            </@shiro.hasPermission>
+        </form>
+    </div>
+
+    <table class="table table-hover">
+        <tr>
+            <th>${_res.get("identity.user.id")}</th>
+            <th>${_res.get("identity.user.avatar")}</th>
+            <th>${_res.get("identity.user.name")}</th>
+            <th class="hidden-xs">${_res.get("identity.user.uid")}</th>
+            <th>${_res.get("identity.user.status")}</th>
+            <th class="hidden-sm hidden-xs">${_res.get("identity.user.followed")}</th>
+            <th class="hidden-sm hidden-xs">${_res.get("identity.user.followed.time")}</th>
+            <th class="hidden-sm hidden-xs">${_res.get("identity.user.invitation_qrcode_url")}</th>
+            <th>${_res.get("identity.user.action")}</th>
+        </tr>
+        <#list users.list as user>
+            <tr>
+                <td>${user.id}</td>
+                <td>
+                    <#if user.avatar??>
+                    <div class="cover-image" style="background-image: url(${user.avatar!});"></div>
+                    <#else>
+                    <div class="cover-image" style="background-image: url(${base}/assets/img/find_user.png);"></div>
+                    </#if>
+                </td>
+                <td>
+                    <@shiro.hasPermission name="identity.view"><a href="${base}/user/edit/${user.id}"></@shiro.hasPermission>
+                    ${user.name!'-'}
+                    <@shiro.hasPermission name="identity.view"></a></@shiro.hasPermission>
+                </td>
+                <td class="hidden-xs">${user.uid!}</td>
+                <td><label class="label <#if user.status=='NORMAL'>label-info<#else>label-default</#if>">${_res.get("identity.user.status."+user.status?lower_case)}</label></td>
+                <td class="hidden-sm hidden-xs"><label class="label <#if user.followed==0>label-info<#else>label-default</#if>">${_res.get("identity.user.followed."+user.followed)}</label></td>
+                <td class="hidden-sm hidden-xs"><#if user.followed==0>${user.follow_time!}</#if></td>
+                <td class="hidden-sm hidden-xs"><a href="javascript:openWindow('${user.invitation_qrcode_url!}')"><img src="${user.invitation_qrcode_url!}" height="60"></a></td>
+                <td>
+                    <@shiro.hasPermission name="identity.delete">
+                    <a class="btn btn-danger btn-sm" href="${base}/user/delete/${user.id}"
+                       onclick="javascript:if (confirm('${_res.get("identity.user.delete_confirm")}')){return true;} return false;">${_res.get("btn.delete")}</a>
+                    </@shiro.hasPermission>
+                </td>
+            </tr>
+        </#list>
+        <#if users.list?size == 0>
+        <td colspan="15">No Data</td>
+        </#if>
+    </table>
+    <@paginate currentPage=users.pageNumber totalPage=users.totalPage actionUrl="${base}/user?pageNumber=" urlParas="&name=${name!}&roleId=${roleId!}"/>
+
+</@layout.layout>

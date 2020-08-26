@@ -1,0 +1,56 @@
+
+<#macro script>
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.config.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/ueditor.all.js"></script>
+    <script src="${base}/assets/ueditor-1.4.3.3/lang/zh-cn/zh-cn.js"></script>
+    <script>
+      $(document).ready(function(){
+        UE.getEditor('myEditor');
+        $("form").validate();
+      });
+    </script>
+</#macro>
+<#macro css>
+    <link href="${base}/assets/ueditor-1.4.3.3/themes/default/css/ueditor.css" type="text/css" rel="stylesheet">
+</#macro>
+<#macro modal></#macro>
+<#import "../template/layout.ftl" as layout>
+<#include "../template/breadcrumb.ftl"/>
+<#include "../template/pagination.ftl"/>
+<#include "../template/message.ftl"/>
+<@layout.layout script css _res.get("breadcrumb.system_announcement") modal>
+    <#assign menus = {"/": _res.get("breadcrumb.home"), "/system_announcement": _res.get("breadcrumb.system_announcement")}/>
+    <@nav menus _res.get("breadcrumb.add")/>
+    <@msg message />
+
+    <form class="form-horizontal" action="${base}/system_announcement/save" method="post">
+        <div class="form-group">
+            <label class="col-md-2 control-label">${_res.get("misc.system_announcement.name")}</label>
+            <div class="col-md-8">
+                <input type="text" class="form-control required" name="systemAnnouncement.name">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label">${_res.get("misc.system_announcement.enabled")}</label>
+            <div class="col-md-8">
+                <label class="radio-inline">
+                    <input type="radio" name="systemAnnouncement.enabled" value="1" checked >${_res.get("misc.system_announcement.enabled.1")}
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="systemAnnouncement.enabled" value="0" >${_res.get("misc.system_announcement.enabled.0")}
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label">${_res.get("misc.system_announcement.content")}</label>
+            <div class="col-md-8">
+                <script type="text/plain" id="myEditor" name="systemAnnouncement.content" style="width: 100%; min-height: 400px"></script>
+            </div>
+        </div>
+
+        <hr>
+        <button type="submit" class="btn btn-primary">${_res.get("btn.save")}</button>
+        <a class="btn btn-default" href="javascript:history.back();">${_res.get("btn.back")}</a>
+    </form>
+
+</@layout.layout>

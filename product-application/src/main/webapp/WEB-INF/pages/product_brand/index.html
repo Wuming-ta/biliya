@@ -1,0 +1,47 @@
+<#macro script>
+    <script>
+        $(document).ready(function(){
+
+        });
+    </script>
+</#macro>
+<#macro css>
+    <style></style>
+</#macro>
+<#macro modal></#macro>
+
+<#import "../template/layout.ftl" as layout />
+<#include "../template/breadcrumb.ftl" />
+
+<@layout.layout script css _res.get("breadcrumb.product_brand") modal>
+    <#assign menus={"/": _res.get("breadcrumb.home")} />
+    <@nav menus _res.get("breadcrumb.product_brand") />
+
+    <div class="search-box">
+        <a class="btn btn-primary" href="${base}/product_brand/add">${_res.get("product_brand.btn.new")}</a>
+    </div>
+    <table class="table table-hover">
+        <tr>
+            <th style="width:15%;">${_res.get("product_brand.id")}</th>
+            <th style="width:15%;"></th>
+            <th style="width:15%;">${_res.get("product_brand.name")}</th>
+            <th style="width:15%;">${_res.get("action")}</th>
+        </tr>
+        <#list productBrands as productBrand>
+        <tr>
+            <td>${productBrand.id!}</td>
+            <td><img src="${productBrand.logo!}" style="height:60px;" /></td>
+            <td>${productBrand.name!}</td>
+            <td>
+                <a href="${base}/product_brand/edit/${productBrand.id!}" class="btn btn-primary btn-sm">${_res.get("btn.edit")}</a>
+                <a href="${base}/product_brand/delete/${productBrand.id!}" class="btn btn-danger btn-sm"
+                   onclick="return confirm('${_res.get('product_brand.delete_confirm')}');">${_res.get("btn.delete")}
+                </a>
+            </td>
+        </tr>
+        </#list>
+        <#if productBrands?size == 0>
+        <tr><td colspan="10">没有任何品牌</td></tr>
+        </#if>
+    </table>
+</@layout.layout>
