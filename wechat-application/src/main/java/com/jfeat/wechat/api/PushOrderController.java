@@ -89,8 +89,11 @@ public class PushOrderController extends RestController {
         PayService payService = (PayService) service;
         Map<String, Object> orderMap = null;
         try {
+            //获得订单数据
             orderMap = payService.retrieveToPayOrder(orderNumber);
+            logger.info("--------成功获取订单数据--------");
         } catch (RetrieveOrderException ex) {
+            logger.error(ex.getMessage());
             renderFailure("retrieve.order.failure");
             return;
         }
@@ -123,6 +126,7 @@ public class PushOrderController extends RestController {
         String sign = PaymentKit.createSign(params, WechatPayDefination.getPartnerKey(type));
         params.put("sign", sign);
         logger.debug("push order param: {}", params);
+        //访问远端进行统一下单
         String xmlResult = PaymentApi.pushOrder(params);
         Map result = PaymentKit.xmlToMap(xmlResult);
 
@@ -160,11 +164,14 @@ public class PushOrderController extends RestController {
                 packageParams.put("title", convertBody(description));
                 packageParams.put("totalFee", totalPrice.toPlainString());
                 packageParams.put("codeUrl", codeUrl);
+                logger.info("--------------------message:{}-------------------------",packageParams);
                 renderSuccess(packageParams);
                 return;
             }
         }
-        renderFailure(result.get("err_code_des") == null ? result.get("return_msg") : result.get("err_code_des"));
+        Object message = result.get("err_code_des") == null ? result.get("return_msg") : result.get("err_code_des");
+        logger.info("--------------------message:{}-------------------------",message);
+        renderFailure(message);
     }
 
     private String getNotifyUrl() {
