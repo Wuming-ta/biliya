@@ -8,6 +8,7 @@
   <name>webapp</name>
 
   <modules>
+    <module>captcha-service</module>
     <module>service-interface</module>
     <module>wechat-domain</module>
     <module>config-domain</module>
