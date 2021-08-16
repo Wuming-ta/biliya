@@ -1,0 +1,53 @@
+# docker run --name mall-webapp  -d --privileged=true \
+# -e TZ="Asia/Shanghai" \
+# -v /etc/localtime:/etc/localtime:ro \
+# -v ${PWD}/logs:/usr/local/tomcat/logs \
+# -v ${PWD}/config/setenv.sh:/usr/local/tomcat/bin/setenv.sh \
+# -v ${PWD}/config:/usr/local/tomcat/config \
+# -v ${PWD}/webapps:/usr/local/tomcat/webapps \
+# -v ${PWD}/images:/images \
+# --link mall-redis:redis
+
+version: "3.4"
+services:
+  api:
+    image: daocloud.io/library/tomcat:7-jre8
+    container_name: mall-webapp
+    environment: 
+      TZ: "Asia/Shanghai"
+    privileged: true
+    volumes: 
+      # - /etc/localtime:/etc/localtime:ro
+      - ./images:/images
+      - ./logs:/usr/local/tomcat/logs
+      - ./config/setenv.sh:/usr/local/tomcat/bin/setenv.sh
+      - ./config:/usr/local/tomcat/config
+      - ./webapps:/usr/local/tomcat/webapps
+      - ../target/mall-webapp-2.3.0.war:/usr/local/tomcat/webapps/ROOT.war
+    ports:
+      - 8081:8080
+
+  # 数据库服务
+  mysql:
+    # 容器名称
+    container_name: mall-mysql
+    # 镜像名称
+    image: 'mysql:8.0'
+    # 容器停止的重启策略，手动停止则策略不生效
+    restart: always
+    # 挂载区（左侧为系统路径，右侧为容器内路径）
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/sql_mode.cnf:/etc/mysql/mysql.conf.d/sql_mode.cnf
+      - ./mysql:/mysql
+      - ./mysql/tmp:/mysql/tmp
+    # 环境变量配置
+    environment:
+      # 时区配置
+      TZ: "Asia/Shanghai"
+      # 数据库名称配置
+      MYSQL_DATABASE: alliance
+      # 数据库ROOT密码配置
+      MYSQL_ROOT_PASSWORD: root
+    # 配置工作路径
+    working_dir: /mysql

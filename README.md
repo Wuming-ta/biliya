@@ -45,6 +45,8 @@ INSERT INTO `t_config` (`id`, `user_id`, `group_id`, `name`, `key_name`, `value_
 INSERT INTO `t_config` (`id`, `user_id`, `group_id`, `name`, `key_name`, `value_type`, `value`, `type`, `visible`, `description`, `readonly`, `org_id`) VALUES ('61', NULL, '2', '小程序密钥', 'wx.wxa_app_secret', 'String', '691046e704920c60c0ad98bee3c4a609', 'sys', '1', '微信小程序APP密钥', '0', NULL);
 INSERT INTO `t_config` (`id`, `user_id`, `group_id`, `name`, `key_name`, `value_type`, `value`, `type`, `visible`, `description`, `readonly`, `org_id`) VALUES ('93', NULL, '2', '小程序AppId', 'wxaAppid', 'String', 'wx335c2191e370c14e', 'wechatConfig', '1', '微信小程序APP ID', '0', NULL);
 INSERT INTO `t_config` (`id`, `user_id`, `group_id`, `name`, `key_name`, `value_type`, `value`, `type`, `visible`, `description`, `readonly`, `org_id`) VALUES ('94', NULL, '2', '小程序密钥', 'wxaAppSecret', 'String', '7cd4fec03bb529625eb64a39b9560c4a', 'wechatConfig', '1', '微信小程序APP密钥', '0', NULL);
+INSERT INTO `t_config` (`id`, `user_id`, `group_id`, `name`, `key_name`, `value_type`, `value`, `type`, `visible`, `description`, `readonly`, `org_id`) VALUES ('17', NULL, '3', 'API服务URL', 'misc.api_url', 'String', 'https://api.cloud.biliya.cn', 'sys', '1', 'API服务提供者的web service URL前缀。', '0', NULL);
+INSERT INTO `t_config` (`id`, `user_id`, `group_id`, `name`, `key_name`, `value_type`, `value`, `type`, `visible`, `description`, `readonly`, `org_id`) VALUES ('16', NULL, '3', '默认角色', 'misc.customer_role_id', 'int', '4', '', '0', '用户注册时默认添加的角色号。', '0', NULL);
 
 ```
 
@@ -81,5 +83,8 @@ INSERT INTO `t_config` (`id`, `user_id`, `group_id`, `name`, `key_name`, `value_
 INSERT INTO `t_config` (`id`, `user_id`, `group_id`, `name`, `key_name`, `value_type`, `value`, `type`, `visible`, `description`, `readonly`, `org_id`) VALUES ('24', NULL, '1002', 'token令牌', 'wx.token', 'String', 'mrt', 'sys', '1', '微信公众号后台的token. 进入 mp.weixin.qq.com 下面的开发-基本配置可以查看和修改。', '0', NULL);
 INSERT INTO `t_config` (`id`, `user_id`, `group_id`, `name`, `key_name`, `value_type`, `value`, `type`, `visible`, `description`, `readonly`, `org_id`) VALUES ('60', NULL, '1002', '小程序AppId', 'wx.wxa_appid', 'String', NULL, 'sys', '1', '微信小程序APP ID', '0', NULL);
 INSERT INTO `t_config` (`id`, `user_id`, `group_id`, `name`, `key_name`, `value_type`, `value`, `type`, `visible`, `description`, `readonly`, `org_id`) VALUES ('61', NULL, '2', '小程序密钥', 'wx.wxa_app_secret', 'String', NULL, 'sys', '1', '微信小程序APP密钥', '0', NULL);
+
+INSERT INTO `t_config` (`id`, `user_id`, `group_id`, `name`, `key_name`, `value_type`, `value`, `type`, `visible`, `description`, `readonly`, `org_id`) VALUES ('16', NULL, '3', '默认角色', 'misc.customer_role_id', 'int', '4', '', '1', '用户注册时默认添加的角色号。', '0', NULL);
+INSERT INTO `t_config` (`id`, `user_id`, `group_id`, `name`, `key_name`, `value_type`, `value`, `type`, `visible`, `description`, `readonly`, `org_id`) VALUES ('17', NULL, '3', 'API服务URL', 'misc.api_url', 'String', 'http://mall.smallsaas.cn', 'sys', '1', 'API服务提供者的web service URL前缀。', '0', NULL);
 
 ```

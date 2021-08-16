@@ -15,4 +15,5 @@ view-app/
 .factorypath
 .project
 .settings/
-.vscode/
+*.war
+.vscode

@@ -1285,10 +1285,11 @@ public class OrderService extends BaseService implements OrderPayService {
 
 
 
-    ///////////////////////// implement OrderPayService.
+    ///////////////////////// implement OrderPayService. 获取订单数据
     @Override
     public Map<String, Object> retrieveToPayOrder(String orderNumber) throws RetrieveOrderException {
         Order order = Order.dao.findByOrderNumber(orderNumber);
+        logger.error("order-info :{}",order.toJson());
         if (order == null) {
             logger.error("order not found. orderNumber = {}", orderNumber);
             throw new RetrieveOrderException("order not found. orderNumber = " + orderNumber);
