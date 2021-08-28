@@ -4,6 +4,7 @@ import com.jfeat.common.AuthConfigHolder;
 import com.jfeat.core.BaseService;
 import com.jfeat.core.RestController;
 import com.jfeat.ext.plugin.validation.Validation;
+import com.jfeat.http.utils.HttpUtils;
 import com.jfeat.identity.authc.AccessToken;
 import com.jfeat.identity.model.User;
 import com.jfeat.identity.service.DefaultRole;
@@ -12,6 +13,7 @@ import com.jfeat.identity.service.UserService;
 import com.jfeat.identity.subject.AttemptingUpdateInviterSubject;
 import com.jfeat.kit.EmojiFilterKit;
 import com.jfeat.util.DrawKit;
+import com.jfeat.wechat.api.fix.FixWxaUserApi;
 import com.jfeat.wechat.config.WechatConfig;
 import com.jfeat.wechat.config.WxConfig;
 import com.jfinal.aop.Enhancer;
@@ -21,6 +23,9 @@ import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.weixin.sdk.api.ApiResult;
+import com.jfinal.weixin.sdk.kit.PaymentKit;
+import com.jfinal.wxaapp.WxaConfig;
+import com.jfinal.wxaapp.WxaConfigKit;
 import com.jfinal.wxaapp.api.WxaQrcodeApi;
 import com.jfinal.wxaapp.api.WxaUserApi;
 
@@ -54,7 +59,7 @@ public class WxaLoginController extends RestController {
         String invitationCode = (String) maps.get("inviteCode");
 
         // 1. 根据code 取 sessionkey
-        WxaUserApi wxaUserApi = new WxaUserApi();
+        WxaUserApi wxaUserApi = new FixWxaUserApi();
         ApiResult sessionKeyResult = wxaUserApi.getSessionKey(code);
         System.out.println(sessionKeyResult);
         logger.debug("jscode2session result = {}", JsonKit.toJson(sessionKeyResult));
