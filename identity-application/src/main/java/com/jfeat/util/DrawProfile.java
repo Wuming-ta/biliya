@@ -4,11 +4,7 @@ import com.google.zxing.WriterException;
 import com.jfeat.kit.qrcode.QrcodeKit;
 import com.jfinal.kit.StrKit;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-
-import sun.awt.SunHints;
 
 
 /**
@@ -246,12 +240,13 @@ public class DrawProfile {
         }
         BufferedImage textImage = new BufferedImage(textWidth, textHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D textImageGraphics = textImage.createGraphics();
-        textImageGraphics.setRenderingHint(SunHints.KEY_ANTIALIASING, SunHints.VALUE_ANTIALIAS_OFF);
-        textImageGraphics.setRenderingHint(SunHints.KEY_TEXT_ANTIALIASING, SunHints.VALUE_TEXT_ANTIALIAS_DEFAULT);
-        textImageGraphics.setRenderingHint(SunHints.KEY_STROKE_CONTROL, SunHints.VALUE_STROKE_DEFAULT);
-        textImageGraphics.setRenderingHint(SunHints.KEY_TEXT_ANTIALIAS_LCD_CONTRAST, 140);
-        textImageGraphics.setRenderingHint(SunHints.KEY_FRACTIONALMETRICS, SunHints.VALUE_FRACTIONALMETRICS_OFF);
-        textImageGraphics.setRenderingHint(SunHints.KEY_RENDERING, SunHints.VALUE_RENDER_DEFAULT);
+        textImageGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        textImageGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT);
+        textImageGraphics.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_DEFAULT);
+        //textImageGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIAS_LCD_CONTRAST, 140);
+        textImageGraphics.setRenderingHint(RenderingHints.KEY_TEXT_LCD_CONTRAST, 140);
+        textImageGraphics.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
+        textImageGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_DEFAULT);
         textImageGraphics.setColor(Color.white);//background-color
         textImageGraphics.fillRect(0, 0, textWidth, textHeight);
         textImageGraphics.setColor(textColor);//color

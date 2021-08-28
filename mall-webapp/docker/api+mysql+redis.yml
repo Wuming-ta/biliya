@@ -26,7 +26,18 @@ services:
       #- ../target/mall-webapp-2.3.0.war:/usr/local/tomcat/webapps/ROOT.war
     ports:
       - 8081:8080
-
+  redis:
+    container_name: mall-redis
+    image: 'daocloud.io/library/redis:3.2.9'
+    environment:
+      TZ: "Asia/Shanghai"
+    ports:
+      - 6379:6379
+    volumes:
+      - ./mall-redis/conf:/usr/local/etc/redis
+    command:
+      redis-server /usr/local/etc/redis/redis.conf
+      
   # 数据库服务
   mysql:
     # 容器名称

@@ -1,0 +1,21 @@
+@endpoint=http://localhost:8081
+
+### 发送验证码
+POST {{endpoint}}/rest/pub/sms
+Content-Type: application/json
+
+{
+    "name": "ali",
+    "phone": "15800254850"
+}
+
+### 登录
+POST {{endpoint}}/rest/login
+Content-Type: application/json
+
+{
+  "username": "abc",
+  "password": "abc",
+  "phone": "13800000001",
+  "captcha": "134556"
+}

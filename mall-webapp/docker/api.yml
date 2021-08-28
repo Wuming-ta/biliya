@@ -26,27 +26,9 @@ services:
       #- ../target/mall-webapp-2.3.0.war:/usr/local/tomcat/webapps/ROOT.war
     ports:
       - 8081:8080
+    networks:
+      - cloudbiliyacn_default
 
-  # 数据库服务
-  mysql:
-    # 容器名称
-    container_name: mall-mysql
-    # 镜像名称
-    image: 'mysql:8.0'
-    # 容器停止的重启策略，手动停止则策略不生效
-    restart: always
-    # 挂载区（左侧为系统路径，右侧为容器内路径）
-    volumes:
-      - ./mysql/data:/var/lib/mysql
-      - ./mysql/logs:/var/log/mysql
-      - ./mysql/mysql.conf.d/sql_mode.cnf:/etc/mysql/mysql.conf.d/sql_mode.cnf
-    # 环境变量配置
-    environment:
-      # 时区配置
-      TZ: "Asia/Shanghai"
-      # 数据库名称配置
-      MYSQL_DATABASE: alliance
-      # 数据库ROOT密码配置
-      MYSQL_ROOT_PASSWORD: root
-    # 配置工作路径
-    working_dir: /mysql
+networks:
+  cloudbiliyacn_default: 
+     external: true      

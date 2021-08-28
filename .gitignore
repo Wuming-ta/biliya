@@ -17,3 +17,7 @@ view-app/
 .settings/
 *.war
 .vscode
+
+## additional
+mall-webapp-2.3.0/
+mall-webapp/docker/mysql/data/

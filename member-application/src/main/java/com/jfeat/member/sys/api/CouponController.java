@@ -15,16 +15,13 @@ package com.jfeat.member.sys.api;
 import com.google.common.collect.Maps;
 import com.jfeat.core.BaseService;
 import com.jfeat.core.RestController;
-import com.jfeat.identity.interceptor.CurrentUserInterceptor;
 import com.jfeat.identity.model.User;
 import com.jfeat.member.model.Coupon;
 import com.jfeat.member.model.CouponTakenRecord;
 import com.jfeat.member.service.CouponStrategyService;
-import com.jfinal.aop.Before;
 import com.jfinal.ext.route.ControllerBind;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.util.List;
 import java.util.Map;

@@ -1,0 +1,7 @@
+version: "3"
+services:
+  sport:
+    image: registry.docker.internal:5000/sport:phrase3
+    build:
+      context: .
+      dockerfile: ./Dockerfile.build

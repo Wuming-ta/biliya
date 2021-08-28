@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  sport:
+    # image: tomcat:9
+    image: registry.docker.internal:5000/sport:phrase3
+    container_name: sport_phrase3
+    build:
+      context: .
+      dockerfile: ./Dockerfile.build
+    privileged: true
+    volumes:
+      - ./server/logs:/usr/local/tomcat/logs
+      - ./server/config:/usr/local/tomcat/config
+      # - ./server/sport_war:/usr/local/tomcat/webapps
+    ports:
+      - '8080:8080'
+    depends_on:
+        - mysqlserver
+
+  mysqlserver:
+      image: daocloud.io/library/mysql:5.7
+      container_name: mysqlserver
+      privileged: true
+      environment:
+         MYSQL_ROOT_PASSWORD: root
+         MYSQL_DATABASE: sport
+      volumes:
+         - ./server/mysql.conf.d/sql_mode.cnf:/etc/mysql/mysql.conf.d/sql_mode.cnf
+         - ./sport_20210327.sql:/docker-entrypoint-initdb.d/sport.sql
+   #     - /var/local/mysql/data:/var/lib/mysql
+   #     - /var/local/mysql/logs:/var/log/mysql
+
+  #  busybox:
+  #   # image: daocloud.io/library/busybox
+  #   image: yauritux/busybox-curl
+  #   container_name: busybox
+  

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.jfeat</groupId>
+  <artifactId>webapp-domain</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>	
+  <name>webapp-domain</name>
+
+  <modules>
+    <module>captcha-service</module>
+    <module>service-interface</module>
+    <module>wechat-domain</module>
+    <module>config-domain</module>
+    <module>config-application</module>
+    <module>event-log-domain</module>
+    <module>pcd-domain</module>
+    <module>ext-plugin-base</module>
+    <module>ext-plugin-wms</module>
+    <module>product-domain</module>
+    <module>ext-plugin-vip</module>
+    <module>identity-domain</module>
+    <module>member-domain</module>
+    <module>order-domain</module>
+    <module>cooperative-partner-domain</module>
+    <module>merchant-domain</module>
+    <module>marketing-domain</module>
+    <module>settlement-domain</module>
+    <module>misc-domain</module>
+    <module>mall-cron</module>
+  </modules>
+
+</project>
