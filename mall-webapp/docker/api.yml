@@ -17,13 +17,12 @@ services:
       TZ: "Asia/Shanghai"
     privileged: true
     volumes: 
-      # - /etc/localtime:/etc/localtime:ro
+      - /etc/localtime:/etc/localtime:ro
       - ./images:/images
       - ./logs:/usr/local/tomcat/logs
       - ./config/setenv.sh:/usr/local/tomcat/bin/setenv.sh
       - ./config:/usr/local/tomcat/config
       - ./webapps:/usr/local/tomcat/webapps
-      #- ../target/mall-webapp-2.3.0.war:/usr/local/tomcat/webapps/ROOT.war
     ports:
       - 8081:8080
     networks:

@@ -1,0 +1,20 @@
+# docker run --name mall-webapp  -d --privileged=true \
+# -e TZ="Asia/Shanghai" \
+# -v /etc/localtime:/etc/localtime:ro \
+# -v ${PWD}/logs:/usr/local/tomcat/logs \
+# -v ${PWD}/config/setenv.sh:/usr/local/tomcat/bin/setenv.sh \
+# -v ${PWD}/config:/usr/local/tomcat/config \
+# -v ${PWD}/webapps:/usr/local/tomcat/webapps \
+# -v ${PWD}/images:/images \
+# --link mall-redis:redis
+
+version: "3.4"
+services:
+  api:
+    image: daocloud.io/library/tomcat:7-jre8
+    volumes:
+      - ./config/local.api.setenv.sh:/usr/local/tomcat/bin/setenv.sh
+      - ./config/config.properties:/usr/local/tomcat/config/config.properties
+      - ../target/mall-webapp-2.3.0.war:/usr/local/tomcat/webapps/ROOT.war
+    ports:
+      - 5005:5005
