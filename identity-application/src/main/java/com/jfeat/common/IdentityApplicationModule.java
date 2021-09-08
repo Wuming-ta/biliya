@@ -16,6 +16,7 @@ import com.jfeat.core.JFeatConfig;
 import com.jfeat.core.Module;
 import com.jfeat.ext.plugin.ExtPluginHolder;
 import com.jfeat.ext.plugin.StorePlugin;
+import com.jfeat.identity.api.model.PhoneCaptchaWhitelist;
 import com.jfeat.identity.filter.sys.SysAuthorizationProviderConfigFileImpl;
 import com.jfeat.identity.filter.sys.SysRealm;
 import com.jfeat.identity.interceptor.CurrentUserInterceptor;
@@ -123,6 +124,17 @@ public class IdentityApplicationModule extends Module {
                 getJFeatConfig().getProperty("ext.store.api.host", getJFeatConfig().getProperty("ext.api.host")),
                 getJFeatConfig().getProperty("ext.store.jwt.key", getJFeatConfig().getProperty("ext.jwt.key")));
         ExtPluginHolder.me().start(StorePlugin.class, storePlugin);
+
+        
+        // 增加手机测试白名单
+        String smsCaptchaWhitelist = getJFeatConfig().getProperty("sms.captcha.whitelist", "");
+        {
+            final String WHITELIST_CAPTCHA = "000000";
+            for (String phone : smsCaptchaWhitelist.split(",")) {
+                PhoneCaptchaWhitelist.getInstance().register(phone, WHITELIST_CAPTCHA);
+            }
+        }
+
     }
 
     @Override

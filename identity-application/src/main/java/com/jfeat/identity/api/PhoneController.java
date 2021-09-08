@@ -2,6 +2,7 @@ package com.jfeat.identity.api;
 
 import com.jfeat.captcha.CaptchaKit;
 import com.jfeat.common.AuthConfigHolder;
+import com.jfeat.core.BaseController;
 import com.jfeat.core.RestController;
 import com.jfeat.ext.plugin.validation.Validation;
 import com.jfeat.identity.api.model.PhoneCaptcha;
@@ -12,10 +13,15 @@ import com.jfeat.identity.service.UserService;
 import com.jfinal.aop.Before;
 import com.jfinal.aop.Enhancer;
 import com.jfinal.ext.route.ControllerBind;
+import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.tx.Tx;
 
 import java.util.Map;
+import com.jfeat.core.Module;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * @author jackyhuang
@@ -23,17 +29,17 @@ import java.util.Map;
  */
 @ControllerBind(controllerKey = "/rest/phone")
 public class PhoneController extends RestController {
+    public static Logger logger = LoggerFactory.getLogger(PhoneController.class);
+
     /*
         可通过第三方模块注册/注销白名单
      */
-    private String WHITELIST__PHONE  = "15800254850";
-    private String WHITELIST_CAPTCHA = "000000";
-
-    private PhoneCaptchaWhitelist whitelist = PhoneCaptchaWhitelist.getInstance().register(WHITELIST__PHONE, WHITELIST_CAPTCHA);
+    //private String WHITELIST__PHONE  = "15800254850";
+    //private static String WHITELIST_CAPTCHA = "000000";
+    //private PhoneCaptchaWhitelist whitelist = PhoneCaptchaWhitelist.getInstance().register(WHITELIST__PHONE, WHITELIST_CAPTCHA);
     /**
      * End whitelist
      */
-
 
     ///
     private UserService userService = Enhancer.enhance(UserService.class);
@@ -52,7 +58,8 @@ public class PhoneController extends RestController {
         String name = (String) map.get("name");
         String captcha = (String) map.get("captcha");
 
-        boolean whitelistPassed = whitelist.check(phone,captcha);
+        boolean whitelistPassed = PhoneCaptchaWhitelist.getInstance().check(phone,captcha);
+
         if(!whitelistPassed) {
             if (!CaptchaKit.verifyCode(phone, captcha)) {
                 renderFailure("captcha.invalid");
@@ -63,12 +70,17 @@ public class PhoneController extends RestController {
         }
 
         User user = User.dao.findByPhone(phone);
-        if(!whitelistPassed) {
+        if(! whitelistPassed) {
+            /// 正常检查
             if (user == null || user.getId().equals(currentUser.getId())) {
                 userService.updatePhone(currentUser.getId(), phone);
                 renderSuccess("phone.updated");
                 return;
             }
+            //else{
+            //    logger.info("phoneUser={}", JsonKit.toJson(user));
+            //    logger.info("currentUser={}}", JsonKit.toJson(currentUser));
+            //}
         }else{
             // 白名单独立处理，逻辑尽可能不影响原功能
             //
@@ -84,10 +96,12 @@ public class PhoneController extends RestController {
             return;
         }
 
-        logger.warn("phone.already.exist, phone = {}", phone);
-        logger.debug("merge conflict user enabled = {}", AuthConfigHolder.me().isMergeUserEnabled());
-        if (needMerge(user)) {
+        logger.warn("phone.already.exist, phone: {}", phone);
+        logger.debug("merge conflict user enabled={}, currentUser={}, user={}", AuthConfigHolder.me().isMergeUserEnabled(), currentUser.getId(), user.getId());
+        //if (needMerge(user)) {
+        if(AuthConfigHolder.me().isMergeUserEnabled()){
             logger.debug("merging user id:{} => id:{}", currentUser.getId(), user.getId());
+
             user.setWeixin(currentUser.getWeixin());
             user.setWxUnionid(currentUser.getWxUnionid());
             user.setWxappOpenid(currentUser.getWxappOpenid());
@@ -105,11 +119,13 @@ public class PhoneController extends RestController {
 
     private boolean needMerge(User phoneUser) {
         if (AuthConfigHolder.me().isMergeUserEnabled()) {
+            logger.info("weixin= {}, wxaOpenid={}, wxappOpenid={}", phoneUser.getWeixin(), phoneUser.getWxaOpenid(), phoneUser.getWxappOpenid());
             if (StrKit.isBlank(phoneUser.getWeixin())
                     && StrKit.isBlank(phoneUser.getWxaOpenid())
                     && StrKit.isBlank(phoneUser.getWxappOpenid())) {
                 return true;
             }
+            return true;
         }
         return false;
     }
