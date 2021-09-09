@@ -21,11 +21,15 @@ import java.util.List;
 public class ClientAccessMayAuthenticationFilter extends OncePerRequestFilter {
     private static Logger logger = LoggerFactory.getLogger(ClientAccessMayAuthenticationFilter.class);
     private static final String BEARER = "Bearer ";
+    private static final String OBJECT_NULL = "[object Null]";
 
     @Override
     protected void doFilterInternal(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws ServletException, IOException {
         logger.debug("authenticating");
         String authorizationHeader = ServletUtils.getAuthzHeader(servletRequest);
+        if(authorizationHeader.equalsIgnoreCase(OBJECT_NULL)){
+            authorizationHeader = "";
+        }
         if (StrKit.isBlank(authorizationHeader)) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;

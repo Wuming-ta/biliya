@@ -1,0 +1,7 @@
+version: "3.4"
+services:
+  build:
+    image: mall:webapp
+    build:
+      context: ..
+      dockerfile: ./Dockerfile.build

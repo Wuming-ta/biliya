@@ -49,17 +49,20 @@ public class ServletUtils {
 
     public static String getDeviceId(ServletRequest servletRequest) {
         HttpServletRequest request = WebUtils.toHttp(servletRequest);
-        return request.getHeader(DEVICE_ID);
+        String result= request.getHeader(DEVICE_ID);
+        return result==null?"":result;
     }
 
     public static String getClientName(ServletRequest servletRequest) {
         HttpServletRequest request = WebUtils.toHttp(servletRequest);
-        return request.getHeader(CLIENT_NAME);
+        String result= request.getHeader(CLIENT_NAME);
+        return result==null?"":result;
     }
 
     public static String getAuthzHeader(ServletRequest request) {
         HttpServletRequest httpRequest = WebUtils.toHttp(request);
-        return httpRequest.getHeader(AUTHORIZATION_HEADER);
+        String result =  httpRequest.getHeader(AUTHORIZATION_HEADER);
+        return result==null?"":result;
     }
 
     public static void sendBadResponse(ServletResponse servletResponse, String message, int errorCode) throws IOException {

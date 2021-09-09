@@ -1,6 +1,7 @@
 package com.jfeat.wechat.api;
 
 import com.jfeat.common.AuthConfigHolder;
+import com.jfeat.core.BaseController;
 import com.jfeat.core.BaseService;
 import com.jfeat.core.RestController;
 import com.jfeat.ext.plugin.validation.Validation;
@@ -28,6 +29,8 @@ import com.jfinal.wxaapp.WxaConfig;
 import com.jfinal.wxaapp.WxaConfigKit;
 import com.jfinal.wxaapp.api.WxaQrcodeApi;
 import com.jfinal.wxaapp.api.WxaUserApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +44,8 @@ import java.util.Map;
  */
 @ControllerBind(controllerKey = "/rest/login_wxa")
 public class WxaLoginController extends RestController {
+
+    private static Logger logger = LoggerFactory.getLogger(WxaLoginController.class);
 
     private UserService userService = Enhancer.enhance(UserService.class);
 

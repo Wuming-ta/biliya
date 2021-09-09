@@ -1,0 +1,16 @@
+version: "3.4"
+services:
+  api:
+    image: daocloud.io/library/tomcat:7-jre8
+    container_name: mall-webapp
+    privileged: true
+    environment: 
+      TZ: "Asia/Shanghai"
+    volumes: 
+      # - /etc/localtime:/etc/localtime:ro
+      - ./images:/images
+      - ./logs:/usr/local/tomcat/logs
+      - ./config/setenv.sh:/usr/local/tomcat/bin/setenv.sh
+      - ./config:/usr/local/tomcat/config
+      - ./webapps:/usr/local/tomcat/webapps
+      #- ../target/mall-webapp-2.3.0.war:/usr/local/tomcat/webapps/ROOT.war

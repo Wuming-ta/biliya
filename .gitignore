@@ -1,5 +1,6 @@
 target/
 build/
+WEB-INF/
 /gen/
 .idea/
 .gradle/
