@@ -31,6 +31,22 @@ CREATE TABLE IF NOT EXISTS t_user  (
   follow_time datetime default null,
   invitation_qrcode_url varchar(200), /*邀请二维码图片地址*/
   invitation_qrcode varchar(200), /*邀请二维码编码前数据*/
+    `wx_unionid` varchar(50) DEFAULT NULL,
+  `wxa_openid` varchar(50) DEFAULT NULL,
+  `wxapp_openid` varchar(50) DEFAULT NULL,
+  `app_user` int(11) DEFAULT '0',
+  `wechat_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `grade` varchar(50) DEFAULT NULL,
+  `contact_phone` varchar(50) DEFAULT NULL COMMENT '员工联系电话',
+  `contact_wx_number` varchar(50) DEFAULT NULL COMMENT '员工联系微信号',
+  `cabin_code` varchar(50) DEFAULT NULL COMMENT '关注小屋',
+  `store_code` varchar(50) DEFAULT NULL COMMENT '关注门店',
+  `assistant_code` varchar(50) DEFAULT NULL COMMENT '导购员',
+  `wxa_invitation_qrcode_url` varchar(250) DEFAULT NULL COMMENT '小程序邀请二维码',
+  `last_modified_time` datetime DEFAULT NULL,
+  `org_id` bigint(20) DEFAULT '0' COMMENT '数据隔离字段',
+  `org_name` varchar(80) DEFAULT NULL COMMENT '租户名称',
+  `domain` varchar(255) DEFAULT NULL COMMENT '用户所属租户域名',
   foreign key (inviter_id) references t_user (id) on delete set null
 ) ENGINE=InnoDB  DEFAULT CHARSET=UTF8;
 
