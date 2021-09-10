@@ -12,11 +12,9 @@ package com.jfeat.ext.plugin.jms;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.jfinal.ext.plugin.config.ConfigPlugin;
 import com.jfinal.kit.StrKit;
 import com.jfinal.log.Log;
 import com.jfinal.plugin.IPlugin;
-import org.omg.PortableInterceptor.INACTIVE;
 
 import javax.jms.MessageListener;
 import java.util.List;

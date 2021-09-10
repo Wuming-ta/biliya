@@ -9,7 +9,6 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
-import sun.security.krb5.Config;
 
 /**
  * @author jackyhuang

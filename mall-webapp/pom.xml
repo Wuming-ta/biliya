@@ -16,6 +16,17 @@
     <!-- 依赖项定义 -->
     <dependencies>
         <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.jfeat</groupId>
             <artifactId>mall-cron</artifactId>
             <version>${project.version}</version>
@@ -686,6 +697,7 @@
                     </overlays>
                 </configuration>
             </plugin>
+
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

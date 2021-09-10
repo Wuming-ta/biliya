@@ -18,6 +18,10 @@ public final class PhotoGalleryConstants {
     }
 
     public String getHost() {
+        //get host from domain
+        if("".equals(host)){
+            host = "";
+        }
         return host;
     }
 
