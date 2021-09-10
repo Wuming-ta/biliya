@@ -13,6 +13,7 @@ import com.jfinal.ext.route.ControllerBind;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -99,6 +100,10 @@ public class WxaRegisterController extends RestController {
         newUser.setWxUnionid(unionid);
         newUser.setAppUser(User.APP_USER);
         newUser.setPassword(RandomKit.randomMD5Str());
+
+        HttpServletRequest request = getRequest();
+        String serverName = request.getServerName();
+        newUser.setDomain(serverName);
 
         User inviter = User.dao.findByInvitationCode(inviteCode);
         if (inviter != null) {

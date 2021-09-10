@@ -64,7 +64,8 @@ public abstract class UserBase<M extends UserBase<?>> extends BaseModel<M> imple
         CONTACT_WX_NUMBER("contact_wx_number"),
         CABIN_CODE("cabin_code"),
         STORE_CODE("store_code"),
-        ASSISTANT_CODE("assistant_code");
+        ASSISTANT_CODE("assistant_code"),
+        DOMAIN("domain");
         
         private String name;
         Fields(String name) {
@@ -391,6 +392,8 @@ public abstract class UserBase<M extends UserBase<?>> extends BaseModel<M> imple
         return (String) get(Fields.ASSISTANT_CODE.toString());
     }
 
+    public void setDomain(String var){set(Fields.DOMAIN.toString(),var);}
+    public String getDomain(){return (String) get(Fields.DOMAIN.toString());}
 
     ///////////////////////////////////////////////////////////////////////////
     
