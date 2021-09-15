@@ -54,7 +54,9 @@ public class CoreModule extends Module {
         me.setI18nDefaultBaseName("i18n/messages");
 
         String uploadPath = getJFeatConfig().getProperty("uploadPath");
+        String oldUploadHost = getJFeatConfig().getProperty("uploadPath","");
         String uploadHost = getJFeatConfig().getProperty("uploadHost", "");
+
         if (StrKit.isBlank(uploadPath)) {
             uploadPath = PathKit.getWebRootPath();
         }
@@ -67,7 +69,7 @@ public class CoreModule extends Module {
         me.setBaseUploadPath("/");
         PhotoGalleryConstants.me().setHost(uploadHost);
         PhotoGalleryConstants.me().setUploadPath(uploadPath);
-
+        PhotoGalleryConstants.me().setOldUploadPath(oldUploadHost);
         String qiniuAk = getJFeatConfig().getProperty("qiniu.ak");
         String qiniuSk = getJFeatConfig().getProperty("qiniu.sk");
         String qiniuBucket = getJFeatConfig().getProperty("qiniu.bucket");

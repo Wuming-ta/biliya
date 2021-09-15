@@ -43,6 +43,7 @@ public class UploadImage {
         }
 
         String uploadPath = PhotoGalleryConstants.me().getUploadPath();
+
         String subDir = "/upload/" + DateKit.today("yyyy-MM-dd") + "/";
         File targetDir = new File(uploadPath + subDir);
         if (!targetDir.exists()) {
@@ -51,7 +52,7 @@ public class UploadImage {
         String imgFileName = DateKit.today("yyyyMMddHHmmss") + "-" + RandomStringUtils.randomNumeric(5) + ".png";
         String imgFilePath = uploadPath + subDir + imgFileName;
         //String url = PhotoGalleryConstants.me().getHost() + subDir + imgFileName;
-        String url = PhotoGalleryConstants.me().getUploadPath() + subDir + imgFileName;
+        String url = PhotoGalleryConstants.me().getOldUploadPath() + subDir + imgFileName;
 
         logger.debug("save uploaded file to {}", imgFilePath);
 
