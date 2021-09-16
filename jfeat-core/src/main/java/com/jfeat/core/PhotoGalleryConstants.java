@@ -6,7 +6,6 @@ package com.jfeat.core;
 public final class PhotoGalleryConstants {
     private String host = "";
     private String uploadPath;
-    private String oldUploadPath;
 
     private static PhotoGalleryConstants me = new PhotoGalleryConstants();
 
@@ -28,14 +27,6 @@ public final class PhotoGalleryConstants {
 
     public void setHost(String host) {
         this.host = host;
-    }
-
-    public String getOldUploadPath() {
-        return oldUploadPath;
-    }
-
-    public void setOldUploadPath(String oldUploadPath) {
-        this.oldUploadPath = oldUploadPath;
     }
 
     public String getUploadPath() {

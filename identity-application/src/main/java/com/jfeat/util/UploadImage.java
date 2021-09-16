@@ -51,8 +51,7 @@ public class UploadImage {
         }
         String imgFileName = DateKit.today("yyyyMMddHHmmss") + "-" + RandomStringUtils.randomNumeric(5) + ".png";
         String imgFilePath = uploadPath + subDir + imgFileName;
-        //String url = PhotoGalleryConstants.me().getHost() + subDir + imgFileName;
-        String url = PhotoGalleryConstants.me().getOldUploadPath() + subDir + imgFileName;
+        String url = PhotoGalleryConstants.me().getHost() + subDir + imgFileName;
 
         logger.debug("save uploaded file to {}", imgFilePath);
 
