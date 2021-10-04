@@ -11,6 +11,8 @@
 **/*.*proj.user
 **/*.dbmdl
 **/*.jfm
+**/.gradle
+**/.idea
 **/azds.yaml
 **/bin
 **/charts
@@ -23,3 +25,10 @@
 **/secrets.dev.yaml
 **/values.dev.yaml
 README.md
+**/tests
+**/test
+*.sh
+*.iml
+*.sql
+**/hotspot
+**/docker

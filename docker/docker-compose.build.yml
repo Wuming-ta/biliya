@@ -1,7 +1,7 @@
 version: "3"
 services:
-  sport:
-    image: registry.docker.internal:5000/sport:phrase3
+  webapp:
+    image: biliya:webapp
     build:
-      context: .
-      dockerfile: ./Dockerfile.build
+      context: ../
+      dockerfile: ./docker/Dockerfile.build

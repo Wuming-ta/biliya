@@ -17,7 +17,8 @@ view-app/
 .project
 .settings/
 *.war
-.vscode
+.vscode/
+.m2/
 
 ## additional
 mall-webapp-2.3.0/

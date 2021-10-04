@@ -90,7 +90,7 @@ public class ProductSettlementProportion extends ProductSettlementProportionBase
         }
 
         public Double getValue() {
-            return (Double) map.get(VALUE);
+            return Double.valueOf(map.get(VALUE).toString());
         }
 
         public void setValue(Double value) {
@@ -98,7 +98,7 @@ public class ProductSettlementProportion extends ProductSettlementProportionBase
         }
 
         public Double getValue(Integer id) {
-            return (Double) map.get(id + "");
+            return Double.valueOf(map.get(id + "").toString());
         }
 
         public void setValue(Integer id, Double value) {
