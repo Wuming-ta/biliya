@@ -41,11 +41,11 @@
     <module>misc-domain</module>
     <module>misc-application</module>
     <module>mall-cron</module>
-    <module>alipay-application</module>
+    <!-- <module>alipay-application</module> -->
 <!--    <module>ext-plugin-perm-data</module>-->
-    <module>ext-plugin-store</module>
+    <!-- <module>ext-plugin-store</module> -->
 <!--    <module>ext-plugin-html</module>-->
-    <module>mall-webapp</module>
+    <!-- <module>mall-webapp</module> -->
   </modules>
 
 </project>

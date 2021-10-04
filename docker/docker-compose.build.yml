@@ -1,7 +1,0 @@
-version: "3"
-services:
-  webapp:
-    image: biliya:webapp
-    build:
-      context: ../
-      dockerfile: ./docker/Dockerfile.build

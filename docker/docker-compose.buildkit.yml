@@ -4,15 +4,9 @@ services:
     image: biliya:webapp
     build:
       context: ../
-      dockerfile: ./docker/Dockerfile
-    volumes:
-      - maven-repo:/root/.m2
-      - ./target:/var/webapps
+      dockerfile: ./docker/Dockerfile.buildkit
     command:
       - /bin/sh
       - -c
       - |
         cp /usr/src/mall-webapp/target/*.war /var/webapps
-
-volumes:
-  maven-repo:

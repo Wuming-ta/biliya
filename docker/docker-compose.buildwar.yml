@@ -1,18 +1,13 @@
 version: "3"
 services:
-  webapp:
-    image: biliya:webapp
+  war:
     build:
       context: ../
-      dockerfile: ./docker/Dockerfile
+      dockerfile: ./docker/Dockerfile.buildwar
     volumes:
-      - maven-repo:/root/.m2
-      - ./target:/var/webapps
+      - ./target:/var/webapps      
     command:
       - /bin/sh
       - -c
       - |
         cp /usr/src/mall-webapp/target/*.war /var/webapps
-
-volumes:
-  maven-repo:
