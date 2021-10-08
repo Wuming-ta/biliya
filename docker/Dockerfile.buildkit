@@ -12,11 +12,11 @@ COPY . .
 
 ## install
 RUN rm -rf /root/.m2/repository/com/jfeat
-RUN --mount=type=cache,id=m2_cache,target=/root/.m2,rw mvn -Dmaven.main.skip=true -Dmaven.test.skip=true install
+RUN --mount=type=cache,id=m2_cache,target=/root/.m2,rw mvn -Dmaven.test.skip=true install
 
 ## package
 WORKDIR /usr/src/mall-webapp
-RUN --mount=type=cache,id=m2_cache,target=/root/.m2,rw mvn -Dmaven.main.skip=true -Dmaven.test.skip=true package
+RUN --mount=type=cache,id=m2_cache,target=/root/.m2,rw mvn -Dmaven.test.skip=true package
 
 #final-stage
 FROM tomcat:jre11-temurin
