@@ -16,7 +16,7 @@ RUN --mount=type=cache,id=m2_cache,target=/root/.m2,rw mvn -Dmaven.main.skip=tru
 
 ## package
 WORKDIR /usr/src/mall-webapp
-RUN --mount=type=cache,id=m2_cache,target=/root/.m2,rw mvn -Dmaven.main.skip=true -Dmaven.test.skip=true package
+RUN --mount=type=cache,id=m2_cache,target=/root/.m2,rw mvn -Dmaven.test.skip=true package
 
 # #final-stage
 # FROM tomcat:jre11-temurin
