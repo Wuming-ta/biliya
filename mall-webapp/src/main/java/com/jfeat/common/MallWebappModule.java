@@ -59,7 +59,7 @@ public class MallWebappModule extends Module {
         new MerchantApplicationModule(jfeatConfig);
         new CaptchaServiceModule(jfeatConfig);
 //        new ExtPluginHtmlModule(jfeatConfig);
-        new AlipayApplicationModule(jfeatConfig);
+//        new AlipayApplicationModule(jfeatConfig);
         new MallCronModule(jfeatConfig);
     }
 
