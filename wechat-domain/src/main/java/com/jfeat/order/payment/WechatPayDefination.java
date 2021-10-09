@@ -27,22 +27,22 @@ public class WechatPayDefination {
     }
 
     /**
-     *        //微信公众号(Wechat public account)
-     *         WPA,
-     *         //小程序
-     *         MINI_PROGRAM,
-     *         //手机应用程序
-     *         APP_ANDROID,
-     *         APP_IOS,
-     *         IPAD,
+     * 下单设备
+     *         //微信公众号   WPA,
+     *         //小程序       MINI_PROGRAM,
+     *         //安卓        APP_ANDROID,
+     *         //苹果        APP_IOS,
+     *         //IPAD        IPAD,
      *         //其他
      *         OTHER
      */
     public static final Map<String, String> ORDER_ORIGINS = new HashMap<>();
     static {
         ORDER_ORIGINS.put("WPA", PaymentApi.TradeType.JSAPI.name());
+        ORDER_ORIGINS.put("MINI_PROGRAM", PaymentApi.TradeType.JSAPI.name());
         ORDER_ORIGINS.put("APP_ANDROID", PaymentApi.TradeType.APP.name());
         ORDER_ORIGINS.put("APP_IOS", PaymentApi.TradeType.APP.name());
+        ORDER_ORIGINS.put("IPAD", PaymentApi.TradeType.APP.name());
     }
 
     public static String getAppId(String type) {
