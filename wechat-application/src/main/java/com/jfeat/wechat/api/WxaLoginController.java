@@ -32,6 +32,7 @@ import com.jfinal.wxaapp.api.WxaUserApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -141,6 +142,11 @@ public class WxaLoginController extends RestController {
             newUser.setSex(sex);
             newUser.setAppUser(User.APP_USER);
             newUser.setPassword(RandomKit.randomMD5Str());
+
+            HttpServletRequest request = getRequest();
+            String serverName = request.getServerName();
+            newUser.setDomain(serverName);
+
             Integer roleId = DefaultRole.me().getRoleProvider().getDefault().getId();
             Integer[] roles = new Integer[] { roleId };
             Ret ret = userService.createUser(newUser, roles);
