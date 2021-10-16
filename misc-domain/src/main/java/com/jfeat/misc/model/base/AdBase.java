@@ -18,6 +18,10 @@
  */
 package com.jfeat.misc.model.base;
 
+import com.alibaba.druid.util.StringUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.jfinal.plugin.activerecord.IBean;
 import com.jfeat.core.BaseModel;
 import java.math.BigDecimal;
@@ -37,6 +41,32 @@ public abstract class AdBase<M extends AdBase<?>> extends BaseModel<M> implement
         ENABLED("enabled"),
         TARGET_URL("target_url"),
         STRATEGY("strategy");
+
+        Fields(String name) {
+            this.name = name;
+        }
+
+        public String getUrl() {
+            if (!StringUtils.isEmpty(this.image)) {
+                try {
+                    JSONArray images = JSON.parseArray(this.image);
+                    if (images != null && images.size() > 0) {
+                        JSONObject img = images.getJSONObject(0);
+                        return img.getString("url");
+                    }
+                } catch (Exception var3) {
+                }
+            }
+            return this.image;
+        }
+        public String getImage() {
+            return this.image;
+        }
+
+        public Fields setImage(String image) {
+            this.image = image;
+            return this;
+        }
         
         private String name;
         Fields(String name) {
