@@ -46,27 +46,6 @@ public abstract class AdBase<M extends AdBase<?>> extends BaseModel<M> implement
             this.name = name;
         }
 
-        public String getUrl() {
-            if (!StringUtils.isEmpty(this.image)) {
-                try {
-                    JSONArray images = JSON.parseArray(this.image);
-                    if (images != null && images.size() > 0) {
-                        JSONObject img = images.getJSONObject(0);
-                        return img.getString("url");
-                    }
-                } catch (Exception var3) {
-                }
-            }
-            return this.image;
-        }
-        public String getImage() {
-            return this.image;
-        }
-
-        public Fields setImage(String image) {
-            this.image = image;
-            return this;
-        }
         
         private String name;
         Fields(String name) {
@@ -132,6 +111,20 @@ public abstract class AdBase<M extends AdBase<?>> extends BaseModel<M> implement
 
     public String getImage() {
         return (String) get(Fields.IMAGE.toString());
+    }
+
+    public String getUrl() {
+        if (!StringUtils.isEmpty(this.getImage)) {
+            try {
+                JSONArray images = JSON.parseArray(this.getImage);
+                if (images != null && images.size() > 0) {
+                    JSONObject img = images.getJSONObject(0);
+                    return img.getString("url");
+                }
+            } catch (Exception var3) {
+            }
+        }
+        return this.getImage;
     }
 
     public void setType(String var) {
